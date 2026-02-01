@@ -1,10 +1,9 @@
-
 /**
  * Conceptual API Routes for SMM Media Generation
  * Mimics production behavior with job IDs and polling
  */
 
-import { z } from 'https://esm.sh/zod';
+import { z } from 'zod';
 
 const ImageGenSchema = z.object({
   prompt: z.string().min(5),

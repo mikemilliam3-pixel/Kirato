@@ -3,6 +3,9 @@ import { MediaJob, MediaJobStatus } from '../ai/media.types';
 import { GoogleGenAI } from "@google/genai";
 import fs from 'node:fs/promises';
 import path from 'node:path';
+// Fix: Importing Node.js process and Buffer to resolve TypeScript global recognition issues
+import process from 'node:process';
+import { Buffer } from 'node:buffer';
 
 // Conceptual DB Store
 const JOBS_DB: Map<string, MediaJob> = new Map();
@@ -68,6 +71,7 @@ const processJob = async (id: string) => {
       }
 
       const fileName = `img-${id}.png`;
+      // Fix: Resolved missing property 'cwd' on type 'Process' by using explicit node:process import
       const publicPath = path.join(process.cwd(), 'public', 'generated');
       const filePath = path.join(publicPath, fileName);
 
@@ -75,6 +79,7 @@ const processJob = async (id: string) => {
       await fs.mkdir(publicPath, { recursive: true });
       
       // Save binary data
+      // Fix: Resolved missing name 'Buffer' by using explicit node:buffer import
       await fs.writeFile(filePath, Buffer.from(base64Image, 'base64'));
 
       const doneJob = { 

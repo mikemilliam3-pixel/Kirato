@@ -1,9 +1,8 @@
-
 /**
  * Conceptual API Route for Orders
  */
 
-import { z } from 'https://esm.sh/zod';
+import { z } from 'zod';
 
 const OrderStatusSchema = z.object({
   id: z.string(),

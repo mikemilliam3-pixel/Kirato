@@ -1,10 +1,9 @@
-
 /**
  * Conceptual API Route for Product CRUD
  * In a real Next.js environment, this would be in app/api/sales/products/route.ts
  */
 
-import { z } from 'https://esm.sh/zod';
+import { z } from 'zod';
 
 const ProductSchema = z.object({
   title: z.string().min(1),
