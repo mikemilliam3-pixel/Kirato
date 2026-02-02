@@ -24,6 +24,11 @@ export const translations: any = {
       back: "Orqaga",
       placeholder: "Hali tayyor emas...",
       search: "Qidirish...",
+      searchModules: "Modullarni qidirish...",
+      suggested: "Tavsiya etilgan",
+      suggestedModules: "Tavsiya etilgan modullar",
+      noModulesFound: "Modullar topilmadi",
+      pressEnter: "Ochish uchun Enterni bosing",
       notFoundTitle: "Sahifa topilmadi",
       notFoundDesc: "Siz qidirayotgan bo'lim mavjud emas yoki hali yakunlanmagan.",
       notifications: "Bildirishnomalar",
@@ -59,6 +64,15 @@ export const translations: any = {
       subscription_monthly_credits: "Tarif krediti",
       subscription_renewal_refill: "Tarif yangilanishi",
       credit_pack_purchase: "Kredit paketi xaridi"
+    },
+    nav: {
+      home: "Asosiy",
+      explore: "Explore",
+      profile: "Profil",
+      signIn: "Kirish",
+      signUp: "Ro'yxat",
+      logout: "Chiqish",
+      settings: "Sozlamalar"
     },
     profile: {
       title: "Mening Profilim",
@@ -102,6 +116,11 @@ export const translations: any = {
       back: "Назад",
       placeholder: "Еще не готово...",
       search: "Поиск...",
+      searchModules: "Поиск модулей...",
+      suggested: "Предложенные",
+      suggestedModules: "Предложенные модули",
+      noModulesFound: "Модули не найдены",
+      pressEnter: "Нажмите Enter чтобы открыть",
       notFoundTitle: "Страница не найдена",
       notFoundDesc: "Раздел, который вы ищете, не существует или находится в разработке.",
       notifications: "Уведомления",
@@ -138,6 +157,15 @@ export const translations: any = {
       subscription_renewal_refill: "Обновление тарифа",
       credit_pack_purchase: "Покупка пакета кредитов"
     },
+    nav: {
+      home: "Главная",
+      explore: "Поиск",
+      profile: "Профиль",
+      signIn: "Войти",
+      signUp: "Регистрация",
+      logout: "Выйти",
+      settings: "Настройки"
+    },
     profile: {
       title: "Мой Профиль",
       subtitle: "Личная информация",
@@ -160,6 +188,7 @@ export const translations: any = {
     }
   },
   EN: {
+    title: "Education",
     appName: "Kirato AI",
     appSubtitle: "ASSISTANT",
     homeTitle: "Select a project",
@@ -180,6 +209,11 @@ export const translations: any = {
       back: "Back",
       placeholder: "Not ready yet...",
       search: "Search...",
+      searchModules: "Search modules...",
+      suggested: "Suggested",
+      suggestedModules: "Suggested modules",
+      noModulesFound: "No modules found",
+      pressEnter: "Press Enter to open",
       notFoundTitle: "Page Not Found",
       notFoundDesc: "The section you are looking for does not exist or is under construction.",
       notifications: "Notifications",
@@ -215,6 +249,15 @@ export const translations: any = {
       subscription_monthly_credits: "Plan credits",
       subscription_renewal_refill: "Subscription renewal",
       credit_pack_purchase: "Credit pack purchase"
+    },
+    nav: {
+      home: "Home",
+      explore: "Explore",
+      profile: "Profile",
+      signIn: "Sign in",
+      signUp: "Sign up",
+      logout: "Logout",
+      settings: "Settings"
     },
     profile: {
       title: "My Profile",

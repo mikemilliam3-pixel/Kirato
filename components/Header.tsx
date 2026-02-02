@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
-  Moon, Sun, ChevronDown, Search, Bell, 
-  User, Settings, LogOut, Menu, Globe, LogIn, Coins
+  Moon, Sun, ChevronDown, Bell, 
+  User, Settings, LogOut, Menu, LogIn, Coins
 } from 'lucide-react';
 import { Language, UserProfile } from '../types';
 
@@ -15,9 +15,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { theme, toggleTheme, language, setLanguage, t, unreadNotifications, isLoggedIn, login, logout, credits } = useApp();
   const navigate = useNavigate();
+  
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const langRef = useRef<HTMLDivElement>(null);
@@ -29,13 +29,11 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       if (stored && isLoggedIn) {
         setUserProfile(JSON.parse(stored));
       } else if (isLoggedIn) {
-        const mockProfile = {
+        setUserProfile({
           fullName: 'John Doe',
           username: 'johndoe',
-          email: 'john.doe@kirato.ai',
           phone: '+998 90 123 45 67'
-        };
-        setUserProfile(mockProfile);
+        });
       } else {
         setUserProfile(null);
       }
@@ -59,58 +57,33 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  const handleLogin = () => {
-    login();
-    navigate('/');
-  };
-
-  const menuAction = (path: string) => {
-    setIsProfileOpen(false);
-    navigate(path);
-  };
-
   return (
     <header className="h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-b border-gray-100 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between sticky top-0 shrink-0">
       {/* Left: Mobile Toggle + Brand */}
-      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+      <div className="flex items-center gap-1 sm:gap-4 min-w-0">
         <button 
           onClick={toggleSidebar}
-          className="lg:hidden p-2 text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+          className="lg:hidden p-2 text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all shrink-0"
         >
           <Menu size={22} />
         </button>
-        <div className="hidden xs:flex flex-col cursor-pointer" onClick={() => navigate('/')}>
-          <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[2px] leading-tight">Kirato</h2>
-          <span className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">{t('appSubtitle')}</span>
-        </div>
-      </div>
-
-      {/* Center: Global Search - Responsive width */}
-      <div className={`
-        flex items-center gap-2 md:gap-3 px-3 md:px-4 h-11 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800
-        transition-all duration-300 flex-1 max-w-md mx-2 md:mx-8
-        ${searchFocused ? 'ring-2 ring-blue-500/20 border-blue-500/50 bg-white dark:bg-slate-900' : ''}
-      `}>
-        <Search size={18} className="text-slate-400 shrink-0" />
-        <input 
-          type="text" 
-          placeholder={t('common.search') || "Search..."} 
-          className="bg-transparent border-none text-[13px] font-bold w-full focus:ring-0 placeholder:text-gray-400"
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-        />
-        <div className="hidden lg:flex items-center gap-1 text-[10px] text-gray-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-1.5 py-0.5 rounded shadow-sm shrink-0">
-          <span className="font-mono">⌘</span>K
+        
+        {/* Branding Block: Mobile & Tablet Only */}
+        <div 
+          onClick={() => navigate('/')}
+          className="flex flex-col cursor-pointer ml-1 sm:ml-0 lg:hidden min-w-0"
+        >
+          <span className="text-sm sm:text-base font-black text-blue-600 leading-none tracking-tight truncate">
+            Kirato AI
+          </span>
+          <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[2px] mt-0.5 leading-none truncate">
+            Assistant
+          </span>
         </div>
       </div>
 
       {/* Right: Action Group */}
       <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-        
         {/* Credits Badge */}
         <button 
           onClick={() => navigate('/billing')}
@@ -156,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           )}
         </div>
 
-        {/* Auth Controlled Profile Dropdown */}
+        {/* Profile Dropdown */}
         {isLoggedIn ? (
           <div className="relative" ref={profileRef}>
             <button
@@ -175,7 +148,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             </button>
             
             {isProfileOpen && (
-              <div className="fixed md:absolute right-4 md:right-0 mt-3 w-[calc(100vw-2rem)] md:w-64 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-slate-800 p-2 overflow-hidden animate-in slide-in-from-top-2 duration-200 z-[100]">
+              <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-slate-800 p-2 overflow-hidden animate-in slide-in-from-top-2 duration-200 z-[100]">
                 <div className="px-4 py-4 border-b border-gray-50 dark:border-slate-800 mb-2">
                   <p className="text-xs font-black text-slate-900 dark:text-white">{userProfile?.fullName || 'John Doe'}</p>
                   <p className="text-[10px] font-bold text-gray-400 truncate">@{userProfile?.username || 'johndoe'}</p>
@@ -183,22 +156,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
                 <div className="space-y-1">
                   <button 
-                    onClick={() => menuAction('/notifications')}
+                    onClick={() => { setIsProfileOpen(false); navigate('/notifications'); }}
                     className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <Bell size={18} className="text-blue-600" />
                       <span>{t('common.notifications')}</span>
                     </div>
-                    {unreadNotifications > 0 && (
-                      <span className="w-5 h-5 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black">
-                        {unreadNotifications}
-                      </span>
-                    )}
                   </button>
                   
                   <button 
-                    onClick={() => menuAction('/profile')}
+                    onClick={() => { setIsProfileOpen(false); navigate('/profile'); }}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     <User size={18} className="text-blue-600" />
@@ -206,7 +174,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   </button>
 
                   <button 
-                    onClick={() => menuAction('/settings')}
+                    onClick={() => { setIsProfileOpen(false); navigate('/settings'); }}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     <Settings size={18} className="text-blue-600" />
@@ -217,7 +185,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 <div className="h-px bg-gray-50 dark:border-slate-800 my-2" />
                 
                 <button 
-                  onClick={handleLogout}
+                  onClick={() => { setIsProfileOpen(false); logout(); }}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
                 >
                   <LogOut size={18} />
@@ -227,21 +195,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleLogin}
-              className="hidden sm:flex px-4 py-2.5 bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-all active:scale-95"
-            >
-              {t('common.signIn')}
-            </button>
-            <button 
-              onClick={handleLogin}
-              className="flex px-4 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex items-center gap-2"
-            >
-              <LogIn size={14} className="sm:hidden" />
-              <span>{t('common.signUp')}</span>
-            </button>
-          </div>
+          <button 
+            onClick={() => { login(); navigate('/'); }}
+            className="flex px-4 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex items-center gap-2"
+          >
+            <LogIn size={14} className="sm:hidden" />
+            <span>{t('common.signUp')}</span>
+          </button>
         )}
       </div>
     </header>

@@ -1,6 +1,7 @@
+
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useApp, SUBSCRIPTION_PLANS } from '../context/AppContext';
 import { 
   Home, ShoppingBag, Megaphone, GraduationCap, 
   Laptop, Plane, Activity, Hammer, 
@@ -13,8 +14,11 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
-  const { t } = useApp();
+  const { t, subscription } = useApp();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const activePlan = (SUBSCRIPTION_PLANS as any)[subscription.planId];
 
   const menuItems = [
     { icon: Home, label: 'Home', path: '/', key: 'home' },
@@ -29,6 +33,37 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { icon: Mic, label: t('modules.voice.title'), path: '/modules/voice', key: 'voice' },
     { icon: Settings2, label: t('modules.automation.title'), path: '/modules/automation', key: 'automation' },
   ];
+
+  const handleBillingClick = () => {
+    navigate('/billing');
+    setIsOpen(false);
+  };
+
+  const renderNavLink = (item: any) => {
+    const isActive = item.path === '/' 
+      ? location.pathname === '/' 
+      : location.pathname.startsWith(item.path);
+    
+    const Icon = item.icon;
+
+    return (
+      <NavLink
+        key={item.key}
+        to={item.path}
+        onClick={() => setIsOpen(false)}
+        className={`
+          flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all
+          ${isActive 
+            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 shadow-sm' 
+            : 'text-slate-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'}
+        `}
+      >
+        <Icon size={20} className={isActive ? 'animate-pulse' : ''} />
+        <span className="flex-1 truncate">{item.label}</span>
+        {isActive && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />}
+      </NavLink>
+    );
+  };
 
   return (
     <>
@@ -48,10 +83,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         flex flex-col
       `}>
-        {/* Logo Section */}
-        <div className="h-20 flex items-center justify-between px-6 border-b border-gray-100 dark:border-slate-800">
+        {/* Original Logo Section */}
+        <div className="h-20 flex items-center justify-between px-6 border-b border-gray-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg rotate-3 group-hover:rotate-0 transition-transform">
+            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg">
               K
             </div>
             <div className="flex flex-col">
@@ -67,49 +102,29 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         {/* Navigation Scroll Area */}
         <nav className="flex-1 overflow-y-auto py-6 px-4 no-scrollbar">
           <div className="space-y-1.5">
-            {menuItems.map((item) => {
-              const isActive = item.path === '/' 
-                ? location.pathname === '/' 
-                : location.pathname.startsWith(item.path);
-              
-              // Added: Extract icon to a capitalized variable to satisfy JSX component requirements and aid parser stability
-              const Icon = item.icon;
-
-              return (
-                <NavLink
-                  key={item.key}
-                  to={item.path}
-                  // Fixed: Removed the incorrect 'lg:' label which was breaking JS syntax and scoping
-                  onClick={() => setIsOpen(false)}
-                  className={`
-                    flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all
-                    ${isActive 
-                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 shadow-sm' 
-                      : 'text-slate-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'}
-                  `}
-                >
-                  {/* Fixed: Use the capitalized Icon variable for the component name */}
-                  <Icon size={20} className={isActive ? 'animate-pulse' : ''} />
-                  <span className="flex-1 truncate">{item.label}</span>
-                  {isActive && <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />}
-                </NavLink>
-              );
-            })}
+            {menuItems.map(renderNavLink)}
           </div>
         </nav>
 
         {/* Sidebar Footer */}
         <div className="p-6 border-t border-gray-100 dark:border-slate-800">
-          <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-3xl flex items-center gap-3">
-             <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600">
+          <button 
+            onClick={handleBillingClick}
+            className="w-full p-4 bg-gray-50 dark:bg-slate-950 rounded-3xl flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group"
+          >
+             <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                <Settings2 size={20} />
              </div>
-             <div className="flex-1 min-w-0">
-               <p className="text-xs font-black truncate">Free Plan</p>
-               <p className="text-[10px] text-gray-500 font-bold">Manage Billing</p>
+             <div className="flex-1 min-w-0 text-left">
+               <p className="text-xs font-black truncate text-slate-900 dark:text-white">
+                 {activePlan.name} Plan
+               </p>
+               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">
+                 {t('common.billing')}
+               </p>
              </div>
-             <ChevronRight size={14} className="text-gray-400" />
-          </div>
+             <ChevronRight size={14} className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+          </button>
         </div>
       </aside>
     </>
