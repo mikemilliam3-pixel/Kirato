@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
 import { 
   ShoppingCart, Search, Heart, Star, ChevronLeft, ArrowRight, 
   Check, Plus, ShieldCheck, MapPin, Clock, AlertTriangle, MessageSquare, 
-  Send, X, ThumbsUp, Phone, Image as ImageIcon, Sparkles
+  Send, X, ThumbsUp, Phone, Image as ImageIcon, Sparkles, LogIn, Copy
 } from 'lucide-react';
-import { ShopProfile, Message, Conversation, ShopWorkingHours, VerificationStatus } from '../types';
+import { ShopProfile, Message, Conversation, ShopWorkingHours, VerificationStatus, Product } from '../types';
 import { chatService } from '../chatService';
 
 interface SellerReview {
@@ -26,20 +28,28 @@ interface SellerReport {
 }
 
 const PublicShop: React.FC = () => {
-  const { language } = useApp();
+  const { language, isLoggedIn, login, t: globalT } = useApp();
+  const location = useLocation();
+  const navigate = useNavigate();
   const t = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
   const ts = t.publicShop;
   const tc = t.chat;
   const tSettings = t.settings;
 
+  // --- DEEP LINK ROUTING LOGIC ---
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const deepLinkedProductId = queryParams.get('productId');
+  const deepLinkedShopId = queryParams.get('shopId');
+
   const [cartCount, setCartCount] = useState(0);
   const [view, setView] = useState<'browse' | 'product'>('browse');
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // Modals State
   const [showRateModal, setShowRateModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showChatPanel, setShowChatPanel] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // Chat State
@@ -79,6 +89,17 @@ const PublicShop: React.FC = () => {
     bannerUrl: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&q=80'
   });
 
+  const products: Product[] = useMemo(() => {
+    const saved = localStorage.getItem('kirato-sales-products');
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: '1', title: 'Wireless Headphones', price: 59.99, images: ['🎧'], shortDescription: 'Premium noise-cancelling headphones.', fullDescription: '', category: 'electronics', tags: [], currency: 'USD', stock: 10, status: 'active', visibility: 'public', approvalRequired: false, trialAvailable: false, createdAt: '' },
+      { id: '2', title: 'Minimalist Wallet', price: 25.00, images: ['💼'], shortDescription: 'RFID blocking slim wallet.', fullDescription: '', category: 'electronics', tags: [], currency: 'USD', stock: 10, status: 'active', visibility: 'public', approvalRequired: false, trialAvailable: false, createdAt: '' },
+      { id: '3', title: 'Smart Watch X', price: 129.00, images: ['⌚'], shortDescription: 'Full health tracking.', fullDescription: '', category: 'electronics', tags: [], currency: 'USD', stock: 10, status: 'active', visibility: 'public', approvalRequired: false, trialAvailable: false, createdAt: '' },
+      { id: '4', title: 'Bamboo Cup', price: 18.50, images: ['☕'], shortDescription: 'Eco-friendly reusable coffee cup.', fullDescription: '', category: 'electronics', tags: [], currency: 'USD', stock: 10, status: 'active', visibility: 'public', approvalRequired: false, trialAvailable: false, createdAt: '' },
+    ];
+  }, []);
+
   const loadProfile = () => {
     const saved = localStorage.getItem('kirato-sales-shop-profile');
     if (saved) {
@@ -93,9 +114,23 @@ const PublicShop: React.FC = () => {
     return () => window.removeEventListener('shop-profile-updated', loadProfile);
   }, []);
 
+  // Handle Deep Linking
+  useEffect(() => {
+    if (deepLinkedProductId) {
+      const p = products.find(prod => prod.id === deepLinkedProductId);
+      if (p) {
+        setSelectedProduct(p);
+        setView('product');
+      }
+    } else {
+      setView('browse');
+      setSelectedProduct(null);
+    }
+  }, [deepLinkedProductId, products]);
+
   // Real-time Chat Sync
   useEffect(() => {
-    if (showChatPanel) {
+    if (showChatPanel && isLoggedIn) {
       const conv = chatService.getOrCreateConversation(seller.id, buyerId, 'Guest User');
       setCurrentConv(conv);
       setChatMessages(chatService.getMessages(conv.id));
@@ -109,7 +144,7 @@ const PublicShop: React.FC = () => {
         }
       });
     }
-  }, [showChatPanel, seller.id, buyerId]);
+  }, [showChatPanel, seller.id, buyerId, isLoggedIn]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -151,13 +186,6 @@ const PublicShop: React.FC = () => {
     return `${daysStr} · ${typedWH.startTime}–${typedWH.endTime}`;
   }, [seller.workingHours, language, tSettings]);
 
-  const products = [
-    { id: '1', title: 'Wireless Headphones', price: 59.99, image: '🎧', rating: 4.8, desc: 'Premium noise-cancelling headphones with up to 30 hours of battery life and studio-quality sound.' },
-    { id: '2', title: 'Minimalist Wallet', price: 25.00, image: '💼', rating: 4.5, desc: 'RFID blocking slim wallet made from high-grade carbon fiber.' },
-    { id: '3', title: 'Smart Watch X', price: 129.00, image: '⌚', rating: 4.9, desc: 'Full health tracking, GPS navigation, and 7-day battery life.' },
-    { id: '4', title: 'Bamboo Cup', price: 18.50, image: '☕', rating: 4.2, desc: 'Eco-friendly reusable coffee cup made from organic bamboo fibers.' },
-  ];
-
   const [reviews, setReviews] = useState<SellerReview[]>([]);
   useEffect(() => {
     const stored = localStorage.getItem('kirato-sales-reviews');
@@ -174,6 +202,7 @@ const PublicShop: React.FC = () => {
   }, [reviews, seller.id]);
 
   const handleRateSubmit = () => {
+    if (!isLoggedIn) { setShowAuthModal(true); return; }
     const newReview: SellerReview = {
       id: Math.random().toString(36).substr(2, 9),
       sellerId: seller.id,
@@ -191,6 +220,7 @@ const PublicShop: React.FC = () => {
   };
 
   const handleReportSubmit = () => {
+    if (!isLoggedIn) { setShowAuthModal(true); return; }
     const report: SellerReport = {
       id: Math.random().toString(36).substr(2, 9),
       sellerId: seller.id,
@@ -211,51 +241,92 @@ const PublicShop: React.FC = () => {
     setTimeout(() => setSuccessMsg(null), 3000);
   };
 
-  const openProduct = (p: any) => {
-    setSelectedProduct(p);
-    setView('product');
+  const openProduct = (p: Product) => {
+    navigate(`?shopId=${seller.id}&productId=${p.id}`);
   };
 
-  if (view === 'product') {
+  const closeProduct = () => {
+    navigate(`?shopId=${seller.id}`);
+  };
+
+  const authGuardedAction = (callback: () => void) => {
+    if (isLoggedIn) {
+      callback();
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
+  const handleModalLogin = () => {
+    login();
+    setShowAuthModal(false);
+    triggerSuccess("Successfully logged in!");
+  };
+
+  if (view === 'product' && selectedProduct) {
     return (
-      <div className="space-y-6 animate-in slide-in-from-right duration-300 pb-24 relative">
-         <button onClick={() => setView('browse')} className="flex items-center gap-1 text-xs font-bold text-rose-600 transition-transform active:translate-x-[-4px]">
+      <div className="space-y-6 animate-in slide-in-from-right duration-300 pb-24 relative max-w-5xl mx-auto">
+         <button onClick={closeProduct} className="flex items-center gap-1 text-xs font-bold text-rose-600 transition-transform active:translate-x-[-4px]">
            <ChevronLeft size={18} /> Back to Shop
          </button>
-         <div className="aspect-square sm:aspect-video bg-white dark:bg-slate-800 rounded-[40px] flex items-center justify-center text-8xl shadow-lg border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
-           <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent pointer-events-none" />
-           {selectedProduct?.image}
-         </div>
-         <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-               <h3 className="text-2xl font-black tracking-tight">{selectedProduct?.title}</h3>
-               <span className="text-2xl font-black text-rose-600">${selectedProduct?.price}</span>
+         
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="aspect-square bg-white dark:bg-slate-800 rounded-[40px] flex items-center justify-center text-8xl shadow-lg border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent pointer-events-none" />
+              {selectedProduct.images[0]?.length < 50 ? selectedProduct.images[0] : <img src={selectedProduct.images[0]} className="w-full h-full object-cover" />}
             </div>
-            <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50 dark:bg-amber-900/20 w-fit px-3 py-1 rounded-full">
-               <Star size={14} fill="currentColor" />
-               <span className="text-xs font-black uppercase tracking-wider">{selectedProduct?.rating} (Verified Purchase)</span>
+            
+            <div className="space-y-6">
+              <div className="space-y-3">
+                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                    <h3 className="text-3xl font-black tracking-tight">{selectedProduct.title}</h3>
+                    <span className="text-3xl font-black text-rose-600">${selectedProduct.price}</span>
+                 </div>
+                 <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50 dark:bg-amber-900/20 w-fit px-3 py-1 rounded-full">
+                    <Star size={14} fill="currentColor" />
+                    <span className="text-[10px] font-black uppercase tracking-wider">4.8 (Verified Purchase)</span>
+                 </div>
+              </div>
+              
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                {selectedProduct.shortDescription || 'No description provided.'}
+              </p>
+
+              <div className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <button 
+                   onClick={() => { setCartCount(c => c + 1); triggerSuccess("Item added to cart"); }}
+                   className="w-full h-14 bg-rose-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all"
+                 >
+                   Add to Cart <ShoppingCart size={20} />
+                 </button>
+                 <button 
+                   onClick={() => authGuardedAction(() => setShowChatPanel(true))}
+                   className="w-full h-14 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-gray-100 dark:border-slate-700 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all"
+                 >
+                   Contact Seller <MessageSquare size={20} />
+                 </button>
+              </div>
             </div>
-         </div>
-         <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-           {selectedProduct?.desc}
-         </p>
-         <div className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button 
-              onClick={() => { setCartCount(c => c + 1); triggerSuccess("Item added to cart"); }}
-              className="w-full h-14 bg-rose-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all"
-            >
-              Add to Cart <ShoppingCart size={20} />
-            </button>
-            <button 
-              onClick={() => setShowChatPanel(true)}
-              className="w-full h-14 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-gray-100 dark:border-slate-700 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all"
-            >
-              Contact Seller <MessageSquare size={20} />
-            </button>
          </div>
 
+         {/* More products section */}
+         <section className="pt-12 space-y-6">
+            <h4 className="text-lg font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{ts.moreFromShop}</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+               {products.filter(p => p.id !== selectedProduct.id).slice(0, 4).map(p => (
+                 <div key={p.id} onClick={() => openProduct(p)} className="bg-white dark:bg-slate-800 rounded-3xl p-3 border border-gray-100 dark:border-slate-700 shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-95 group">
+                    <div className="aspect-square rounded-2xl bg-gray-50 dark:bg-slate-900 flex items-center justify-center text-3xl mb-3 overflow-hidden">
+                       {p.images[0]?.length < 50 ? p.images[0] : <img src={p.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />}
+                    </div>
+                    <h5 className="text-[11px] font-black truncate">{p.title}</h5>
+                    <p className="text-xs font-black text-rose-600 mt-1">${p.price}</p>
+                 </div>
+               ))}
+            </div>
+         </section>
+
          <button 
-           onClick={() => setShowChatPanel(true)}
+           onClick={() => authGuardedAction(() => setShowChatPanel(true))}
            className="fixed bottom-24 sm:bottom-10 right-5 sm:right-10 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-rose-600 to-rose-500 text-white rounded-full flex items-center justify-center shadow-2xl shadow-rose-500/40 z-50 active:scale-90 transition-transform animate-in zoom-in duration-500"
            title={ts.chatFloatingBtn}
          >
@@ -268,7 +339,7 @@ const PublicShop: React.FC = () => {
   return (
     <div className="space-y-6 sm:space-y-8 pb-32 max-w-7xl mx-auto relative">
       <button 
-        onClick={() => setShowChatPanel(true)}
+        onClick={() => authGuardedAction(() => setShowChatPanel(true))}
         className="fixed bottom-24 sm:bottom-10 right-5 sm:right-10 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-rose-600 to-rose-500 text-white rounded-full flex items-center justify-center shadow-2xl shadow-rose-500/40 z-50 active:scale-90 transition-transform animate-in zoom-in duration-500"
         title={ts.chatFloatingBtn}
       >
@@ -312,12 +383,6 @@ const PublicShop: React.FC = () => {
                         <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">{ts.verified}</span>
                      </div>
                    )}
-                   {seller.verificationStatus === 'pending' && (
-                     <div className="flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 rounded-full border border-amber-100 dark:border-amber-900/40">
-                        <Clock size={12} />
-                        <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest">{ts.verificationPending}</span>
-                     </div>
-                   )}
                    <div className="flex items-center gap-1 text-amber-500 bg-amber-50/50 dark:bg-amber-900/10 px-2 py-0.5 rounded-full sm:bg-transparent">
                       <Star size={14} fill="currentColor" />
                       <span className="text-xs font-black">{avgRating}</span>
@@ -327,17 +392,17 @@ const PublicShop: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <button onClick={() => setShowRateModal(true)} className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-3 bg-gray-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">
+              <button onClick={() => authGuardedAction(() => setShowRateModal(true))} className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-3 bg-gray-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">
                 <ThumbsUp size={14} /> {ts.rateBtn}
               </button>
-              <button onClick={() => setShowReportModal(true)} className="flex items-center gap-2 p-2 sm:p-3 bg-gray-50 dark:bg-slate-900 text-gray-400 rounded-xl sm:rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">
+              <button onClick={() => authGuardedAction(() => setShowReportModal(true))} className="flex items-center gap-2 p-2 sm:p-3 bg-gray-50 dark:bg-slate-900 text-gray-400 rounded-xl sm:rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-all active:scale-95">
                 <AlertTriangle size={18} />
               </button>
             </div>
           </div>
 
           {seller.description && (
-            <p className="mt-4 sm:mt-8 text-[11px] sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium max-w-2xl text-center sm:text-left mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none">
+            <p className="mt-4 sm:mt-8 text-[11px] sm:sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium max-w-2xl text-center sm:text-left mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none">
               {seller.description}
             </p>
           )}
@@ -368,27 +433,27 @@ const PublicShop: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
           {products.map((p) => (
             <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[24px] sm:rounded-[32px] overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all group flex flex-col">
               <div onClick={() => openProduct(p)} className="h-32 sm:h-56 bg-gray-50 dark:bg-slate-900 flex items-center justify-center text-4xl sm:text-7xl cursor-pointer group-hover:scale-105 transition-transform duration-500 relative">
-                {p.image}
+                {p.images[0]?.length < 50 ? p.images[0] : <img src={p.images[0]} className="w-full h-full object-cover" />}
               </div>
               <div className="p-3 sm:p-5 space-y-2 sm:space-y-4 flex-1 flex flex-col">
                 <div className="space-y-0.5">
                   <h4 onClick={() => openProduct(p)} className="font-black text-xs sm:text-base cursor-pointer hover:text-rose-600 transition-colors truncate">{p.title}</h4>
-                  <p className="text-[9px] sm:text-[10px] text-gray-400 line-clamp-1 leading-relaxed">{p.desc}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-400 line-clamp-1 leading-relaxed">{p.shortDescription}</p>
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <span className="text-sm sm:text-lg font-black text-rose-600 tracking-tight">${p.price}</span>
-                  <div className="flex items-center gap-0.5 sm:gap-1 text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-lg text-[8px] sm:text-[10px] font-black"><Star size={10} fill="currentColor" /> {p.rating}</div>
+                  <div className="flex items-center gap-0.5 sm:gap-1 text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-lg text-[8px] sm:text-[10px] font-black"><Star size={10} fill="currentColor" /> 4.8</div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 sm:pt-2">
-                   <button onClick={() => setShowChatPanel(true)} className="py-1.5 sm:py-2.5 bg-gray-50 dark:bg-slate-900 text-slate-500 rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all active:scale-95">
+                   <button onClick={() => authGuardedAction(() => setShowChatPanel(true))} className="py-1.5 sm:py-2.5 bg-gray-50 dark:bg-slate-900 text-slate-500 rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all active:scale-95">
                      {ts.contactBtn}
                    </button>
-                   <button onClick={() => triggerSuccess("Request sent to seller")} className="py-1.5 sm:py-2.5 bg-rose-600 text-white rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all">
-                     {ts.requestBtn}
+                   <button onClick={() => openProduct(p)} className="py-1.5 sm:py-2.5 bg-rose-600 text-white rounded-lg sm:rounded-xl text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all">
+                     {ts.openProduct}
                    </button>
                 </div>
               </div>
@@ -397,14 +462,44 @@ const PublicShop: React.FC = () => {
         </div>
       </section>
 
-      {/* --- MODALS & PANELS --- */}
+      {/* --- Modals & Panels remains the same as previous implementations --- */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAuthModal(false)} />
+          <div className="relative w-full max-sm:max-w-xs bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+             <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <LogIn size={32} />
+             </div>
+             <h4 className="text-xl font-black mb-2">{globalT('common.loginRequired')}</h4>
+             <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">{globalT('common.loginRequiredDesc')}</p>
+             <div className="space-y-3">
+                <button 
+                  onClick={handleModalLogin}
+                  className="w-full py-4 bg-rose-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                >
+                  {globalT('common.signIn')}
+                </button>
+                <button 
+                  onClick={handleModalLogin}
+                  className="w-full py-4 bg-gray-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest text-[10px] border border-gray-100 dark:border-slate-700 active:scale-95 transition-all"
+                >
+                  {globalT('common.signUp')}
+                </button>
+                <button 
+                  onClick={() => setShowAuthModal(false)}
+                  className="w-full py-3 text-slate-400 font-bold uppercase text-[10px]"
+                >
+                  {globalT('common.cancel')}
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
 
-      {/* Chat Panel - Bottom Sheet for Mobile, Modal for Desktop */}
-      {showChatPanel && (
+      {showChatPanel && isLoggedIn && (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowChatPanel(false)} />
            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[32px] sm:rounded-[32px] h-[85vh] sm:h-[600px] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-500">
-              {/* Chat Header */}
               <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center"><MessageSquare size={22}/></div>
@@ -415,18 +510,12 @@ const PublicShop: React.FC = () => {
                           <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">
                             {currentConv?.sellerPresence === 'online' ? ts.online : ts.offline}
                           </span>
-                          {currentConv?.handoffMode === 'ai' && (
-                            <span className="flex items-center gap-1 text-[8px] font-black text-purple-400 uppercase tracking-widest ml-2">
-                              <Sparkles size={8}/> AI Active
-                            </span>
-                          )}
                        </div>
                     </div>
                  </div>
                  <button onClick={() => setShowChatPanel(false)} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-slate-600"><X size={24}/></button>
               </div>
 
-              {/* Chat Messages */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar bg-gray-50/50 dark:bg-slate-950/30">
                  {chatMessages.length === 0 ? (
                    <div className="h-full flex flex-col items-center justify-center opacity-30 text-center px-10">
@@ -445,7 +534,7 @@ const PublicShop: React.FC = () => {
                         }`}>
                            <p className="text-xs font-medium leading-relaxed">{msg.text}</p>
                            <div className="flex items-center justify-between gap-4 mt-1 opacity-60">
-                              {msg.sender === 'ai' && <span className="text-[7px] font-black uppercase tracking-widest flex items-center gap-1"><Sparkles size={8}/> AI Assistant</span>}
+                              {msg.sender === 'ai' && <span className="text-[7px] font-black uppercase tracking-widest flex items-center gap-1"><Sparkles size={8}/> AI Answer</span>}
                               <span className="text-[8px] font-black ml-auto">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                            </div>
                         </div>
@@ -454,7 +543,6 @@ const PublicShop: React.FC = () => {
                  )}
               </div>
 
-              {/* Chat Input */}
               <div className="p-5 border-t border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                  <div className="flex gap-2 p-1.5 bg-gray-50 dark:bg-slate-800 rounded-[20px] shadow-inner">
                     <input 
@@ -478,8 +566,7 @@ const PublicShop: React.FC = () => {
         </div>
       )}
 
-      {/* Rate Modal */}
-      {showRateModal && (
+      {showRateModal && isLoggedIn && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowRateModal(false)} />
           <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
@@ -505,8 +592,7 @@ const PublicShop: React.FC = () => {
         </div>
       )}
 
-      {/* Report Modal */}
-      {showReportModal && (
+      {showReportModal && isLoggedIn && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowReportModal(false)} />
           <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-200">

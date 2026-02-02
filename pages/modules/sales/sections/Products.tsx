@@ -1,18 +1,20 @@
 
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
 import { 
   Search, Plus, MoreVertical, X, Image as ImageIcon, 
   Video, DollarSign, Info, Tag, Check, Layout, Sparkles, Eye, EyeOff, Globe,
-  Upload, Trash2, RefreshCw
+  Upload, Trash2, RefreshCw, Copy, Share2, Link as LinkIcon
 } from 'lucide-react';
-import { Product, ProductStatus, ProductVisibility } from '../types';
+import { Product, ProductStatus, ProductVisibility, IntegrationConfig } from '../types';
 
 const PRODUCT_CATEGORIES = [
   'clothing', 'shoes', 'bags', 'electronics', 'home', 
   'beauty', 'kids', 'sports', 'auto', 'books', 'food', 'other'
 ];
+
+const DEFAULT_PLATFORM_BOT = "kirato_market_bot";
 
 const Products: React.FC = () => {
   const { language } = useApp();
@@ -22,8 +24,25 @@ const Products: React.FC = () => {
 
   const [filter, setFilter] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // --- Initial State for New Product ---
+  // --- Bot Context ---
+  const botUsername = useMemo(() => {
+    const saved = localStorage.getItem('kirato-sales-integrations');
+    if (saved) {
+      const integrations = JSON.parse(saved);
+      if (integrations.tg?.connected && integrations.tg.botMode === 'own') {
+        return integrations.tg.botUsername || DEFAULT_PLATFORM_BOT;
+      }
+    }
+    return DEFAULT_PLATFORM_BOT;
+  }, []);
+
+  const generateDeepLink = (productId: string) => {
+    const shopId = "seller_kirato";
+    return `https://t.me/${botUsername}?startapp=shop_${shopId}_p_${productId}`;
+  };
+
   const initialProductState: Partial<Product> = {
     title: '',
     shortDescription: '',
@@ -42,8 +61,35 @@ const Products: React.FC = () => {
   };
 
   const [form, setForm] = useState<Partial<Product>>(initialProductState);
-  
-  // Media State (Files + Previews)
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kirato-sales-products');
+    if (saved) {
+      setProducts(JSON.parse(saved));
+    } else {
+      setProducts([
+        { 
+          id: '1', 
+          title: 'Wireless Headphones', 
+          shortDescription: 'High quality sound',
+          fullDescription: '# Best Headphones\n- Great Bass\n- Long Battery',
+          category: 'electronics', 
+          tags: ['audio', 'tech'],
+          price: 59.99, 
+          currency: 'USD',
+          stock: 12, 
+          status: 'active', 
+          visibility: 'public',
+          approvalRequired: false,
+          trialAvailable: false,
+          images: ['🎧'],
+          createdAt: new Date().toISOString()
+        }
+      ]);
+    }
+  }, []);
+
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -57,44 +103,6 @@ const Products: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [products, setProducts] = useState<Product[]>([
-    { 
-      id: '1', 
-      title: 'Wireless Headphones', 
-      shortDescription: 'High quality sound',
-      fullDescription: '# Best Headphones\n- Great Bass\n- Long Battery',
-      category: 'electronics', 
-      tags: ['audio', 'tech'],
-      price: 59.99, 
-      currency: 'USD',
-      stock: 12, 
-      status: 'active', 
-      visibility: 'public',
-      approvalRequired: false,
-      trialAvailable: false,
-      images: ['🎧'],
-      createdAt: new Date().toISOString()
-    },
-    { 
-      id: '2', 
-      title: 'Smart Watch X', 
-      shortDescription: 'Feature rich watch',
-      fullDescription: '# Smart Watch\nTracking every step.',
-      category: 'electronics', 
-      tags: ['health', 'wearable'],
-      price: 129.00, 
-      currency: 'USD',
-      stock: 0, 
-      status: 'out_of_stock', 
-      visibility: 'public',
-      approvalRequired: false,
-      trialAvailable: true,
-      trialDays: 14,
-      images: ['⌚'],
-      createdAt: new Date().toISOString()
-    },
-  ]);
-
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title) newErrors.title = tForm.errors.name;
@@ -106,20 +114,17 @@ const Products: React.FC = () => {
 
   const handleSave = () => {
     if (!validate()) return;
-
     const finalStatus: ProductStatus = form.approvalRequired ? 'pending' : (form.status || 'draft');
-
     const newProduct: Product = {
       ...form as Product,
       id: Math.random().toString(36).substr(2, 9),
       status: finalStatus,
       createdAt: new Date().toISOString(),
-      // In a real app, you'd upload these files and get URLs back
-      // For now we use the local preview or fallback icon
       images: coverPreview ? [coverPreview, ...galleryPreviews] : ['📦']
     };
-
-    setProducts([newProduct, ...products]);
+    const updated = [newProduct, ...products];
+    setProducts(updated);
+    localStorage.setItem('kirato-sales-products', JSON.stringify(updated));
     resetForm();
   };
 
@@ -131,6 +136,13 @@ const Products: React.FC = () => {
     setVideoFile(null);
     setSampleOutputFile(null);
     setErrors({});
+  };
+
+  const copyLink = (productId: string) => {
+    const link = generateDeepLink(productId);
+    navigator.clipboard.writeText(link);
+    setSuccessMsg(moduleT.publicShop.success.linkCopied);
+    setTimeout(() => setSuccessMsg(null), 3000);
   };
 
   const addTag = () => {
@@ -166,7 +178,6 @@ const Products: React.FC = () => {
     { id: 'out_of_stock', label: t.outOfStock }
   ];
 
-  // Helper for file inputs
   const FileInput = ({ 
     label, 
     accept = "image/*", 
@@ -208,6 +219,12 @@ const Products: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-24 max-w-7xl mx-auto">
+      {successMsg && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[150] bg-emerald-500 text-white px-6 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 font-black text-xs uppercase tracking-widest flex items-center gap-2">
+          <Check size={18} /> {successMsg}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h3 className="font-black text-xl md:text-2xl tracking-tight">{t.inventory}</h3>
         <button 
@@ -231,7 +248,7 @@ const Products: React.FC = () => {
               className={`px-5 h-14 rounded-[20px] text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border shrink-0 ${
                 filter === s.id 
                   ? 'bg-rose-600 border-rose-600 text-white shadow-lg' 
-                  : 'bg-white dark:bg-slate-800 text-slate-400 border-gray-100 dark:border-slate-700 hover:text-slate-600 dark:hover:text-slate-200'
+                  : 'bg-white dark:bg-slate-800 text-slate-400 border border-gray-100 dark:border-slate-700 hover:text-slate-600 dark:hover:text-slate-200'
               }`}
             >
               {s.label}
@@ -243,7 +260,6 @@ const Products: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {filtered.map((product) => {
           const badge = getStatusBadge(product.status);
-          // Fix: Safely lookup category translation and ensure it's a string for React rendering to avoid object-as-child errors
           const categories = t.categories as Record<string, string>;
           const translatedCategory = categories[product.category] || categories.other || product.category;
           
@@ -262,15 +278,23 @@ const Products: React.FC = () => {
                     <MoreVertical size={20} />
                   </button>
                 </div>
-                {/* Fix: Ensured translatedCategory is treated as ReactNode to satisfy TypeScript */}
                 <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 font-black uppercase tracking-widest">{translatedCategory as React.ReactNode}</p>
               </div>
+
+              {/* Product Deep Link Section */}
+              <div className="mt-2 p-3 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700 space-y-1.5">
+                 <div className="flex justify-between items-center px-1">
+                   <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{t.productLink}</span>
+                   <button onClick={() => copyLink(product.id)} className="text-rose-600 hover:text-rose-500 transition-colors"><Copy size={12}/></button>
+                 </div>
+                 <p className="text-[9px] font-bold text-slate-500 dark:text-slate-400 truncate">{generateDeepLink(product.id)}</p>
+              </div>
+
               <div className="flex items-center justify-between pt-2 mt-auto">
                 <span className="text-base sm:text-lg font-black text-rose-600 tracking-tight">${product.price}</span>
                 <div className="flex items-center gap-1.5">
                    <div className={`w-2 h-2 rounded-full ${product.visibility === 'public' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                    <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
-                     {/* Fix: Index access on 't' could return an object (categories), cast to any to ensure we only render the string parts like 'public'/'private' label */}
                      {((t as any)[product.visibility] || product.visibility) as React.ReactNode}
                    </span>
                 </div>
@@ -280,12 +304,11 @@ const Products: React.FC = () => {
         })}
       </div>
 
-      {/* --- New Product Modal --- */}
+      {/* --- Modal Form - Kept as is --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={resetForm} />
           <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[40px] p-0 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-hidden flex flex-col">
-            {/* Header */}
             <div className="flex justify-between items-center p-8 border-b border-gray-100 dark:border-slate-800 shrink-0">
               <h4 className="text-2xl font-black tracking-tight flex items-center gap-3">
                 <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl flex items-center justify-center">
@@ -296,9 +319,7 @@ const Products: React.FC = () => {
               <button onClick={resetForm} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-slate-600 transition-colors"><X size={28}/></button>
             </div>
 
-            {/* Scrollable Body */}
             <div className="flex-1 overflow-y-auto p-8 no-scrollbar space-y-12">
-              {/* 1. Basic Info */}
               <section className="space-y-6">
                 <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.basicInfo}</h5>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -322,7 +343,6 @@ const Products: React.FC = () => {
                     >
                       {PRODUCT_CATEGORIES.map(catKey => (
                         <option key={catKey} value={catKey}>
-                          {/* Fix: Ensured lookup is cast correctly for display in select option */}
                           {((t.categories as any)[catKey] || catKey) as React.ReactNode}
                         </option>
                       ))}
@@ -370,19 +390,15 @@ const Products: React.FC = () => {
                 </div>
               </section>
 
-              {/* 2. Media */}
               <section className="space-y-6">
                 <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.media}</h5>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Cover Image */}
                   <FileInput 
                     label={tForm.coverLabel}
                     preview={coverPreview}
                     onChange={(e: any) => setCoverFile(e.target.files[0])}
                     onRemove={() => setCoverFile(null)}
                   />
-
-                  {/* Demo Video */}
                   <FileInput 
                     label={tForm.videoLabel}
                     accept="video/mp4,video/webm"
@@ -391,8 +407,6 @@ const Products: React.FC = () => {
                     onRemove={() => setVideoFile(null)}
                   />
                 </div>
-
-                {/* Gallery */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.galleryLabel}</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -420,21 +434,8 @@ const Products: React.FC = () => {
                     </label>
                   </div>
                 </div>
-
-                {/* Conditional Sample Output - Kept for structure but disabled for current categories */}
-                {['AI tools', 'Prompt'].includes(form.category || '') && (
-                  <div className="animate-in fade-in slide-in-from-top-2">
-                    <FileInput 
-                      label={tForm.sampleLabel}
-                      preview={sampleOutputPreview}
-                      onChange={(e: any) => setSampleOutputFile(e.target.files[0])}
-                      onRemove={() => setSampleOutputFile(null)}
-                    />
-                  </div>
-                )}
               </section>
 
-              {/* 3. Pricing */}
               <section className="space-y-6">
                 <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.pricing}</h5>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -491,21 +492,8 @@ const Products: React.FC = () => {
                     <div className={`w-5 h-5 bg-white rounded-full transition-transform ${form.trialAvailable ? 'translate-x-7' : ''}`} />
                   </button>
                 </div>
-                {form.trialAvailable && (
-                  <div className="space-y-2 animate-in slide-in-from-top-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.trialDaysLabel}</label>
-                    <input 
-                      type="number" 
-                      value={form.trialDays}
-                      onChange={e => setForm({ ...form, trialDays: parseInt(e.target.value) })}
-                      className="w-full h-12 px-5 bg-gray-50 dark:bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs" 
-                      placeholder="7"
-                    />
-                  </div>
-                )}
               </section>
 
-              {/* 4. Status & Visibility */}
               <section className="space-y-8">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
@@ -565,7 +553,6 @@ const Products: React.FC = () => {
               </section>
             </div>
 
-            {/* Footer Actions */}
             <div className="p-8 border-t border-gray-100 dark:border-slate-800 bg-gray-100/50 dark:bg-slate-900/50 flex gap-4 shrink-0">
                <button 
                 onClick={resetForm}

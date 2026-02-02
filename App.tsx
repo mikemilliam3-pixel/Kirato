@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
@@ -16,6 +17,12 @@ import LegalPage from './pages/modules/LegalPage';
 import ResumePage from './pages/modules/ResumePage';
 import VoicePage from './pages/modules/VoicePage';
 import AutomationPage from './pages/modules/AutomationPage';
+
+// New Global Pages
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
+import Billing from './pages/Billing';
 
 const NotFound: React.FC = () => {
   const { t } = useApp();
@@ -89,6 +96,13 @@ const App: React.FC = () => {
             <Route path="/modules/resume/*" element={<ResumePage />} />
             <Route path="/modules/voice/*" element={<VoicePage />} />
             <Route path="/modules/automation/*" element={<AutomationPage />} />
+            
+            {/* Global Routes */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/billing" element={<Billing />} />
+
             {/* Catch-all for undefined routes */}
             <Route path="*" element={<NotFound />} />
           </Route>

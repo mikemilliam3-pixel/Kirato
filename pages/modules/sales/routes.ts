@@ -11,4 +11,5 @@ export const salesRoutes: SalesSection[] = [
   { id: 'chat', path: 'chat', icon: 'MessageSquare', labelKey: 'chat' },
   { id: 'promotions', path: 'promotions', icon: 'Tag', labelKey: 'promotions' },
   { id: 'settings', path: 'settings', icon: 'Settings', labelKey: 'settings' },
+  { id: 'support-inbox', path: 'support-inbox', icon: 'ShieldAlert', labelKey: 'supportInbox' },
 ];

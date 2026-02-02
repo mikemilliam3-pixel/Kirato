@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import * as LucideIcons from 'lucide-react';
@@ -16,16 +17,27 @@ const SalesLayout: React.FC<SalesLayoutProps> = ({ children }) => {
   const location = useLocation();
   const t = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
 
+  const [supportMode, setSupportMode] = useState(false);
+
+  useEffect(() => {
+    setSupportMode(localStorage.getItem('kirato-support-mode') === 'true');
+  }, []);
+
   const currentSection = location.pathname.split('/').pop() || 'dashboard';
+
+  const visibleRoutes = salesRoutes.filter(route => {
+    if (route.id === 'support-inbox') return supportMode;
+    return true;
+  });
 
   return (
     <div className="flex flex-col min-h-full">
-      {/* Module Navigation Sub-Bar - Sticks to the top of the SCROLLABLE content area, NOT the screen */}
+      {/* Module Navigation Sub-Bar */}
       <div className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 z-30 px-4 md:px-8 py-6">
         <TopBar title={t.title} hideMenu={true} />
 
         <nav className="max-w-7xl mx-auto w-full flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar md:justify-center md:gap-10 lg:gap-14 pb-1">
-          {salesRoutes.map((route) => {
+          {visibleRoutes.map((route) => {
             const IconComponent = (LucideIcons as any)[route.icon] || LucideIcons.Circle;
             const isActive = currentSection === route.id;
             

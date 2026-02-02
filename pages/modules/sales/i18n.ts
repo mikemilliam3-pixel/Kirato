@@ -1,3 +1,4 @@
+
 export const salesTranslations = {
   UZ: {
     title: "Savdo va Do'kon",
@@ -10,7 +11,62 @@ export const salesTranslations = {
       customers: "Mijozlar",
       chat: "Chat",
       promotions: "Aksiyalar",
-      settings: "Sozlamalar"
+      settings: "Sozalamalar",
+      supportInbox: "Support Inbox"
+    },
+    channel: {
+      title: "Kanal Integratsiyalari",
+      subtitle: "Mahsulotlaringizni ijtimoiy tarmoqlarda avtomatik nashr qiling",
+      activeDeepLinks: "Faol Deep Linklar",
+      telegram: {
+        title: "Telegram Kanal + Bot",
+        desc: "Bot orqali mahsulotlarni kanalingizga to'g'ridan-to'g'ri joylang",
+        botMode: "Bot rejimi",
+        platformBot: "Platforma boti",
+        ownBot: "O'z botingiz",
+        botUsername: "Bot Username (masalan: mening_do'konim_bot)",
+        botToken: "Bot Token (ixtiyoriy)",
+        channelUsername: "Kanal Username (masalan: @kanal_nomi)",
+        testMsg: "Test Xabar",
+        disconnect: "Ulanishni uzish"
+      },
+      instagram: {
+        title: "Instagram Business",
+        desc: "Instagram post va storislarda mahsulotlarni belgilang",
+        permissions: "Talab qilinadigan ruxsatlar:",
+        p1: "Kontentni nashr qilish",
+        p2: "Profil ma'lumotlarini o'qish",
+        oauthRedirect: "Hozircha ma'lumotlarni qo'lda kiriting. Kelajakda OAuth qo'shiladi.",
+        username: "Instagram foydalanuvchi nomi",
+        accessToken: "Access Token (ixtiyoriy)",
+        businessId: "IG Business ID (ixtiyoriy)",
+        tokenHint: "Haqiqiy API orqali nashr qilish yoqilganda talab qilinadi",
+        idHint: "Hozircha ixtiyoriy",
+        oauthNote: "Haqiqiy Instagram ulanishi OAuth orqali amalga oshiriladi. Hozircha biz ushbu ma'lumotlarni sozlash uchun saqlaymiz."
+      },
+      status: {
+        connected: "Ulangan",
+        notConnected: "Ulanmagan"
+      },
+      actions: {
+        connect: "Bog'lanish",
+        manage: "Boshqarish",
+        disconnect: "Ulanishni uzish",
+        save: "Saqlash",
+        postProduct: "Mahsulotni ulashish",
+        postNow: "Hozir nashr qilish",
+        schedule: "Rejalashtirish",
+        selectProduct: "Mahsulotni tanlang",
+        preview: "Ko'rinishi",
+        copyLink: "Linkni nusxalash",
+        share: "Ulashish"
+      },
+      validation: {
+        invalidToken: "Token noto'g'ri formatda ( : bo'lishi shart)",
+        invalidChannel: "Username @ bilan boshlanishi shart",
+        invalidBotUser: "Bot username @ siz, faqat do'kon nomi boti shaklida bo'lishi shart",
+        usernameRequired: "Foydalanuvchi nomi kiritilishi shart"
+      }
     },
     dashboard: {
       totalSales: "Umumiy tushum",
@@ -47,6 +103,7 @@ export const salesTranslations = {
       private: "Shaxsiy",
       unlisted: "Ro'yxatdan tashqari",
       status: "Holat",
+      productLink: "Mahsulot havolasi",
       categories: {
         clothing: "Kiyim-kechak va aksessuarlar",
         shoes: "Oyoq kiyimlar",
@@ -78,6 +135,8 @@ export const salesTranslations = {
       online: "Onlayn",
       offline: "Oflayn",
       verificationPending: "Tasdiqlash kutilmoqda",
+      moreFromShop: "Sotuvchining boshqa mahsulotlari",
+      openProduct: "Mahsulotni ochish",
       rateModal: {
         title: "Sotuvchini baholang",
         placeholder: "O'z fikringizni yozing (ixtiyoriy)...",
@@ -96,7 +155,8 @@ export const salesTranslations = {
       },
       success: {
         rated: "Rahmat! Bahongiz qabul qilindi.",
-        reported: "Shikoyatingiz yuborildi va ko'rib chiqiladi."
+        reported: "Shikoyatingiz yuborildi va ko'rib chiqiladi.",
+        linkCopied: "Link nusxalandi!"
       },
       submit: "Yuborish",
       cancel: "Bekor qilish"
@@ -172,6 +232,32 @@ export const salesTranslations = {
         missingDocs: "Iltimos, barcha majburiy hujjatlarni yuklang",
         adminNote: "Admin izohi",
         supportReview: "Support Review (Hidden Mode)"
+      }
+    },
+    supportInbox: {
+      title: "Support Inbox",
+      notAuthorized: "Ruxsat berilmagan",
+      filters: {
+        all: "Barchasi",
+        pending: "Kutilmoqda",
+        verified: "Tasdiqlangan",
+        rejected: "Rad etilgan"
+      },
+      list: {
+        shop: "Do'kon",
+        type: "Turi",
+        submitted: "Yuborilgan",
+        status: "Holat"
+      },
+      detail: {
+        sellerInfo: "Sotuvchi ma'lumoti",
+        documents: "Hujjatlar",
+        actions: "Amallar",
+        approve: "Tasdiqlash",
+        reject: "Rad etish",
+        notePlaceholder: "Rad etish sababini yozing...",
+        history: "Tarix",
+        back: "Ro'yxatga qaytish"
       }
     },
     newProduct: {
@@ -269,7 +355,62 @@ export const salesTranslations = {
       customers: "Клиенты",
       chat: "Чат",
       promotions: "Акции",
-      settings: "Настройки"
+      settings: "Настройки",
+      supportInbox: "Поддержка"
+    },
+    channel: {
+      title: "Интеграции каналов",
+      subtitle: "Автоматически публикуйте товары в соцсетях",
+      activeDeepLinks: "Активные Deep Link",
+      telegram: {
+        title: "Telegram Канал + Бот",
+        desc: "Публикуйте товары напрямую в канал через бота",
+        botMode: "Режим бота",
+        platformBot: "Бот платформы",
+        ownBot: "Свой бот",
+        botUsername: "Username бота (например: my_shop_bot)",
+        botToken: "Токен бота (опц.)",
+        channelUsername: "Username канала (например: @my_channel)",
+        testMsg: "Тест сообщение",
+        disconnect: "Отключить"
+      },
+      instagram: {
+        title: "Instagram Business",
+        desc: "Отмечайте товары в постах и сторис Instagram",
+        permissions: "Требуемые разрешения:",
+        p1: "Публикация контента",
+        p2: "Чтение инфо профиля",
+        oauthRedirect: "Введите данные вручную. OAuth будет добавлен позже.",
+        username: "Username в Instagram",
+        accessToken: "Access Token (опц.)",
+        businessId: "IG Business ID (опц.)",
+        tokenHint: "Потребуется при включении публикации через API",
+        idHint: "Необязательно сейчас",
+        oauthNote: "Настоящее подключение Instagram будет через OAuth. Сейчас мы сохраняем эти данные для настройки публикаций."
+      },
+      status: {
+        connected: "Подключено",
+        notConnected: "Не подключено"
+      },
+      actions: {
+        connect: "Подключить",
+        manage: "Управлять",
+        disconnect: "Отключить",
+        save: "Сохранить",
+        postProduct: "Опубликовать товар",
+        postNow: "Опубликовать сейчас",
+        schedule: "Запланировать",
+        selectProduct: "Выберите товар",
+        preview: "Предпросмотр",
+        copyLink: "Копировать ссылку",
+        share: "Поделиться"
+      },
+      validation: {
+        invalidToken: "Неверный формат токена (должен содержать :)",
+        invalidChannel: "Username должен начинаться с @",
+        invalidBotUser: "Username бота должен быть без @ и заканчиваться на bot",
+        usernameRequired: "Username обязателен"
+      }
     },
     dashboard: {
       totalSales: "Общая выручка",
@@ -306,6 +447,7 @@ export const salesTranslations = {
       private: "Приватный",
       unlisted: "Скрытый",
       status: "Статус",
+      productLink: "Ссылка на товар",
       categories: {
         clothing: "Одежда и аксессуары",
         shoes: "Обувь",
@@ -337,6 +479,8 @@ export const salesTranslations = {
       online: "Онлайн",
       offline: "Офлайн",
       verificationPending: "Проверка kutilmoqda",
+      moreFromShop: "Другие товары продавца",
+      openProduct: "Открыть товар",
       rateModal: {
         title: "Оцените продавца",
         placeholder: "Напишите ваш отзыв (необязательно)...",
@@ -355,7 +499,8 @@ export const salesTranslations = {
       },
       success: {
         rated: "Спасибо! Ваш отзыв принят.",
-        reported: "Жалоба отправлена и будет рассмотрена."
+        reported: "Жалоба отправлена и будет рассмотрена.",
+        linkCopied: "Ссылка скопирована!"
       },
       submit: "Отправить",
       cancel: "Отмена"
@@ -433,45 +578,71 @@ export const salesTranslations = {
         supportReview: "Проверка (Support Mode)"
       }
     },
+    supportInbox: {
+      title: "Входящие поддержки",
+      notAuthorized: "Нет доступа",
+      filters: {
+        all: "Все",
+        pending: "Ожидают",
+        verified: "Одобрены",
+        rejected: "Отклонены"
+      },
+      list: {
+        shop: "Магазин",
+        type: "Тип",
+        submitted: "Отправлено",
+        status: "Статус"
+      },
+      detail: {
+        sellerInfo: "Инфо о продавце",
+        documents: "Документы",
+        actions: "Действия",
+        approve: "Одобрить",
+        reject: "Отклонить",
+        notePlaceholder: "Причина отклонения...",
+        history: "История",
+        back: "Назад к списку"
+      }
+    },
     newProduct: {
-      title: "Новый товар",
-      basicInfo: "Основная информация",
-      media: "Медиа и активы",
-      pricing: "Цена и пробный период",
-      statusMod: "Статус и модерация",
-      visibilitySettings: "Настройки видимости",
-      nameLabel: "Название товара *",
-      namePlaceholder: "Напр: AI Prompt Engineer",
-      catLabel: "Категория *",
-      shortDescLabel: "Краткое описание",
-      shortDescPlaceholder: "Краткий обзор (1-2 строки)...",
-      fullDescLabel: "Полное описание (Markdown)",
-      fullDescPlaceholder: "# Детальное описание...",
-      tagsLabel: "Теги",
-      tagsPlaceholder: "Добавить тег...",
-      tagsAdd: "Добавить",
-      coverLabel: "Обложка",
-      galleryLabel: "Галерея изображений",
-      videoLabel: "Демо видео",
-      sampleLabel: "Пример результата (Скриншот)",
-      upload: "Загрузить",
-      replace: "Заменить",
-      remove: "Удалить",
-      addMore: "Добавить еще",
-      priceLabel: "Цена *",
-      discountLabel: "Скидка (%)",
-      currencyLabel: "Валюта",
-      trialToggle: "Предложить пробный период",
-      trialDesc: "Дайте пользователям протестировать перед покупкой",
-      trialDaysLabel: "Дней пробного периода",
-      statusLabel: "Начальный статус",
-      approvalLabel: "Требуется одобрение админа",
-      cancel: "Отмена",
-      create: "Создать товар",
+      title: "New Product",
+      basicInfo: "Basic Information",
+      media: "Media & Assets",
+      pricing: "Pricing & Trial",
+      statusMod: "Status & Moderation",
+      visibilitySettings: "Visibility Settings",
+      nameLabel: "Product Name *",
+      namePlaceholder: "e.g. AI Prompt Engineer",
+      catLabel: "Category *",
+      shortDescLabel: "Short Description",
+      shortDescPlaceholder: "Brief overview (1-2 lines)...",
+      fullDescLabel: "Full Description (Markdown)",
+      fullDescPlaceholder: "# Detailed Description...",
+      tagsLabel: "Tags",
+      tagsPlaceholder: "Add a tag...",
+      tagsAdd: "Add",
+      coverLabel: "Cover Image",
+      galleryLabel: "Gallery Images",
+      videoLabel: "Demo Video",
+      sampleLabel: "Sample Output Screenshot",
+      upload: "Upload",
+      replace: "Replace",
+      remove: "Remove",
+      addMore: "Add More",
+      priceLabel: "Price *",
+      discountLabel: "Discount (%)",
+      currencyLabel: "Valyuta",
+      trialToggle: "Offer Free Trial",
+      trialDesc: "Let users test before buying",
+      trialDaysLabel: "Trial Days",
+      statusLabel: "Initial Status",
+      approvalLabel: "Admin Approval Required",
+      cancel: "Cancel",
+      create: "Create Product",
       errors: {
-        name: "Название товара обязательно",
-        category: "Категория обязательна",
-        price: "Введите корректную цену"
+        name: "Product Name is required",
+        category: "Category is required",
+        price: "Valid price is required"
       }
     },
     orders: {
@@ -528,7 +699,62 @@ export const salesTranslations = {
       customers: "Customers",
       chat: "Chat",
       promotions: "Promotions",
-      settings: "Settings"
+      settings: "Settings",
+      supportInbox: "Support Inbox"
+    },
+    channel: {
+      title: "Channel Integrations",
+      subtitle: "Automatically publish products to social networks",
+      activeDeepLinks: "Active Deep Links",
+      telegram: {
+        title: "Telegram Channel + Bot",
+        desc: "Post products directly to your channel via bot",
+        botMode: "Bot Mode",
+        platformBot: "Platform Bot",
+        ownBot: "Your Own Bot",
+        botUsername: "Bot Username (e.g. my_shop_bot)",
+        botToken: "Bot Token (optional)",
+        channelUsername: "Channel Username (e.g. @myshopchannel)",
+        testMsg: "Test Message",
+        disconnect: "Disconnect"
+      },
+      instagram: {
+        title: "Instagram Business",
+        desc: "Tag products in Instagram posts and stories",
+        permissions: "Permissions required:",
+        p1: "Publish content",
+        p2: "Read account info",
+        oauthRedirect: "Enter info manually for now. OAuth will be added later.",
+        username: "Instagram Username",
+        accessToken: "Access Token (optional)",
+        businessId: "IG Business ID (optional)",
+        tokenHint: "Required when API posting is enabled",
+        idHint: "Optional for now",
+        oauthNote: "Real Instagram connection will use OAuth. For now, we store this info to enable posting setup."
+      },
+      status: {
+        connected: "Connected",
+        notConnected: "Not connected"
+      },
+      actions: {
+        connect: "Connect",
+        manage: "Manage",
+        disconnect: "Disconnect",
+        save: "Save Changes",
+        postProduct: "Post Product",
+        postNow: "Post Now",
+        schedule: "Schedule",
+        selectProduct: "Select Product",
+        preview: "Preview",
+        copyLink: "Copy Link",
+        share: "Share"
+      },
+      validation: {
+        invalidToken: "Token is invalid (must contain :)",
+        invalidChannel: "Username must start with @",
+        invalidBotUser: "Bot username must be without @ and end in bot",
+        usernameRequired: "Username is required"
+      }
     },
     dashboard: {
       totalSales: "Total Revenue",
@@ -565,6 +791,7 @@ export const salesTranslations = {
       private: "Private",
       unlisted: "Unlisted",
       status: "Status",
+      productLink: "Product Link",
       categories: {
         clothing: "Clothing & Accessories",
         shoes: "Shoes",
@@ -596,6 +823,8 @@ export const salesTranslations = {
       online: "Online",
       offline: "Offline",
       verificationPending: "Verification Pending",
+      moreFromShop: "More products from this shop",
+      openProduct: "Open Product",
       rateModal: {
         title: "Rate this Seller",
         placeholder: "Write your review (optional)...",
@@ -614,7 +843,8 @@ export const salesTranslations = {
       },
       success: {
         rated: "Thank you! Your rating has been received.",
-        reported: "Report submitted successfully."
+        reported: "Report submitted successfully.",
+        linkCopied: "Link copied to clipboard!"
       },
       submit: "Submit",
       cancel: "Cancel"
@@ -690,6 +920,32 @@ export const salesTranslations = {
         missingDocs: "Please upload all required documents",
         adminNote: "Admin Note",
         supportReview: "Support Review (Hidden Mode)"
+      }
+    },
+    supportInbox: {
+      title: "Support Inbox",
+      notAuthorized: "Not Authorized",
+      filters: {
+        all: "All",
+        pending: "Pending",
+        verified: "Verified",
+        rejected: "Rejected"
+      },
+      list: {
+        shop: "Shop",
+        type: "Type",
+        submitted: "Submitted",
+        status: "Status"
+      },
+      detail: {
+        sellerInfo: "Seller Information",
+        documents: "Documents",
+        actions: "Review Actions",
+        approve: "Approve Verification",
+        reject: "Reject Verification",
+        notePlaceholder: "Reason for rejection...",
+        history: "Audit History",
+        back: "Back to Inbox"
       }
     },
     newProduct: {

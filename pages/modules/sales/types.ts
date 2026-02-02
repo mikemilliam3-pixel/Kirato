@@ -25,6 +25,12 @@ export interface VerificationDocument {
   storageRef?: string; // placeholder for backend
 }
 
+export interface VerificationHistoryItem {
+  action: 'submitted' | 'approved' | 'rejected' | 'resubmitted';
+  at: string;
+  note?: string;
+}
+
 export interface ShopWorkingHours {
   days: DayOfWeek[];
   startTime: string; // '09:00'
@@ -48,6 +54,7 @@ export interface ShopProfile {
   verificationDocs?: VerificationDocument[];
   verificationSubmittedAt?: string;
   verifiedAt?: string;
+  verificationHistory?: VerificationHistoryItem[];
 }
 
 export interface SellerProfile extends ShopProfile {
@@ -116,6 +123,7 @@ export interface Order {
 
 export interface Product {
   id: string;
+  slug?: string;
   title: string;
   shortDescription: string;
   fullDescription: string;
@@ -135,6 +143,19 @@ export interface Product {
   videoUrl?: string;
   sampleOutputScreenshot?: string;
   createdAt: string;
+  deepLink?: string;
+}
+
+export interface IntegrationConfig {
+  connected: boolean;
+  botMode?: 'platform' | 'own';
+  botUsername?: string;
+  botToken?: string;
+  channelUsername?: string;
+  accountName?: string;
+  accountType?: 'business' | 'creator';
+  pageId?: string;
+  connectedAt?: string;
 }
 
 export interface Category {

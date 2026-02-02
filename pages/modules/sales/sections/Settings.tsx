@@ -8,7 +8,7 @@ import {
   Check, Upload, Calendar, ShieldAlert, AlertCircle, Info, XCircle, 
   FileText, Trash2, Eye, User, Briefcase, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { ShopProfile, ShopWorkingHours, DayOfWeek, VerificationStatus, SellerType, VerificationDocument, DocumentType } from '../types';
+import { ShopProfile, ShopWorkingHours, DayOfWeek, VerificationStatus, SellerType, VerificationDocument, DocumentType, VerificationHistoryItem } from '../types';
 
 const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -39,6 +39,7 @@ const Settings: React.FC = () => {
       if (!parsed.verificationStatus) parsed.verificationStatus = 'unverified';
       if (!parsed.sellerType) parsed.sellerType = 'individual';
       if (!parsed.verificationDocs) parsed.verificationDocs = [];
+      if (!parsed.verificationHistory) parsed.verificationHistory = [];
       return parsed;
     }
     return {
@@ -54,7 +55,8 @@ const Settings: React.FC = () => {
       phone: '+998 90 123 45 67',
       verificationStatus: 'unverified',
       sellerType: 'individual',
-      verificationDocs: []
+      verificationDocs: [],
+      verificationHistory: []
     };
   });
 
@@ -62,13 +64,14 @@ const Settings: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState(ts.success);
   const [isRequesting, setIsRequesting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [supportMode, setSupportMode] = useState(false);
-  const [adminNote, setAdminNote] = useState('');
 
   useEffect(() => {
-    // Hidden support review mode toggle
-    const isSupport = localStorage.getItem('kirato-support-mode') === 'true';
-    setSupportMode(isSupport);
+    const handleProfileSync = () => {
+      const saved = localStorage.getItem('kirato-sales-shop-profile');
+      if (saved) setProfile(JSON.parse(saved));
+    };
+    window.addEventListener('shop-profile-updated', handleProfileSync);
+    return () => window.removeEventListener('shop-profile-updated', handleProfileSync);
   }, []);
 
   const handleSave = (updatedProfile?: ShopProfile) => {
@@ -90,7 +93,6 @@ const Settings: React.FC = () => {
     }
   };
 
-  // --- Document Upload Logic ---
   const handleDocUpload = (type: DocumentType, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -141,10 +143,16 @@ const Settings: React.FC = () => {
       return;
     }
 
+    const historyItem: VerificationHistoryItem = {
+      action: profile.verificationStatus === 'rejected' ? 'resubmitted' : 'submitted',
+      at: new Date().toISOString()
+    };
+
     const updated = { 
       ...profile, 
       verificationStatus: 'pending' as VerificationStatus,
-      verificationSubmittedAt: new Date().toISOString()
+      verificationSubmittedAt: new Date().toISOString(),
+      verificationHistory: [historyItem, ...(profile.verificationHistory || [])]
     };
     setProfile(updated);
     setSuccessMessage(tv.requestSent);
@@ -152,7 +160,6 @@ const Settings: React.FC = () => {
     handleSave(updated);
   };
 
-  // --- UI Helpers ---
   const toggleDay = (day: DayOfWeek) => {
     const currentWH = profile.workingHours as ShopWorkingHours;
     const newDays = currentWH.days.includes(day)
@@ -175,29 +182,6 @@ const Settings: React.FC = () => {
       ...profile,
       workingHours: { ...(profile.workingHours as ShopWorkingHours), days }
     });
-  };
-
-  // --- Support Actions (Hidden Mode) ---
-  const supportApprove = () => {
-    const updated = { 
-      ...profile, 
-      verificationStatus: 'verified' as VerificationStatus,
-      verifiedAt: new Date().toISOString()
-    };
-    setProfile(updated);
-    setSuccessMessage("Approved");
-    handleSave(updated);
-  };
-
-  const supportReject = () => {
-    const updated = { 
-      ...profile, 
-      verificationStatus: 'rejected' as VerificationStatus,
-      verificationNote: adminNote || 'Documents invalid or incomplete.'
-    };
-    setProfile(updated);
-    setSuccessMessage("Rejected");
-    handleSave(updated);
   };
 
   const workingHours = profile.workingHours as ShopWorkingHours;
@@ -276,7 +260,6 @@ const Settings: React.FC = () => {
       <div className="p-5 md:p-8 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
         <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-gray-400 px-1">{tv.title}</h3>
         
-        {/* Status Badge */}
         <div className={`p-5 rounded-[24px] flex flex-col sm:flex-row items-center justify-between gap-4 ${current.bg} dark:bg-opacity-10 border border-transparent dark:border-slate-700`}>
            <div className="flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${current.bg} dark:bg-slate-800 shadow-sm`}>
@@ -288,7 +271,7 @@ const Settings: React.FC = () => {
               </div>
            </div>
            
-           {(status === 'unverified') && !isRequesting && (
+           {status === 'unverified' && !isRequesting && (
              <button 
                onClick={() => setIsRequesting(true)}
                className="w-full sm:w-auto px-8 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
@@ -307,7 +290,6 @@ const Settings: React.FC = () => {
            )}
         </div>
 
-        {/* Informational Messages */}
         {isPending && (
           <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30 flex gap-3">
              <Clock className="text-amber-500 shrink-0" size={16} />
@@ -336,10 +318,8 @@ const Settings: React.FC = () => {
           </div>
         )}
 
-        {/* Verification Form (Docs) */}
         {(isRequesting || isPending || isVerified || isRejected) && (
           <div className="space-y-6 pt-4 animate-in slide-in-from-top-2 duration-300">
-            {/* Seller Type Selection - Read Only when pending/verified */}
             <div className="space-y-3">
                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tv.sellerType}</label>
                <div className="flex p-1 bg-gray-50 dark:bg-slate-900 rounded-2xl">
@@ -360,7 +340,6 @@ const Settings: React.FC = () => {
                </div>
             </div>
 
-            {/* Document Uploads - Grid layout */}
             <div className="flex flex-wrap gap-4">
                <DocUploadCard type="id_front" label={tv.uploadIdFront} required />
                <DocUploadCard type="id_back" label={tv.uploadIdBack} />
@@ -383,40 +362,6 @@ const Settings: React.FC = () => {
             )}
           </div>
         )}
-
-        {/* Support Only - Hidden Admin Review Mode */}
-        {supportMode && isPending && (
-          <div className="p-6 bg-slate-900 rounded-[32px] border-4 border-cyan-500 shadow-2xl animate-in zoom-in duration-300">
-             <h4 className="text-cyan-400 font-black text-xs uppercase tracking-[4px] mb-6 flex items-center gap-2">
-               <ShieldCheck size={18} /> {tv.supportReview}
-             </h4>
-             <div className="space-y-4">
-                <div className="space-y-2">
-                   <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest ml-1">{tv.adminNote}</label>
-                   <textarea 
-                     value={adminNote}
-                     onChange={e => setAdminNote(e.target.value)}
-                     className="w-full p-4 bg-slate-800 rounded-2xl border-none text-white text-xs font-bold"
-                     placeholder="Explain why rejected..."
-                   />
-                </div>
-                <div className="flex gap-3">
-                   <button 
-                     onClick={supportReject}
-                     className="flex-1 h-12 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
-                   >
-                     {tv.adminReject}
-                   </button>
-                   <button 
-                     onClick={supportApprove}
-                     className="flex-1 h-12 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
-                   >
-                     {tv.adminVerify}
-                   </button>
-                </div>
-             </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -431,7 +376,6 @@ const Settings: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
-          {/* Shop Information Section */}
           <div className="p-4 md:p-8 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6 md:space-y-8">
             <h3 className="text-xl font-black flex items-center gap-3 tracking-tight">
               <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl flex items-center justify-center">
@@ -573,7 +517,6 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="space-y-4 md:space-y-6">
-           {/* Verification Section */}
            {getVerificationUI()}
 
            <div className="p-4 md:p-8 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-4 md:space-y-6">

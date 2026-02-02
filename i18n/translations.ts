@@ -1,4 +1,6 @@
-import { Language, TranslationDictionary } from '../types';
+
+// Fix: Removed non-existent TranslationDictionary import from types
+import { Language } from '../types';
 
 export const translations: any = {
   UZ: {
@@ -24,7 +26,59 @@ export const translations: any = {
       search: "Qidirish...",
       notFoundTitle: "Sahifa topilmadi",
       notFoundDesc: "Siz qidirayotgan bo'lim mavjud emas yoki hali yakunlanmagan.",
-      notifications: "Bildirishnomalar"
+      notifications: "Bildirishnomalar",
+      loginRequired: "Tizimga kirish shart",
+      loginRequiredDesc: "Sotuvchi bilan bog'lanish uchun tizimga kiring.",
+      signIn: "Kirish",
+      signUp: "Ro'yxatdan o'tish",
+      cancel: "Bekor qilish",
+      credits: "Kreditlar",
+      notEnoughCredits: "Kreditlar yetarli emas",
+      required: "Talab qilinadi",
+      available: "Mavjud",
+      goToBilling: "Balansni to'ldirish",
+      earned: "Topildi",
+      spent: "Sarflandi",
+      transactions: "Tranzaksiyalar",
+      welcome_bonus: "Xush kelibsiz bonusi",
+      buyCredits: "Kredit sotib olish",
+      plans: "Tariflar",
+      billing: "Hisob-kitob",
+      currentPlan: "Joriy tarif",
+      upgradePlan: "Tarifni oshirish",
+      monthlyCredits: "Oylik kreditlar",
+      nextRenewal: "Keyingi yangilanish",
+      autoRenew: "Avtomatik uzaytirish",
+      creditPacks: "Kredit paketlari",
+      current: "Joriy",
+      upgrade: "O'tish",
+      downgrade: "Pasaytirish",
+      comingSoon: "Tez kunda",
+      simulatePurchase: "Sotib olishni simulyatsiya qilish",
+      paymentComingSoon: "To'lov tizimi tez kunda ishga tushadi",
+      subscription_monthly_credits: "Tarif krediti",
+      subscription_renewal_refill: "Tarif yangilanishi",
+      credit_pack_purchase: "Kredit paketi xaridi"
+    },
+    profile: {
+      title: "Mening Profilim",
+      subtitle: "Shaxsiy ma'lumotlar",
+      fullName: "To'liq ism",
+      username: "Username",
+      phone: "Telefon raqami",
+      optional: "Ixtiyoriy",
+      addPhone: "Telefon qo'shish",
+      phoneInfo: "Telefon raqami faqat autentifikatsiya paytida ruxsat berilgan bo'lsagina ko'rinadi",
+      saveChanges: "Saqlash",
+      changesSaved: "O'zgarishlar saqlandi",
+      publicProfile: "Ochiq profil"
+    },
+    auth: {
+      notAuthorized: {
+        title: "Ruxsat yo‘q",
+        description: "Bu bo‘lim faqat sotuvchilar uchun. Do‘koningizni boshqarish uchun tizimga kiring.",
+        visitPublicShop: "Ochiq do‘kon sahifasiga o‘tish"
+      }
     }
   },
   RU: {
@@ -50,7 +104,59 @@ export const translations: any = {
       search: "Поиск...",
       notFoundTitle: "Страница не найдена",
       notFoundDesc: "Раздел, который вы ищете, не существует или находится в разработке.",
-      notifications: "Уведомления"
+      notifications: "Уведомления",
+      loginRequired: "Требуется вход",
+      loginRequiredDesc: "Пожалуйста, войдите, чтобы связаться с продавцом.",
+      signIn: "Войти",
+      signUp: "Регистрация",
+      cancel: "Отмена",
+      credits: "Кредиты",
+      notEnoughCredits: "Недостаточно кредитов",
+      required: "Требуется",
+      available: "Доступно",
+      goToBilling: "Пополнить баланс",
+      earned: "Заработано",
+      spent: "Потрачено",
+      transactions: "Транзакции",
+      welcome_bonus: "Приветственный бонус",
+      buyCredits: "Купить кредиты",
+      plans: "Тарифы",
+      billing: "Биллинг",
+      currentPlan: "Текущий тариф",
+      upgradePlan: "Сменить тариф",
+      monthlyCredits: "Кредиты в месяц",
+      nextRenewal: "След. продление",
+      autoRenew: "Автопродление",
+      creditPacks: "Пакеты кредитов",
+      current: "Текущий",
+      upgrade: "Улучшить",
+      downgrade: "Понизить",
+      comingSoon: "Скоро",
+      simulatePurchase: "Симуляция покупки",
+      paymentComingSoon: "Система оплаты скоро появится",
+      subscription_monthly_credits: "Кредиты по тарифу",
+      subscription_renewal_refill: "Обновление тарифа",
+      credit_pack_purchase: "Покупка пакета кредитов"
+    },
+    profile: {
+      title: "Мой Профиль",
+      subtitle: "Личная информация",
+      fullName: "Полное имя",
+      username: "Username",
+      phone: "Номер телефона",
+      optional: "Опционально",
+      addPhone: "Добавить телефон",
+      phoneInfo: "Номер телефона доступен только если он был передан при авторизации",
+      saveChanges: "Сохранить",
+      changesSaved: "Изменения сохранены",
+      publicProfile: "Публичный профиль"
+    },
+    auth: {
+      notAuthorized: {
+        title: "Нет доступа",
+        description: "Этот раздел доступен только продавцам. Войдите, чтобы управлять своим магазином.",
+        visitPublicShop: "Перейти в публичный магазин"
+      }
     }
   },
   EN: {
@@ -76,7 +182,59 @@ export const translations: any = {
       search: "Search...",
       notFoundTitle: "Page Not Found",
       notFoundDesc: "The section you are looking for does not exist or is under construction.",
-      notifications: "Notifications"
+      notifications: "Notifications",
+      loginRequired: "Login required",
+      loginRequiredDesc: "Please sign in to contact the seller.",
+      signIn: "Sign in",
+      signUp: "Sign up",
+      cancel: "Cancel",
+      credits: "Credits",
+      notEnoughCredits: "Not enough credits",
+      required: "Required",
+      available: "Available",
+      goToBilling: "Go to Billing",
+      earned: "Earned",
+      spent: "Spent",
+      transactions: "Transactions",
+      welcome_bonus: "Welcome bonus",
+      buyCredits: "Buy credits",
+      plans: "Plans",
+      billing: "Billing",
+      currentPlan: "Current Plan",
+      upgradePlan: "Upgrade plan",
+      monthlyCredits: "Monthly credits",
+      nextRenewal: "Next renewal",
+      autoRenew: "Auto renew",
+      creditPacks: "Credit packs",
+      current: "Current",
+      upgrade: "Upgrade",
+      downgrade: "Downgrade",
+      comingSoon: "Coming soon",
+      simulatePurchase: "Simulate purchase",
+      paymentComingSoon: "Payment integration coming soon",
+      subscription_monthly_credits: "Plan credits",
+      subscription_renewal_refill: "Subscription renewal",
+      credit_pack_purchase: "Credit pack purchase"
+    },
+    profile: {
+      title: "My Profile",
+      subtitle: "Identity & Public Info",
+      fullName: "Full Name",
+      username: "Username",
+      phone: "Phone Number",
+      optional: "Optional",
+      addPhone: "Add phone",
+      phoneInfo: "Phone number is available only if shared during authentication",
+      saveChanges: "Save Changes",
+      changesSaved: "Changes Saved",
+      publicProfile: "Public Profile"
+    },
+    auth: {
+      notAuthorized: {
+        title: "Not authorized",
+        description: "This section is for sellers only. Please log in to manage your shop.",
+        visitPublicShop: "Visit Public Shop"
+      }
     }
   }
 };
