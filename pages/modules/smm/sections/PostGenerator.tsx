@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { smmTranslations } from '../i18n';
@@ -7,10 +6,10 @@ import {
   Sparkles, Copy, FolderPlus, RefreshCw, 
   Image as ImageIcon, Video, FileText, 
   Maximize, LayoutGrid, Monitor, Clock,
-  Download, ExternalLink, AlertCircle,
+  Download, AlertCircle,
   Info, ChevronDown, ChevronUp, Instagram, 
-  Send, Smartphone, Hash, Calendar, Tag, Link as LinkIcon,
-  Upload, X, FileImage
+  Send, Smartphone, Tag,
+  Upload, X
 } from 'lucide-react';
 
 type GenMode = 'post' | 'image' | 't2v' | 'i2v';
@@ -41,7 +40,6 @@ const PostGenerator: React.FC = () => {
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
   const [link, setLink] = useState('');
-  const [deadline, setDeadline] = useState('');
   const [brand, setBrand] = useState('');
   const [variantCount, setVariantCount] = useState('3');
   const [length, setLength] = useState('medium');
@@ -70,7 +68,6 @@ const PostGenerator: React.FC = () => {
 
       for (const job of activeJobs) {
         try {
-          // Note: In this environment we simulate the fetch call
           const statusUpdate = await mediaService.getJobStatus(job.id);
           if (statusUpdate.status !== job.status) {
             setResults(prev => prev.map(r => r.id === job.id ? { 
@@ -98,12 +95,12 @@ const PostGenerator: React.FC = () => {
 
     const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setUploadError('Invalid file type. Please upload PNG, JPEG or WEBP.');
+      setUploadError('Invalid type. Use PNG, JPG or WEBP.');
       return;
     }
 
     if (file.size > 20 * 1024 * 1024) {
-      setUploadError('File is too large. Max size is 20MB.');
+      setUploadError('File too large. Max 20MB.');
       return;
     }
 
@@ -129,40 +126,22 @@ const PostGenerator: React.FC = () => {
 
   const handleDownload = async (url: string, res: GenResult) => {
     const ext = res.type === 'image' ? 'png' : 'mp4';
-    let prefix = 'media';
-    if (res.genMode === 'image') prefix = 'text-to-image';
-    else if (res.genMode === 't2v') prefix = 'text-to-video';
-    else if (res.genMode === 'i2v') prefix = 'image-to-video';
-    
-    const filename = `kirato-${prefix}-${Date.now()}.${ext}`;
-
+    const filename = `kirato-${res.id}.${ext}`;
     try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
       link.target = '_blank';
       link.click();
+    } catch (error) {
+      console.error("Download failed", error);
     }
   };
 
   const handleGenerate = async () => {
     setLoading(true);
-    
     try {
       if (mode === 'post') {
-        // Post generator remains mock for now as per instructions
         const count = parseInt(variantCount);
         const newResults: GenResult[] = Array.from({ length: count }).map((_, i) => ({
           id: Math.random().toString(36).substr(2, 9),
@@ -180,8 +159,7 @@ const PostGenerator: React.FC = () => {
         } else if (mode === 't2v') {
           job = await mediaService.createTextToVideoJob(prompt, aspect, quality, resolution, duration);
         } else if (mode === 'i2v') {
-          // Assume image upload is handled or we use a temporary URL for the simulation
-          const tempUrl = filePreview || 'https://kirato-storage.local/temp.png';
+          const tempUrl = filePreview || '';
           job = await mediaService.createImageToVideoJob(tempUrl, prompt, aspect, quality, resolution, duration);
         }
 
@@ -204,27 +182,27 @@ const PostGenerator: React.FC = () => {
   };
 
   const renderSharedControls = () => (
-    <div className="grid grid-cols-2 gap-3 mt-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-6">
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-gray-400 uppercase ml-1 flex items-center gap-1">
-          <Maximize size={10} /> {t.aspectRatio}
+        <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 flex items-center gap-1 tracking-widest">
+          <Maximize size={12} /> {t.aspectRatio}
         </label>
         <select 
           value={aspect}
           onChange={(e) => setAspect(e.target.value)}
-          className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
         >
           {['1:1', '4:5', '9:16', '16:9', '3:2', '2:3'].map(a => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-gray-400 uppercase ml-1 flex items-center gap-1">
-          <LayoutGrid size={10} /> {t.quality}
+        <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 flex items-center gap-1 tracking-widest">
+          <LayoutGrid size={12} /> {t.quality}
         </label>
         <select 
           value={quality}
           onChange={(e) => setQuality(e.target.value)}
-          className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
         >
           {mode === 'image' && <option value="draft">{t.qualityLevels.draft}</option>}
           <option value="standard">{t.qualityLevels.standard}</option>
@@ -234,26 +212,26 @@ const PostGenerator: React.FC = () => {
       {(mode === 't2v' || mode === 'i2v') && (
         <>
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase ml-1 flex items-center gap-1">
-              <Monitor size={10} /> {t.resolution}
+            <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 flex items-center gap-1 tracking-widest">
+              <Monitor size={12} /> {t.resolution}
             </label>
             <select 
               value={resolution}
               onChange={(e) => setResolution(e.target.value)}
-              className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
             >
               <option value="720p">720p</option>
               <option value="1080p">1080p</option>
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase ml-1 flex items-center gap-1">
-              <Clock size={10} /> {t.duration}
+            <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 flex items-center gap-1 tracking-widest">
+              <Clock size={12} /> {t.duration}
             </label>
             <select 
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
             >
               <option value="4s">4s</option>
               <option value="6s">6s</option>
@@ -266,32 +244,32 @@ const PostGenerator: React.FC = () => {
   );
 
   const renderPostGenerator = () => (
-    <div className="space-y-6">
-      {/* Explainer Header */}
-      <div className="p-4 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border border-purple-100 dark:border-purple-800/50">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center">
-            <Info size={18} />
+    <div className="space-y-6 md:space-y-8">
+      {/* Explainer Header - Responsive Padding */}
+      <div className="p-5 sm:p-7 md:p-8 bg-purple-50 dark:bg-purple-900/10 rounded-[32px] border border-purple-100 dark:border-purple-800/50">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+            <Info size={24} />
           </div>
-          <div>
-            <h4 className="text-xs font-extrabold text-purple-900 dark:text-purple-200">{t.postExplainer.title}</h4>
-            <p className="text-[10px] font-medium text-purple-700/70 dark:text-purple-300/60">{t.postExplainer.subtitle}</p>
+          <div className="min-w-0">
+            <h4 className="text-sm sm:text-base font-black text-purple-900 dark:text-purple-200 tracking-tight truncate">{t.postExplainer.title}</h4>
+            <p className="text-[10px] sm:text-[11px] md:text-xs font-bold text-purple-700/70 dark:text-purple-300/60 line-clamp-1 sm:line-clamp-none">{t.postExplainer.subtitle}</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
           {[t.postExplainer.bullet1, t.postExplainer.bullet2, t.postExplainer.bullet3].map((b, i) => (
-            <div key={i} className="flex items-center gap-2 text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase">
-              <div className="w-1 h-1 bg-purple-400 rounded-full" /> {b}
+            <div key={i} className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-white/50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-white/50 dark:border-transparent">
+              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full shrink-0" /> {b}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-5">
+      <div className="p-5 sm:p-8 md:p-10 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-6">
         {/* Platform Selector */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.platform}</label>
-          <div className="flex p-1 bg-gray-50 dark:bg-slate-900 rounded-xl">
+        <div className="space-y-3">
+          <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.platform}</label>
+          <div className="flex p-1 bg-gray-50 dark:bg-slate-900 rounded-2xl overflow-x-auto no-scrollbar">
             {[
               { id: 'Telegram', icon: Send },
               { id: 'Instagram', icon: Instagram },
@@ -300,108 +278,108 @@ const PostGenerator: React.FC = () => {
               <button
                 key={p.id}
                 onClick={() => setPlatform(p.id)}
-                className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-2 transition-all ${
-                  platform === p.id ? 'bg-white dark:bg-slate-700 text-purple-600 shadow-sm' : 'text-gray-400'
+                className={`flex-1 min-w-[90px] py-3.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase flex items-center justify-center gap-2 transition-all tracking-widest shrink-0 ${
+                  platform === p.id ? 'bg-white dark:bg-slate-700 text-purple-600 shadow-md' : 'text-gray-400 hover:text-slate-600'
                 }`}
               >
-                <p.icon size={14} /> {p.id}
+                <p.icon size={16} /> {p.id}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Post Type & CTA */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Post Type & CTA Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.postType}</label>
+            <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.postType}</label>
             <select 
               value={postType}
               onChange={(e) => setPostType(e.target.value)}
-              className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
             >
               {Object.keys(t.postTypes).map(k => <option key={k} value={k}>{(t.postTypes as any)[k]}</option>)}
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.cta}</label>
+            <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.cta}</label>
             <select 
               value={ctaType}
               onChange={(e) => setCtaType(e.target.value)}
-              className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
             >
               {Object.keys(t.ctas).map(k => <option key={k} value={k}>{(t.ctas as any)[k]}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Main Topic */}
+        {/* Main Topic TextArea */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.promptLabel}</label>
+          <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.promptLabel}</label>
           <textarea 
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="w-full p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-xs border-none focus:ring-2 focus:ring-purple-500 min-h-[100px]"
+            className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[24px] text-sm md:text-base border-none focus:ring-2 focus:ring-purple-500 min-h-[120px] sm:min-h-[140px] font-medium leading-relaxed"
             placeholder={t.promptHelper}
           />
         </div>
 
-        {/* Optional Details Collapsible */}
-        <div className="space-y-2 border-t border-gray-50 dark:border-slate-700/50 pt-4">
+        {/* Details Section */}
+        <div className="space-y-4 border-t border-gray-100 dark:border-slate-700/50 pt-6">
           <button 
             onClick={() => setShowDetails(!showDetails)}
-            className="w-full flex items-center justify-between text-xs font-bold text-slate-500"
+            className="w-full flex items-center justify-between text-[10px] sm:text-[11px] font-black uppercase text-slate-500 tracking-widest hover:text-purple-600 transition-colors"
           >
-            <span className="flex items-center gap-2"><Tag size={14} /> {t.addDetails}</span>
-            {showDetails ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+            <span className="flex items-center gap-2"><Tag size={16} /> {t.addDetails}</span>
+            {showDetails ? <ChevronUp size={20}/> : <ChevronDown size={20}/>}
           </button>
           
           {showDetails && (
-            <div className="grid grid-cols-2 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.price}</label>
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.price}</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-3 text-gray-400 text-xs">$</span>
-                  <input type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-3 pl-6 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none" placeholder="100" />
+                  <span className="absolute left-3 top-[13px] text-gray-400 text-xs font-bold">$</span>
+                  <input type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full h-11 pl-7 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="100" />
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.discount}</label>
-                <input type="text" value={discount} onChange={e => setDiscount(e.target.value)} className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none" placeholder="20%" />
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.discount}</label>
+                <input type="text" value={discount} onChange={e => setDiscount(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="20%" />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.link}</label>
-                <input type="text" value={link} onChange={e => setLink(e.target.value)} className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none" placeholder="shop.com/buy" />
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.link}</label>
+                <input type="text" value={link} onChange={e => setLink(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="shop.com" />
               </div>
               <div className="space-y-1">
-                <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.brand}</label>
-                <input type="text" value={brand} onChange={e => setBrand(e.target.value)} className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none" placeholder="Brand Name" />
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.brand}</label>
+                <input type="text" value={brand} onChange={e => setBrand(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="Brand" />
               </div>
             </div>
           )}
         </div>
 
-        {/* Output Controls */}
-        <div className="space-y-4 border-t border-gray-50 dark:border-slate-700/50 pt-4">
-           <h5 className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.outputSettings}</h5>
-           <div className="grid grid-cols-3 gap-3">
-             <div className="space-y-1">
-               <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.variantCount}</label>
-               <select value={variantCount} onChange={e => setVariantCount(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-[10px] border-none">
-                 <option value="3">3</option>
-                 <option value="5">5</option>
+        {/* Output Settings Grid */}
+        <div className="space-y-4 border-t border-gray-100 dark:border-slate-700/50 pt-6">
+           <h5 className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.outputSettings}</h5>
+           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+             <div className="space-y-2">
+               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.variantCount}</label>
+               <select value={variantCount} onChange={e => setVariantCount(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
+                 <option value="3">3 Variants</option>
+                 <option value="5">5 Variants</option>
                </select>
              </div>
-             <div className="space-y-1">
-               <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.length}</label>
-               <select value={length} onChange={e => setLength(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-[10px] border-none">
+             <div className="space-y-2">
+               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.length}</label>
+               <select value={length} onChange={e => setLength(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
                  <option value="short">{t.lengths.short}</option>
                  <option value="medium">{t.lengths.medium}</option>
                  <option value="long">{t.lengths.long}</option>
                </select>
              </div>
-             <div className="space-y-1">
-               <label className="text-[9px] font-bold text-gray-400 uppercase ml-1">{t.hashtags}</label>
-               <select value={hashtagsEnabled} onChange={e => setHashtagsEnabled(e.target.value)} className="w-full p-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-[10px] border-none">
+             <div className="space-y-2">
+               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.hashtags}</label>
+               <select value={hashtagsEnabled} onChange={e => setHashtagsEnabled(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
                  <option value="off">Off</option>
                  <option value="on">On</option>
                  <option value="auto">Auto</option>
@@ -410,32 +388,12 @@ const PostGenerator: React.FC = () => {
            </div>
         </div>
 
-        {/* Live Preview Format Box */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/50">
-           <div className="flex items-center justify-between mb-3">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.previewFormat}</h5>
-              <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400">
-                <div className={`w-1.5 h-1.5 rounded-full ${platform === 'Telegram' ? 'bg-blue-400' : platform === 'Instagram' ? 'bg-pink-400' : 'bg-cyan-400'}`} />
-                {platform}
-              </div>
-           </div>
-           <div className="space-y-2 opacity-60 pointer-events-none">
-              <div className="h-2 w-3/4 bg-slate-200 dark:bg-slate-700 rounded" />
-              <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded" />
-              <div className="h-2 w-1/2 bg-slate-200 dark:bg-slate-700 rounded" />
-              <div className="pt-2 flex gap-2">
-                 <div className="h-1.5 w-12 bg-purple-100 dark:bg-purple-900/30 rounded" />
-                 <div className="h-1.5 w-16 bg-purple-100 dark:bg-purple-900/30 rounded" />
-              </div>
-           </div>
-        </div>
-
         <button 
           onClick={handleGenerate}
           disabled={loading || !prompt}
-          className="w-full py-4 bg-purple-600 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-200 dark:shadow-none"
+          className="w-full h-16 bg-purple-600 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-[24px] text-base font-black uppercase tracking-[2px] flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-purple-200 dark:shadow-none hover:bg-purple-700"
         >
-          {loading ? <RefreshCw className="animate-spin" size={18} /> : <Sparkles size={18} />}
+          {loading ? <RefreshCw className="animate-spin" size={24} /> : <Sparkles size={24} />}
           {t.generate}
         </button>
       </div>
@@ -443,9 +401,9 @@ const PostGenerator: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 pb-20 max-w-4xl mx-auto">
-      {/* Mode Switcher */}
-      <div className="flex p-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-x-auto no-scrollbar">
+    <div className="space-y-6 md:space-y-8 pb-24 max-w-7xl mx-auto">
+      {/* Mode Switcher - Responsive width */}
+      <div className="max-w-3xl mx-auto flex p-1.5 bg-white dark:bg-slate-800 rounded-[28px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-x-auto no-scrollbar">
         {[
           { id: 'post', icon: FileText, label: t.modes.post },
           { id: 'image', icon: ImageIcon, label: t.modes.image },
@@ -455,70 +413,54 @@ const PostGenerator: React.FC = () => {
           <button
             key={item.id}
             onClick={() => setMode(item.id as GenMode)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap flex-1 justify-center ${
+            className={`flex items-center gap-2 px-4 sm:px-6 py-3.5 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-[1px] transition-all whitespace-nowrap flex-1 justify-center shrink-0 ${
               mode === item.id 
-                ? 'bg-purple-600 text-white shadow-md' 
+                ? 'bg-purple-600 text-white shadow-xl' 
                 : 'text-gray-400 hover:text-purple-600'
             }`}
           >
-            <item.icon size={14} />
+            <item.icon size={16} />
             <span className="hidden sm:inline">{item.label}</span>
           </button>
         ))}
       </div>
 
       {mode === 'post' ? renderPostGenerator() : (
-        <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-4">
+        <div className="p-5 sm:p-8 md:p-10 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-6">
           {mode === 'i2v' && (
             <div className="space-y-3">
-              <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Source Image</label>
+              <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Source Image</label>
               
               {!filePreview ? (
                 <div 
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`relative group cursor-pointer py-10 px-6 bg-gray-50 dark:bg-slate-900 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center transition-all ${
-                    uploadError ? 'border-rose-300 bg-rose-50 dark:bg-rose-900/10' : 'border-gray-200 dark:border-slate-700 hover:border-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/10'
+                  className={`relative group cursor-pointer py-10 sm:py-14 px-6 sm:px-8 bg-gray-50 dark:bg-slate-900 border-2 border-dashed rounded-[32px] flex flex-col items-center justify-center transition-all ${
+                    uploadError ? 'border-rose-300' : 'border-gray-200 dark:border-slate-700 hover:border-purple-400'
                   }`}
                 >
-                  <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    accept="image/png, image/jpeg, image/webp"
-                    className="hidden"
-                  />
-                  <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                    <Upload size={24} className="text-purple-600" />
+                  <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-md mb-4 sm:mb-5 group-hover:scale-110 transition-transform">
+                    <Upload size={28} className="text-purple-600" />
                   </div>
-                  <p className="text-xs font-bold text-slate-900 dark:text-white mb-1">Click or drag image to upload</p>
-                  <p className="text-[10px] text-gray-400 font-medium">PNG, JPG, WEBP • Max 20MB</p>
-                  
-                  {uploadError && (
-                    <div className="mt-4 px-3 py-1.5 bg-rose-100 dark:bg-rose-900/30 rounded-lg flex items-center gap-2">
-                      <AlertCircle size={12} className="text-rose-600" />
-                      <span className="text-[10px] font-bold text-rose-600">{uploadError}</span>
-                    </div>
-                  )}
+                  <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mb-1 tracking-tight text-center">Click or drag image</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-widest">PNG, JPG • Max 20MB</p>
                 </div>
               ) : (
-                <div className="relative p-3 bg-gray-50 dark:bg-slate-900 rounded-3xl border border-gray-200 dark:border-slate-700 animate-in zoom-in-95 duration-200">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shrink-0">
+                <div className="relative p-3 sm:p-4 bg-gray-50 dark:bg-slate-900 rounded-[32px] border border-gray-200 dark:border-slate-700">
+                  <div className="flex items-center gap-4 sm:gap-5">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800 shrink-0 shadow-lg">
                       <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h5 className="text-xs font-bold truncate">{selectedFile?.name}</h5>
-                      <p className="text-[10px] text-gray-400 font-medium">
-                        {(selectedFile?.size || 0 / (1024 * 1024)).toFixed(2)} MB
+                      <h5 className="text-xs sm:text-sm font-black truncate tracking-tight">{selectedFile?.name}</h5>
+                      <p className="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase mt-1">
+                        {(selectedFile?.size ? selectedFile.size / (1024 * 1024) : 0).toFixed(2)} MB
                       </p>
                     </div>
-                    <button 
-                      onClick={removeFile}
-                      className="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-400 hover:text-rose-500 transition-colors shadow-sm"
-                    >
-                      <X size={18} />
+                    <button onClick={removeFile} className="w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-slate-800 rounded-2xl text-rose-500 shadow-md flex items-center justify-center active:scale-90 transition-all">
+                      <X size={20} />
                     </button>
                   </div>
                 </div>
@@ -526,164 +468,89 @@ const PostGenerator: React.FC = () => {
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">
+          <div className="space-y-3">
+            <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">
               {mode === 'image' ? 'Image Prompt' : 'Video Prompt'}
             </label>
             <textarea 
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              className="w-full p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-xs border-none focus:ring-2 focus:ring-purple-500 min-h-[100px]"
-              placeholder="Describe the visuals..."
+              className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[28px] text-sm md:text-base border-none focus:ring-2 focus:ring-purple-500 min-h-[100px] sm:min-h-[120px] leading-relaxed font-medium"
+              placeholder="Describe what you want to see in detail..."
             />
           </div>
-
-          {mode === 'image' && (
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{t.negativePrompt}</label>
-              <input 
-                type="text"
-                value={negativePrompt}
-                onChange={(e) => setNegativePrompt(e.target.value)}
-                className="w-full p-3 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:ring-2 focus:ring-purple-500"
-                placeholder="e.g. blurry, low quality, watermarks..."
-              />
-            </div>
-          )}
 
           {renderSharedControls()}
 
           <button 
             onClick={handleGenerate}
             disabled={loading || (mode === 'i2v' && !selectedFile) || !prompt}
-            className="w-full py-4 bg-purple-600 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-purple-200 dark:shadow-none"
+            className="w-full h-16 bg-purple-600 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-[24px] text-base font-black uppercase tracking-[2px] flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-purple-200 dark:shadow-none hover:bg-purple-700"
           >
-            {loading ? <RefreshCw className="animate-spin" size={18} /> : <Sparkles size={18} />}
+            {loading ? <RefreshCw className="animate-spin" size={24} /> : <Sparkles size={24} />}
             {t.generate}
           </button>
         </div>
       )}
 
-      {/* Results Section */}
+      {/* Results Section - Desktop Optimized Grid */}
       <div className="space-y-6">
-        <h3 className="font-bold text-sm px-1 flex items-center gap-2">
+        <h3 className="font-black text-sm sm:text-base md:text-lg px-2 flex items-center gap-3 tracking-tight">
           {t.variants}
-          {results.length > 0 && <span className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded-full text-[10px] text-gray-400">{results.length}</span>}
+          {results.length > 0 && <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full text-xs font-black text-purple-600">{results.length}</span>}
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map((res) => (
-            <div key={res.id} className="p-5 bg-white dark:bg-slate-800 rounded-[28px] border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col group">
-              <div className="flex justify-between items-center mb-4">
+            <div key={res.id} className="p-5 sm:p-6 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col group hover:shadow-xl transition-all h-full">
+              <div className="flex justify-between items-center mb-5">
                 {res.platform && (
-                  <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 dark:bg-slate-900 rounded-lg text-[9px] font-extrabold uppercase text-purple-600">
-                    {res.platform === 'Telegram' ? <Send size={10}/> : res.platform === 'Instagram' ? <Instagram size={10}/> : <Smartphone size={10}/>}
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-[9px] font-black uppercase tracking-widest text-purple-600">
+                    {res.platform === 'Telegram' ? <Send size={12}/> : res.platform === 'Instagram' ? <Instagram size={12}/> : <Smartphone size={12}/>}
                     {res.platform}
                   </div>
                 )}
-                {res.content && (
-                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{res.content.length} {t.charCount}</span>
-                )}
+                {res.content && <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{res.content.length} {t.charCount}</span>}
               </div>
 
               {res.type === 'text' && (
-                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed mb-4 flex-1">
+                <p className="text-xs sm:text-sm md:text-base text-slate-700 dark:text-slate-200 leading-relaxed mb-6 flex-1 italic bg-gray-50 dark:bg-slate-900/30 p-4 sm:p-5 rounded-[24px] border border-transparent dark:border-slate-700/50">
                   {res.content}
                 </p>
               )}
 
               {res.status !== 'done' ? (
-                <div className="h-48 sm:h-64 bg-gray-50 dark:bg-slate-900 rounded-2xl flex flex-col items-center justify-center gap-3">
+                <div className="aspect-square bg-gray-50 dark:bg-slate-900 rounded-[32px] flex flex-col items-center justify-center gap-4 border border-gray-100 dark:border-slate-700">
                   {res.status === 'failed' ? (
-                    <>
-                      <AlertCircle className="text-rose-500" size={32} />
-                      <p className="text-[10px] font-bold text-rose-500 uppercase">{t.status.failed}</p>
-                    </>
+                    <AlertCircle className="text-rose-500" size={48} />
                   ) : (
-                    <>
-                      <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                      <p className="text-[10px] font-bold text-purple-600 uppercase animate-pulse">
-                        {res.status === 'queued' ? t.status.queued : t.status.running}
-                      </p>
-                    </>
+                    <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
                   )}
+                  <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest animate-pulse">{res.status}</p>
                 </div>
               ) : (
                 <>
                   {res.type === 'image' && (
-                    <div className="relative overflow-hidden rounded-2xl mb-4 h-48 sm:h-64 bg-gray-100 dark:bg-slate-900">
-                      <img src={res.url} alt="Generated" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute top-3 right-3 flex gap-2">
-                        <button 
-                          onClick={() => handleDownload(res.url!, res)}
-                          className="p-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur rounded-xl text-purple-600 shadow-lg"
-                        >
-                          <Download size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {res.type === 'video' && (
-                    <div className="relative overflow-hidden rounded-2xl mb-4 h-48 sm:h-64 bg-black group">
-                      <video 
-                        src={res.url} 
-                        className="w-full h-full object-contain" 
-                        controls 
-                        loop
-                      />
-                      <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <button 
-                          onClick={() => handleDownload(res.url!, res)}
-                          className="p-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur rounded-xl text-purple-600 shadow-lg"
-                        >
-                          <Download size={14} />
-                        </button>
-                      </div>
+                    <div className="relative overflow-hidden rounded-[28px] mb-6 aspect-square bg-gray-100 dark:bg-slate-900 shadow-inner group-hover:shadow-none transition-all">
+                      <img src={res.url} alt="Gen" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      <button onClick={() => handleDownload(res.url!, res)} className="absolute top-4 right-4 w-10 h-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur rounded-xl text-purple-600 shadow-xl flex items-center justify-center active:scale-90 transition-all opacity-0 group-hover:opacity-100">
+                        <Download size={18} />
+                      </button>
                     </div>
                   )}
                 </>
               )}
 
-              <div className="flex items-center gap-2 border-t border-gray-50 dark:border-slate-700 pt-4 mt-auto">
-                {res.type === 'text' ? (
-                  <>
-                    <button className="flex-1 py-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
-                      <Copy size={14} className="text-purple-600" /> {t.copy}
-                    </button>
-                    <button className="flex-1 py-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
-                      <FolderPlus size={14} className="text-purple-600" /> {t.save}
-                    </button>
-                    <button className="p-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-slate-400 hover:text-purple-600">
-                      <Calendar size={14} />
-                    </button>
-                  </>
-                ) : res.status === 'done' ? (
-                  <>
-                    <button className="flex-1 py-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
-                      <FolderPlus size={14} className="text-purple-600" /> {t.save}
-                    </button>
-                    <button 
-                       onClick={() => handleDownload(res.url!, res)}
-                       className="p-2.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-slate-400 hover:text-purple-600 transition-colors"
-                    >
-                      <Download size={16} />
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex-1 py-2.5 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    Processing...
-                  </div>
-                )}
+              <div className="flex items-center gap-2 sm:gap-3 border-t border-gray-50 dark:border-slate-700/50 pt-5 sm:pt-6 mt-auto">
+                <button className="flex-1 h-12 bg-gray-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all active:scale-95 text-slate-600 dark:text-slate-300">
+                  <Copy size={16} className="text-purple-600" /> {t.copy}
+                </button>
+                <button className="flex-1 h-12 bg-gray-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all active:scale-95 text-slate-600 dark:text-slate-300">
+                  <FolderPlus size={16} className="text-purple-600" /> {t.save}
+                </button>
               </div>
             </div>
           ))}
-
-          {results.length === 0 && !loading && (
-            <div className="col-span-full py-16 flex flex-col items-center justify-center text-gray-400 opacity-40">
-              <Sparkles size={48} className="mb-4" />
-              <p className="text-xs font-bold uppercase tracking-[4px]">Nothing generated yet</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

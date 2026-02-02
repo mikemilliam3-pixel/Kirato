@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
@@ -19,19 +18,19 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ iconName, color, path, translat
   return (
     <Link 
       to={path} 
-      className="flex flex-col rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all active:scale-[0.98] bg-white dark:bg-slate-800"
+      className="flex flex-col rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 active:scale-95 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 group h-full relative"
     >
       <div 
-        className="h-28 flex items-center justify-center transition-colors"
+        className="h-20 sm:h-36 md:h-44 flex items-center justify-center transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
         style={{ backgroundColor: color }}
       >
-        <Icon className="w-10 h-10 text-white" />
+        <Icon className="w-7 h-7 sm:w-12 sm:h-12 md:w-14 md:h-14 text-white drop-shadow-lg transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110" />
       </div>
-      <div className="p-4 flex flex-col items-center text-center">
-        <h3 className="font-bold text-sm mb-1 line-clamp-1" style={{ color: color }}>
+      <div className="p-2.5 sm:p-6 md:p-8 flex flex-col items-center text-center flex-1 justify-center relative bg-white dark:bg-slate-900">
+        <h3 className="font-black text-[13px] sm:text-base md:text-lg mb-0.5 sm:mb-2 line-clamp-1 uppercase tracking-tight" style={{ color: color }}>
           {t(`modules.${translationKey}.title`)}
         </h3>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
+        <p className="text-[9px] sm:text-[10px] md:text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-tight sm:leading-relaxed">
           {t(`modules.${translationKey}.subtitle`)}
         </p>
       </div>

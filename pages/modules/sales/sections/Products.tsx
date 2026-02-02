@@ -1,76 +1,588 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
-import { Search, Plus, Filter, MoreVertical, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import { 
+  Search, Plus, MoreVertical, X, Image as ImageIcon, 
+  Video, DollarSign, Info, Tag, Check, Layout, Sparkles, Eye, EyeOff, Globe,
+  Upload, Trash2, RefreshCw
+} from 'lucide-react';
+import { Product, ProductStatus, ProductVisibility } from '../types';
+
+const PRODUCT_CATEGORIES = [
+  'clothing', 'shoes', 'bags', 'electronics', 'home', 
+  'beauty', 'kids', 'sports', 'auto', 'books', 'food', 'other'
+];
 
 const Products: React.FC = () => {
   const { language } = useApp();
-  const t = salesTranslations[language].products;
-  const [filter, setFilter] = useState('all');
+  const moduleT = useMemo(() => salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'], [language]);
+  const t = moduleT.products;
+  const tForm = moduleT.newProduct;
 
-  const products = [
-    { id: '1', title: 'Wireless Headphones', price: 59.99, stock: 12, category: 'Electronics', status: 'active', image: '🎧' },
-    { id: '2', title: 'Smart Watch X', price: 129.00, stock: 0, category: 'Gadgets', status: 'out_of_stock', image: '⌚' },
-    { id: '3', title: 'Minimalist Wallet', price: 25.00, stock: 45, category: 'Accessories', status: 'active', image: '💼' },
-    { id: '4', title: 'Bamboo Coffee Cup', price: 18.50, stock: 8, category: 'Home', status: 'draft', image: '☕' },
-  ];
+  const [filter, setFilter] = useState('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // --- Initial State for New Product ---
+  const initialProductState: Partial<Product> = {
+    title: '',
+    shortDescription: '',
+    fullDescription: '',
+    category: 'clothing',
+    tags: [],
+    price: 0,
+    discount: 0,
+    currency: 'USD',
+    stock: 100,
+    status: 'draft',
+    visibility: 'public',
+    approvalRequired: false,
+    trialAvailable: false,
+    trialDays: 7,
+  };
+
+  const [form, setForm] = useState<Partial<Product>>(initialProductState);
+  
+  // Media State (Files + Previews)
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [sampleOutputFile, setSampleOutputFile] = useState<File | null>(null);
+
+  const coverPreview = useMemo(() => coverFile ? URL.createObjectURL(coverFile) : null, [coverFile]);
+  const galleryPreviews = useMemo(() => galleryFiles.map(f => URL.createObjectURL(f)), [galleryFiles]);
+  const videoPreview = useMemo(() => videoFile ? URL.createObjectURL(videoFile) : null, [videoFile]);
+  const sampleOutputPreview = useMemo(() => sampleOutputFile ? URL.createObjectURL(sampleOutputFile) : null, [sampleOutputFile]);
+
+  const [tagInput, setTagInput] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [products, setProducts] = useState<Product[]>([
+    { 
+      id: '1', 
+      title: 'Wireless Headphones', 
+      shortDescription: 'High quality sound',
+      fullDescription: '# Best Headphones\n- Great Bass\n- Long Battery',
+      category: 'electronics', 
+      tags: ['audio', 'tech'],
+      price: 59.99, 
+      currency: 'USD',
+      stock: 12, 
+      status: 'active', 
+      visibility: 'public',
+      approvalRequired: false,
+      trialAvailable: false,
+      images: ['🎧'],
+      createdAt: new Date().toISOString()
+    },
+    { 
+      id: '2', 
+      title: 'Smart Watch X', 
+      shortDescription: 'Feature rich watch',
+      fullDescription: '# Smart Watch\nTracking every step.',
+      category: 'electronics', 
+      tags: ['health', 'wearable'],
+      price: 129.00, 
+      currency: 'USD',
+      stock: 0, 
+      status: 'out_of_stock', 
+      visibility: 'public',
+      approvalRequired: false,
+      trialAvailable: true,
+      trialDays: 14,
+      images: ['⌚'],
+      createdAt: new Date().toISOString()
+    },
+  ]);
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!form.title) newErrors.title = tForm.errors.name;
+    if (!form.category) newErrors.category = tForm.errors.category;
+    if (form.price === undefined || form.price < 0) newErrors.price = tForm.errors.price;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = () => {
+    if (!validate()) return;
+
+    const finalStatus: ProductStatus = form.approvalRequired ? 'pending' : (form.status || 'draft');
+
+    const newProduct: Product = {
+      ...form as Product,
+      id: Math.random().toString(36).substr(2, 9),
+      status: finalStatus,
+      createdAt: new Date().toISOString(),
+      // In a real app, you'd upload these files and get URLs back
+      // For now we use the local preview or fallback icon
+      images: coverPreview ? [coverPreview, ...galleryPreviews] : ['📦']
+    };
+
+    setProducts([newProduct, ...products]);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setIsModalOpen(false);
+    setForm(initialProductState);
+    setCoverFile(null);
+    setGalleryFiles([]);
+    setVideoFile(null);
+    setSampleOutputFile(null);
+    setErrors({});
+  };
+
+  const addTag = () => {
+    if (tagInput && !form.tags?.includes(tagInput)) {
+      setForm({ ...form, tags: [...(form.tags || []), tagInput] });
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tag: string) => {
+    setForm({ ...form, tags: form.tags?.filter(t => t !== tag) });
+  };
 
   const filtered = products.filter(p => filter === 'all' || p.status === filter);
 
+  const getStatusBadge = (status: ProductStatus) => {
+    switch(status) {
+      case 'active': return { label: t.published, color: 'bg-emerald-50 text-emerald-600' };
+      case 'pending': return { label: t.pending, color: 'bg-blue-50 text-blue-600' };
+      case 'draft': return { label: t.draft, color: 'bg-gray-100 text-gray-500' };
+      case 'archived': return { label: t.archived, color: 'bg-rose-50 text-rose-600' };
+      case 'out_of_stock': return { label: t.outOfStock, color: 'bg-amber-50 text-amber-600' };
+      default: return { label: status as string, color: 'bg-gray-50 text-gray-400' };
+    }
+  };
+
+  const filterStates: { id: string; label: string }[] = [
+    { id: 'all', label: t.all },
+    { id: 'active', label: t.active },
+    { id: 'pending', label: t.pending },
+    { id: 'draft', label: t.draft },
+    { id: 'archived', label: t.archived },
+    { id: 'out_of_stock', label: t.outOfStock }
+  ];
+
+  // Helper for file inputs
+  const FileInput = ({ 
+    label, 
+    accept = "image/*", 
+    onChange, 
+    preview, 
+    icon: Icon = ImageIcon,
+    multiple = false,
+    onRemove
+  }: any) => (
+    <div className="space-y-2">
+      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
+      <div className="relative group min-h-[140px] flex items-center justify-center bg-gray-50 dark:bg-slate-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-slate-700 hover:border-rose-500/50 transition-all overflow-hidden">
+        {preview ? (
+          <div className="absolute inset-0 w-full h-full">
+            {accept.includes("video") ? (
+              <video src={preview} className="w-full h-full object-cover" />
+            ) : (
+              <img src={preview} className="w-full h-full object-cover" />
+            )}
+            <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+               <button 
+                 onClick={onRemove}
+                 className="p-2 bg-white text-rose-600 rounded-xl shadow-lg active:scale-90 transition-transform"
+               >
+                 <Trash2 size={18} />
+               </button>
+            </div>
+          </div>
+        ) : (
+          <label className="cursor-pointer flex flex-col items-center gap-2 p-6 w-full h-full">
+            <Upload className="text-gray-300 group-hover:text-rose-500 transition-colors" size={32} />
+            <span className="text-[10px] font-black uppercase text-gray-400">{tForm.upload}</span>
+            <input type="file" accept={accept} multiple={multiple} className="hidden" onChange={onChange} />
+          </label>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex items-center justify-between">
-        <h3 className="font-extrabold text-lg lg:text-xl">Inventory</h3>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-lg active:scale-95 transition-all">
-          <Plus size={16} /> {t.add}
+    <div className="space-y-6 pb-24 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h3 className="font-black text-xl md:text-2xl tracking-tight">{t.inventory}</h3>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center justify-center gap-2 px-6 h-12 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:bg-rose-700 w-full sm:w-auto"
+        >
+          <Plus size={18} /> {t.add}
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="flex-1 flex items-center gap-3 bg-white dark:bg-slate-800 p-3 lg:p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
-          <Search size={18} className="text-gray-400" />
-          <input type="text" placeholder={t.search} className="bg-transparent border-none text-sm focus:ring-0 w-full" />
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1 flex items-center gap-3 bg-white dark:bg-slate-800 h-14 px-5 rounded-[20px] border border-gray-100 dark:border-slate-700 shadow-sm transition-all focus-within:ring-2 focus-within:ring-rose-500/20">
+          <Search size={20} className="text-gray-400" />
+          <input type="text" placeholder={t.search} className="bg-transparent border-none text-sm font-medium focus:ring-0 w-full" />
         </div>
-        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          {['all', 'active', 'draft', 'out_of_stock'].map((s) => (
+        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1 shrink-0">
+          {filterStates.map((s) => (
             <button 
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-4 py-2 rounded-xl text-[10px] lg:text-[11px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
-                filter === s ? 'bg-rose-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-400 border border-gray-100 dark:border-slate-700'
+              key={s.id}
+              onClick={() => setFilter(s.id)}
+              className={`px-5 h-14 rounded-[20px] text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap border shrink-0 ${
+                filter === s.id 
+                  ? 'bg-rose-600 border-rose-600 text-white shadow-lg' 
+                  : 'bg-white dark:bg-slate-800 text-slate-400 border-gray-100 dark:border-slate-700 hover:text-slate-600 dark:hover:text-slate-200'
               }`}
             >
-              {s === 'all' ? t.all : (t as any)[s === 'out_of_stock' ? 'outOfStock' : s]}
+              {s.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {filtered.map((product) => (
-          <div key={product.id} className="p-4 lg:p-6 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm flex items-center md:items-start gap-4 hover:shadow-md transition-shadow">
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gray-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center text-3xl lg:text-4xl shadow-inner shrink-0">
-              {product.image}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-sm lg:text-base truncate">{product.title}</h4>
-              <p className="text-[10px] lg:text-xs text-gray-400 font-bold uppercase mb-1">{product.category}</p>
-              <div className="flex items-center gap-3">
-                <span className="text-sm lg:text-base font-extrabold text-rose-600">${product.price}</span>
-                <span className={`text-[9px] lg:text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  product.stock > 10 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                }`}>
-                  {product.stock} in stock
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        {filtered.map((product) => {
+          const badge = getStatusBadge(product.status);
+          // Fix: Safely lookup category translation and ensure it's a string for React rendering to avoid object-as-child errors
+          const categories = t.categories as Record<string, string>;
+          const translatedCategory = categories[product.category] || categories.other || product.category;
+          
+          return (
+            <div key={product.id} className="p-5 md:p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col gap-4 hover:shadow-xl transition-all group">
+              <div className="w-full aspect-square bg-gray-50 dark:bg-slate-900 rounded-[24px] flex items-center justify-center text-5xl md:text-6xl shadow-inner group-hover:scale-105 transition-transform duration-500 relative">
+                {product.images[0]?.length < 100 ? product.images[0] : <img src={product.images[0]} className="w-full h-full object-cover rounded-[24px]" alt={product.title} />}
+                <span className={`absolute top-4 right-4 px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${badge.color}`}>
+                  {badge.label}
                 </span>
               </div>
+              <div className="space-y-1">
+                <div className="flex justify-between items-start">
+                  <h4 className="font-black text-sm sm:text-base md:text-lg truncate tracking-tight">{product.title}</h4>
+                  <button className="text-gray-300 hover:text-rose-600 transition-colors shrink-0 ml-2">
+                    <MoreVertical size={20} />
+                  </button>
+                </div>
+                {/* Fix: Ensured translatedCategory is treated as ReactNode to satisfy TypeScript */}
+                <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 font-black uppercase tracking-widest">{translatedCategory as React.ReactNode}</p>
+              </div>
+              <div className="flex items-center justify-between pt-2 mt-auto">
+                <span className="text-base sm:text-lg font-black text-rose-600 tracking-tight">${product.price}</span>
+                <div className="flex items-center gap-1.5">
+                   <div className={`w-2 h-2 rounded-full ${product.visibility === 'public' ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                   <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">
+                     {/* Fix: Index access on 't' could return an object (categories), cast to any to ensure we only render the string parts like 'public'/'private' label */}
+                     {((t as any)[product.visibility] || product.visibility) as React.ReactNode}
+                   </span>
+                </div>
+              </div>
             </div>
-            <button className="p-2 text-gray-300 hover:text-rose-600 transition-colors">
-              <MoreVertical size={20} />
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* --- New Product Modal --- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={resetForm} />
+          <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[40px] p-0 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center p-8 border-b border-gray-100 dark:border-slate-800 shrink-0">
+              <h4 className="text-2xl font-black tracking-tight flex items-center gap-3">
+                <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-xl flex items-center justify-center">
+                  <Plus size={24} />
+                </div>
+                {tForm.title}
+              </h4>
+              <button onClick={resetForm} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-slate-600 transition-colors"><X size={28}/></button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto p-8 no-scrollbar space-y-12">
+              {/* 1. Basic Info */}
+              <section className="space-y-6">
+                <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.basicInfo}</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.nameLabel}</label>
+                    <input 
+                      type="text" 
+                      value={form.title}
+                      onChange={e => setForm({ ...form, title: e.target.value })}
+                      className={`w-full h-14 px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm ${errors.title ? 'ring-2 ring-rose-500' : ''}`} 
+                      placeholder={tForm.namePlaceholder}
+                    />
+                    {errors.title && <p className="text-[10px] text-rose-500 font-bold ml-1">{errors.title}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.catLabel}</label>
+                    <select 
+                      value={form.category}
+                      onChange={e => setForm({ ...form, category: e.target.value })}
+                      className="w-full h-14 px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm"
+                    >
+                      {PRODUCT_CATEGORIES.map(catKey => (
+                        <option key={catKey} value={catKey}>
+                          {/* Fix: Ensured lookup is cast correctly for display in select option */}
+                          {((t.categories as any)[catKey] || catKey) as React.ReactNode}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.shortDescLabel}</label>
+                  <textarea 
+                    value={form.shortDescription}
+                    onChange={e => setForm({ ...form, shortDescription: e.target.value })}
+                    className="w-full h-20 p-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 text-sm font-medium leading-relaxed"
+                    placeholder={tForm.shortDescPlaceholder}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.fullDescLabel}</label>
+                  <textarea 
+                    value={form.fullDescription}
+                    onChange={e => setForm({ ...form, fullDescription: e.target.value })}
+                    className="w-full h-48 p-5 bg-gray-50 dark:bg-slate-800 rounded-3xl border-none focus:ring-2 focus:ring-rose-500 text-sm font-medium leading-relaxed"
+                    placeholder={tForm.fullDescPlaceholder}
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.tagsLabel}</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {form.tags?.map(tag => (
+                      <span key={tag} className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                        {tag} <X size={12} className="cursor-pointer" onClick={() => removeTag(tag)} />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={tagInput}
+                      onChange={e => setTagInput(e.target.value)}
+                      onKeyPress={e => e.key === 'Enter' && addTag()}
+                      className="flex-1 h-12 px-5 bg-gray-50 dark:bg-slate-800 rounded-xl border-none text-xs font-bold" 
+                      placeholder={tForm.tagsPlaceholder}
+                    />
+                    <button onClick={addTag} className="px-4 bg-gray-100 dark:bg-slate-700 rounded-xl font-black text-[10px] uppercase">{tForm.tagsAdd}</button>
+                  </div>
+                </div>
+              </section>
+
+              {/* 2. Media */}
+              <section className="space-y-6">
+                <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.media}</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Cover Image */}
+                  <FileInput 
+                    label={tForm.coverLabel}
+                    preview={coverPreview}
+                    onChange={(e: any) => setCoverFile(e.target.files[0])}
+                    onRemove={() => setCoverFile(null)}
+                  />
+
+                  {/* Demo Video */}
+                  <FileInput 
+                    label={tForm.videoLabel}
+                    accept="video/mp4,video/webm"
+                    preview={videoPreview}
+                    onChange={(e: any) => setVideoFile(e.target.files[0])}
+                    onRemove={() => setVideoFile(null)}
+                  />
+                </div>
+
+                {/* Gallery */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.galleryLabel}</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {galleryPreviews.map((p, i) => (
+                      <div key={i} className="aspect-square relative rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 group">
+                        <img src={p} className="w-full h-full object-cover" alt={`Gallery ${i}`} />
+                        <button 
+                          onClick={() => setGalleryFiles(prev => prev.filter((_, idx) => idx !== i))}
+                          className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    ))}
+                    <label className="aspect-square flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-800 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-rose-500/50 transition-all">
+                      <Plus className="text-gray-300" />
+                      <span className="text-[8px] font-black uppercase text-gray-400 mt-1">{tForm.addMore}</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        className="hidden" 
+                        onChange={(e: any) => setGalleryFiles(prev => [...prev, ...Array.from(e.target.files as FileList)])} 
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Conditional Sample Output - Kept for structure but disabled for current categories */}
+                {['AI tools', 'Prompt'].includes(form.category || '') && (
+                  <div className="animate-in fade-in slide-in-from-top-2">
+                    <FileInput 
+                      label={tForm.sampleLabel}
+                      preview={sampleOutputPreview}
+                      onChange={(e: any) => setSampleOutputFile(e.target.files[0])}
+                      onRemove={() => setSampleOutputFile(null)}
+                    />
+                  </div>
+                )}
+              </section>
+
+              {/* 3. Pricing */}
+              <section className="space-y-6">
+                <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.pricing}</h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.priceLabel}</label>
+                    <div className="relative">
+                       <DollarSign className="absolute left-4 top-4 text-gray-400" size={18} />
+                       <input 
+                        type="number" 
+                        value={form.price}
+                        onChange={e => setForm({ ...form, price: parseFloat(e.target.value) })}
+                        className={`w-full h-12 pl-12 bg-gray-50 dark:bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs ${errors.price ? 'ring-2 ring-rose-500' : ''}`} 
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.discountLabel}</label>
+                    <input 
+                      type="number" 
+                      value={form.discount}
+                      onChange={e => setForm({ ...form, discount: parseFloat(e.target.value) })}
+                      className="w-full h-12 px-5 bg-gray-50 dark:bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs" 
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.currencyLabel}</label>
+                    <select 
+                      value={form.currency}
+                      onChange={e => setForm({ ...form, currency: e.target.value })}
+                      className="w-full h-12 px-5 bg-gray-50 dark:bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="UZS">UZS (so'm)</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-5 bg-gray-50 dark:bg-slate-800 rounded-[24px]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
+                      <Layout size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black">{tForm.trialToggle}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">{tForm.trialDesc}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setForm({ ...form, trialAvailable: !form.trialAvailable })}
+                    className={`w-14 h-7 rounded-full p-1 transition-all ${form.trialAvailable ? 'bg-emerald-500' : 'bg-gray-300'}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${form.trialAvailable ? 'translate-x-7' : ''}`} />
+                  </button>
+                </div>
+                {form.trialAvailable && (
+                  <div className="space-y-2 animate-in slide-in-from-top-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.trialDaysLabel}</label>
+                    <input 
+                      type="number" 
+                      value={form.trialDays}
+                      onChange={e => setForm({ ...form, trialDays: parseInt(e.target.value) })}
+                      className="w-full h-12 px-5 bg-gray-50 dark:bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs" 
+                      placeholder="7"
+                    />
+                  </div>
+                )}
+              </section>
+
+              {/* 4. Status & Visibility */}
+              <section className="space-y-8">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.statusMod}</h5>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.statusLabel}</label>
+                          <select 
+                            value={form.status}
+                            onChange={e => setForm({ ...form, status: e.target.value as any })}
+                            className="w-full h-14 px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm"
+                          >
+                            <option value="draft">{t.draft}</option>
+                            <option value="active">{t.published}</option>
+                            <option value="archived">{t.archived}</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center justify-between p-4 bg-rose-50/50 dark:bg-rose-900/10 rounded-2xl border border-rose-100 dark:border-rose-900/30">
+                           <div className="flex items-center gap-3">
+                              <Info size={16} className="text-rose-500" />
+                              <span className="text-xs font-bold">{tForm.approvalLabel}</span>
+                           </div>
+                           <button 
+                            onClick={() => setForm({ ...form, approvalRequired: !form.approvalRequired })}
+                            className={`w-12 h-6 rounded-full p-1 transition-all ${form.approvalRequired ? 'bg-rose-500' : 'bg-gray-300'}`}
+                          >
+                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${form.approvalRequired ? 'translate-x-6' : ''}`} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.visibilitySettings}</h5>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: 'public', icon: Globe, label: t.public },
+                          { id: 'private', icon: EyeOff, label: t.private },
+                          { id: 'unlisted', icon: Eye, label: t.unlisted }
+                        ].map(v => (
+                          <button 
+                            key={v.id}
+                            onClick={() => setForm({ ...form, visibility: v.id as any })}
+                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${
+                              form.visibility === v.id 
+                                ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-600 text-rose-600 shadow-sm' 
+                                : 'bg-white dark:bg-slate-800 border-gray-50 dark:border-slate-800 text-gray-400'
+                            }`}
+                          >
+                            <v.icon size={20} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">{v.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                 </div>
+              </section>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="p-8 border-t border-gray-100 dark:border-slate-800 bg-gray-100/50 dark:bg-slate-900/50 flex gap-4 shrink-0">
+               <button 
+                onClick={resetForm}
+                className="flex-1 h-14 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-slate-500 rounded-2xl text-sm font-black uppercase tracking-widest active:scale-95 transition-all"
+              >
+                {tForm.cancel}
+              </button>
+              <button 
+                onClick={handleSave}
+                className="flex-[2] h-14 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all hover:bg-rose-700 flex items-center justify-center gap-2"
+              >
+                <Check size={20} /> {tForm.create}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { resumeTranslations } from '../i18n';
-import { FileText, Mail, Briefcase, Mic, Plus, ChevronRight, Clock, Star } from 'lucide-react';
+import { FileText, Mail, Briefcase, Mic, Plus, ChevronRight } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const { language } = useApp();
@@ -16,76 +15,55 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-            <div className={`w-8 h-8 ${kpi.bg} rounded-lg flex items-center justify-center mb-3`}>
-              <kpi.icon size={16} className={kpi.color} />
+          <div key={idx} className="p-4 sm:p-5 md:p-7 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 transition-all hover:shadow-md">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${kpi.bg} rounded-2xl flex items-center justify-center mb-3 sm:mb-4`}>
+              <kpi.icon size={22} className={kpi.color} />
             </div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight mb-1">{kpi.label}</p>
-            <h4 className="text-lg font-extrabold text-slate-900 dark:text-white">{kpi.value}</h4>
+            <p className="text-[9px] sm:text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{kpi.label}</p>
+            <h4 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">{kpi.value}</h4>
           </div>
         ))}
       </div>
 
-      <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl text-white shadow-xl shadow-blue-200 dark:shadow-none">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">Continue Editing</span>
-            <h3 className="text-xl font-bold">Senior Web Developer</h3>
-          </div>
-          <Star className="text-amber-300" fill="currentColor" size={24} />
+      <div className="p-6 sm:p-8 md:p-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden relative">
+        <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+          <FileText size={240} />
         </div>
-        <p className="text-xs opacity-90 mb-6">Last edited 2 hours ago. Your profile is 85% complete.</p>
-        <button className="w-full py-3 bg-white text-blue-700 rounded-xl font-bold text-xs active:scale-95 transition-all">
+        <div className="flex-1 relative z-10">
+          <span className="text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-widest opacity-70">Resume Blueprint</span>
+          <h3 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mt-1">Senior Web Developer</h3>
+          <p className="text-xs sm:text-sm font-bold opacity-80 mt-2 max-w-md">Your profile is 85% complete. Add your latest project to boost visibility by 30%.</p>
+        </div>
+        <button className="h-12 sm:h-14 px-8 sm:px-10 bg-white text-blue-700 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest active:scale-95 transition-all shadow-lg shrink-0 relative z-10">
           {t.continueEditing}
         </button>
       </div>
 
       <div>
-        <h3 className="font-bold text-sm mb-3 px-1">{t.quickActions}</h3>
-        <div className="grid grid-cols-3 gap-3">
-          <button className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 active:scale-95 transition-all">
-            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl flex items-center justify-center">
+        <h3 className="font-black text-sm sm:text-base md:text-lg mb-4 px-1 tracking-tight">{t.quickActions}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <button className="flex items-center gap-4 p-5 bg-white dark:bg-slate-800 rounded-[24px] border border-gray-100 dark:border-slate-700 active:scale-95 transition-all hover:bg-gray-50 h-16 sm:h-20 group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
               <Plus size={20} />
             </div>
-            <span className="text-[10px] font-bold text-center leading-tight">{t.createResume}</span>
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">{t.createResume}</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 active:scale-95 transition-all">
-            <div className="w-10 h-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl flex items-center justify-center">
+          <button className="flex items-center gap-4 p-5 bg-white dark:bg-slate-800 rounded-[24px] border border-gray-100 dark:border-slate-700 active:scale-95 transition-all hover:bg-gray-50 h-16 sm:h-20 group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
               <Mail size={20} />
             </div>
-            <span className="text-[10px] font-bold text-center leading-tight">{t.newLetter}</span>
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">{t.newLetter}</span>
           </button>
-          <button className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 active:scale-95 transition-all">
-            <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 rounded-xl flex items-center justify-center">
+          <button className="flex items-center gap-4 p-5 bg-white dark:bg-slate-800 rounded-[24px] border border-gray-100 dark:border-slate-700 active:scale-95 transition-all hover:bg-gray-50 h-16 sm:h-20 group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
               <Briefcase size={20} />
             </div>
-            <span className="text-[10px] font-bold text-center leading-tight">{t.addJob}</span>
+            <span className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">{t.addJob}</span>
           </button>
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="font-bold text-sm px-1">Recent Activity</h3>
-        {[
-          { title: "Applied to Google", time: "3 hours ago", icon: Briefcase, color: "text-emerald-500" },
-          { title: "Interpreted Feedback", time: "Yesterday", icon: Mic, color: "text-orange-500" }
-        ].map((item, i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-50 dark:bg-slate-900 rounded-xl flex items-center justify-center">
-                <item.icon size={18} className={item.color} />
-              </div>
-              <div>
-                <p className="text-xs font-bold">{item.title}</p>
-                <p className="text-[10px] text-gray-500">{item.time}</p>
-              </div>
-            </div>
-            <ChevronRight size={16} className="text-slate-300" />
-          </div>
-        ))}
       </div>
     </div>
   );

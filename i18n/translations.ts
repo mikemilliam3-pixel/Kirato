@@ -1,7 +1,6 @@
-
 import { Language, TranslationDictionary } from '../types';
 
-export const translations: Record<Language, TranslationDictionary> = {
+export const translations: any = {
   UZ: {
     appName: "Kirato AI",
     appSubtitle: "ASSISTANT",
@@ -21,7 +20,11 @@ export const translations: Record<Language, TranslationDictionary> = {
     },
     common: {
       back: "Orqaga",
-      placeholder: "Hali tayyor emas..."
+      placeholder: "Hali tayyor emas...",
+      search: "Qidirish...",
+      notFoundTitle: "Sahifa topilmadi",
+      notFoundDesc: "Siz qidirayotgan bo'lim mavjud emas yoki hali yakunlanmagan.",
+      notifications: "Bildirishnomalar"
     }
   },
   RU: {
@@ -43,7 +46,11 @@ export const translations: Record<Language, TranslationDictionary> = {
     },
     common: {
       back: "Назад",
-      placeholder: "Еще не готово..."
+      placeholder: "Еще не готово...",
+      search: "Поиск...",
+      notFoundTitle: "Страница не найдена",
+      notFoundDesc: "Раздел, который вы ищете, не существует или находится в разработке.",
+      notifications: "Уведомления"
     }
   },
   EN: {
@@ -65,7 +72,11 @@ export const translations: Record<Language, TranslationDictionary> = {
     },
     common: {
       back: "Back",
-      placeholder: "Not ready yet..."
+      placeholder: "Not ready yet...",
+      search: "Search...",
+      notFoundTitle: "Page Not Found",
+      notFoundDesc: "The section you are looking for does not exist or is under construction.",
+      notifications: "Notifications"
     }
   }
 };

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AppState, Language, Theme } from '../types';
 import { translations } from '../i18n/translations';
 
@@ -7,16 +7,16 @@ const AppContext = createContext<AppState | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
     try {
-      const stored = localStorage.getItem('app-language');
-      return (stored as Language) || 'UZ';
+      const stored = localStorage.getItem('kirato-lang');
+      return (stored as Language) || 'EN';
     } catch {
-      return 'UZ';
+      return 'EN';
     }
   });
 
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
-      const stored = localStorage.getItem('app-theme');
+      const stored = localStorage.getItem('kirato-theme');
       return (stored as Theme) || 'light';
     } catch {
       return 'light';
@@ -24,20 +24,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   useEffect(() => {
-    try {
-      localStorage.setItem('app-language', language);
-    } catch (e) {
-      console.warn("Storage restricted:", e);
-    }
+    localStorage.setItem('kirato-lang', language);
   }, [language]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('app-theme', theme);
-    } catch (e) {
-      console.warn("Storage restricted:", e);
-    }
-    
+    localStorage.setItem('kirato-theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -45,21 +36,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [theme]);
 
-  const setLanguage = (lang: Language) => setLanguageState(lang);
-  const toggleTheme = () => setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+  }, []);
 
-  const t = (path: string): string => {
+  const toggleTheme = useCallback(() => {
+    setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+  }, []);
+
+  const t = useCallback((path: string): string => {
     const keys = path.split('.');
-    let current: any = translations[language];
+    let current: any = translations[language] || translations['EN'];
+
     for (const key of keys) {
-      if (current && current[key]) {
+      if (current && typeof current === 'object' && key in current) {
         current = current[key];
       } else {
-        return path;
+        // Fallback to English
+        let fallback: any = translations['EN'];
+        for (const fKey of keys) {
+          fallback = fallback?.[fKey];
+        }
+        return typeof fallback === 'string' ? fallback : path;
       }
     }
     return typeof current === 'string' ? current : path;
-  };
+  }, [language]);
 
   return (
     <AppContext.Provider value={{ language, theme, setLanguage, toggleTheme, t }}>

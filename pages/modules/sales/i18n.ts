@@ -1,4 +1,3 @@
-
 export const salesTranslations = {
   UZ: {
     title: "Savdo va Do'kon",
@@ -23,9 +22,13 @@ export const salesTranslations = {
       addProduct: "Mahsulot qo'shish",
       viewShop: "Do'konni ko'rish",
       shareChannel: "Ulashish",
-      analytics: "Analitika"
+      analytics: "Analitika",
+      onHoldFunds: "Escrow (Ushlab turilgan)",
+      pendingPayouts: "To'lovga tayyor",
+      disputedOrders: "Bahsli buyurtmalar"
     },
     products: {
+      inventory: "Inventar",
       search: "Mahsulotlarni qidirish...",
       add: "Yangi mahsulot",
       edit: "Tahrirlash",
@@ -35,7 +38,182 @@ export const salesTranslations = {
       all: "Barchasi",
       draft: "Qoralama",
       active: "Faol",
-      outOfStock: "Tugagan"
+      pending: "Kutilmoqda",
+      archived: "Arxivlandi",
+      published: "Nashr etilgan",
+      outOfStock: "Tugagan",
+      visibility: "Ko'rinishi",
+      public: "Ochiq",
+      private: "Shaxsiy",
+      unlisted: "Ro'yxatdan tashqari",
+      status: "Holat",
+      categories: {
+        clothing: "Kiyim-kechak va aksessuarlar",
+        shoes: "Oyoq kiyimlar",
+        bags: "Sumkalar va hamyonlar",
+        electronics: "Elektronika va gadjetlar",
+        home: "Uy va oshxona buyumlari",
+        beauty: "Go‘zallik va shaxsiy parvarish",
+        kids: "Bolalar va chaqaloqlar uchun",
+        sports: "Sport va faol dam olish",
+        auto: "Avto va asbob-uskunalar",
+        books: "Kitoblar va kanselyariya",
+        food: "Oziq-ovqat va ichimliklar",
+        other: "Boshqa"
+      }
+    },
+    publicShop: {
+      verified: "Tasdiqlangan sotuvchi",
+      rateBtn: "Baholash",
+      reportBtn: "Shikoyat qilish",
+      location: "Manzil",
+      hours: "Ish vaqti",
+      contactBtn: "Bog'lanish",
+      requestBtn: "So'rov yuborish",
+      reviews: "Sharhlar",
+      chatFloatingBtn: "Sotuvchi bilan chat",
+      messageSeller: "Sotuvchiga xabar yuboring",
+      startChat: "Chatni boshlash",
+      close: "Yopish",
+      online: "Onlayn",
+      offline: "Oflayn",
+      verificationPending: "Tasdiqlash kutilmoqda",
+      rateModal: {
+        title: "Sotuvchini baholang",
+        placeholder: "O'z fikringizni yozing (ixtiyoriy)...",
+      },
+      reportModal: {
+        title: "Sotuvchi ustidan shikoyat",
+        reason: "Sababni tanlang",
+        description: "Tafsilotlar",
+        reasons: {
+          scam: "Firibgarlik",
+          fake: "Qalbaki mahsulot",
+          no_response: "Javob bermayapti",
+          inappropriate: "Noxush xulq-atvor",
+          other: "Boshqa sabab"
+        }
+      },
+      success: {
+        rated: "Rahmat! Bahongiz qabul qilindi.",
+        reported: "Shikoyatingiz yuborildi va ko'rib chiqiladi."
+      },
+      submit: "Yuborish",
+      cancel: "Bekor qilish"
+    },
+    chat: {
+      title: "Chat",
+      online: "Onlayn",
+      offline: "Oflayn",
+      aiMode: "AI Rejimi",
+      sellerMode: "Sotuvchi Rejimi",
+      aiAssist: "AI Yordamchi",
+      suggestReply: "Javob taklif qilish",
+      takeOver: "Boshqaruvni olish",
+      returnToAi: "AI rejimiga qaytish",
+      sending: "Yuborilmoqda...",
+      sent: "Yuborildi",
+      failed: "Xatolik",
+      aiAssistant: "AI Yordamchi",
+      aiDesc: "AI mijozlarga avtomatik javob beradi",
+      type: "Xabar yozing...",
+      noConversations: "Hozircha xabarlar yo'q"
+    },
+    settings: {
+      shopProfile: "Do'kon Profili",
+      shopName: "Do'kon nomi",
+      description: "Tavsif",
+      city: "Shahar / Hudud",
+      workingHours: "Ish vaqti",
+      selectDays: "Kunlarni tanlang",
+      startTime: "Boshlanish vaqti",
+      endTime: "Tugash vaqti",
+      presets: {
+        monFri: "Dush-Jum",
+        monSat: "Dush-Shan",
+        everyday: "Har kuni"
+      },
+      days: {
+        mon: "Dush",
+        tue: "Sesh",
+        wed: "Chor",
+        thu: "Pay",
+        fri: "Jum",
+        sat: "Shan",
+        sun: "Yak"
+      },
+      closed: "Yopiq",
+      contact: "Aloqa ma'lumotlari",
+      saveChanges: "O'zgarishlarni saqlash",
+      cancel: "Bekor qilish",
+      success: "Sozlamalar saqlandi!",
+      verification: {
+        title: "Sotuvchini tasdiqlash",
+        unverified: "Tasdiqlanmagan",
+        pending: "Ko'rib chiqilmoqda",
+        verified: "Tasdiqlangan",
+        rejected: "Rad etilgan",
+        requestBtn: "Tasdiqlashni boshlash",
+        submitBtn: "Ko'rib chiqishga yuborish",
+        resubmitBtn: "Qayta yuborish",
+        requestSent: "Hujjatlar yuborildi. Qo'llab-quvvatlash jamoasi ko'rib chiqadi.",
+        pendingMessage: "Hujjatlaringiz tekshirilmoqda. Tasdiqlangach, sizga xabar beriladi.",
+        adminVerify: "Tasdiqlash",
+        adminReject: "Rad etish",
+        sellerType: "Sotuvchi turi",
+        individual: "Jismoniy shaxs",
+        business: "Yuridik shaxs (Biznes)",
+        uploadIdFront: "Pasport/ID oldi (Majburiy)",
+        uploadIdBack: "Pasport/ID orqasi",
+        uploadBusinessCert: "Guvohnoma (Majburiy)",
+        fileRequirements: "PNG, JPG yoki PDF, maksimal 10MB",
+        replace: "Almashtirish",
+        remove: "O'chirish",
+        missingDocs: "Iltimos, barcha majburiy hujjatlarni yuklang",
+        adminNote: "Admin izohi",
+        supportReview: "Support Review (Hidden Mode)"
+      }
+    },
+    newProduct: {
+      title: "Yangi mahsulot",
+      basicInfo: "Asosiy ma'lumotlar",
+      media: "Media va aktivlar",
+      pricing: "Narxlash va Sinov",
+      statusMod: "Holat va Moderatsiya",
+      visibilitySettings: "Ko'rinish sozlamalari",
+      nameLabel: "Mahsulot nomi *",
+      namePlaceholder: "Masalan: AI Prompt Engineer",
+      catLabel: "Toifa *",
+      shortDescLabel: "Qisqa tavsif",
+      shortDescPlaceholder: "Qisqacha sharh (1-2 qator)...",
+      fullDescLabel: "To'liq tavsif (Markdown)",
+      fullDescPlaceholder: "# Batafsil tavsif...",
+      tagsLabel: "Teglar",
+      tagsPlaceholder: "Teg qo'shish...",
+      tagsAdd: "Qo'shish",
+      coverLabel: "Muqova rasmi",
+      galleryLabel: "Galereya rasmlari",
+      videoLabel: "Demo video",
+      sampleLabel: "Namuna natijasi (Screenshot)",
+      upload: "Yuklash",
+      replace: "Almashtirish",
+      remove: "O'chirish",
+      addMore: "Yana qo'shish",
+      priceLabel: "Narx *",
+      discountLabel: "Chegirma (%)",
+      currencyLabel: "Valyuta",
+      trialToggle: "Bepul sinov muddatini taklif qilish",
+      trialDesc: "Sotib olishdan oldin sinab ko'rish imkonini bering",
+      trialDaysLabel: "Sinov kunlari",
+      statusLabel: "Boshlang'ich holat",
+      approvalLabel: "Admin tasdiqlashi shart",
+      cancel: "Bekor qilish",
+      create: "Mahsulot yaratish",
+      errors: {
+        name: "Mahsulot nomi kiritilishi shart",
+        category: "Toifa tanlanishi shart",
+        price: "To'g'ri narx kiriting"
+      }
     },
     orders: {
       status: {
@@ -43,18 +221,34 @@ export const salesTranslations = {
         processing: "Tayyorlanmoqda",
         shipped: "Yuborildi",
         delivered: "Yetkazildi",
-        cancelled: "Bekor qilindi"
+        cancelled: "Bekor qilindi",
+        disputed: "Bahsli",
+        refunded: "Qaytarildi"
+      },
+      payoutStatus: {
+        on_hold: "Ushlab turilibdi",
+        eligible: "To'lanishi mumkin",
+        released: "To'lab berildi",
+        frozen: "Muzlatilgan"
+      },
+      actions: {
+        markAsShipped: "Yuborilgan deb belgilash",
+        confirmReceipt: "Qabul qildim",
+        reportProblem: "Muammo haqida xabar berish",
+        trackingRequired: "Kuzatuv raqami shart",
+        selectCarrier: "Kuryer xizmatini tanlang",
+        confirmPayout: "To'lovni tasdiqlash"
+      },
+      disputeReasons: {
+        not_received: "Yetib kelmadi",
+        damaged: "Zararlangan",
+        wrong_item: "Noto'g'ri mahsulot",
+        other: "Boshqa sabab"
       },
       payment: {
         unpaid: "To'lanmagan",
         paid: "To'langan"
       }
-    },
-    chat: {
-      aiAssistant: "AI Yordamchi",
-      aiDesc: "AI mijozlarga avtomatik javob beradi",
-      type: "Xabar yozing...",
-      online: "Onlayn"
     },
     promotions: {
       create: "Aksiya yaratish",
@@ -87,9 +281,13 @@ export const salesTranslations = {
       addProduct: "Добавить товар",
       viewShop: "В магазин",
       shareChannel: "Поделиться",
-      analytics: "Аналитика"
+      analytics: "Аналитика",
+      onHoldFunds: "Escrow (Удержание)",
+      pendingPayouts: "К выплате",
+      disputedOrders: "Споры"
     },
     products: {
+      inventory: "Инвентарь",
       search: "Поиск товаров...",
       add: "Новый товар",
       edit: "Изменить",
@@ -99,7 +297,182 @@ export const salesTranslations = {
       all: "Все",
       draft: "Черновик",
       active: "Активен",
-      outOfStock: "Нет в наличии"
+      pending: "На рассмотрении",
+      archived: "Архивирован",
+      published: "Опубликован",
+      outOfStock: "Нет в наличии",
+      visibility: "Видимость",
+      public: "Публичный",
+      private: "Приватный",
+      unlisted: "Скрытый",
+      status: "Статус",
+      categories: {
+        clothing: "Одежда и аксессуары",
+        shoes: "Обувь",
+        bags: "Сумки и кошельки",
+        electronics: "Электроника и гаджеты",
+        home: "Дом и кухня",
+        beauty: "Красота и уход",
+        kids: "Детские товары",
+        sports: "Спорт и отдых",
+        auto: "Авто и инструменты",
+        books: "Книги и канцелярия",
+        food: "Еда и напитки",
+        other: "Другое"
+      }
+    },
+    publicShop: {
+      verified: "Проверенный продавец",
+      rateBtn: "Оценить",
+      reportBtn: "Пожаловаться",
+      location: "Местоположение",
+      hours: "График работы",
+      contactBtn: "Связаться",
+      requestBtn: "Отправить запрос",
+      reviews: "Отзывов",
+      chatFloatingBtn: "Чат с продавцом",
+      messageSeller: "Написать продавцу",
+      startChat: "Начать чат",
+      close: "Закрыть",
+      online: "Онлайн",
+      offline: "Офлайн",
+      verificationPending: "Проверка kutilmoqda",
+      rateModal: {
+        title: "Оцените продавца",
+        placeholder: "Напишите ваш отзыв (необязательно)...",
+      },
+      reportModal: {
+        title: "Пожаловаться на продавца",
+        reason: "Выберите причину",
+        description: "Подробности",
+        reasons: {
+          scam: "Мошенничество",
+          fake: "Поддельный товар",
+          no_response: "Не отвечает",
+          inappropriate: "Неподобающее поведение",
+          other: "Другая причина"
+        }
+      },
+      success: {
+        rated: "Спасибо! Ваш отзыв принят.",
+        reported: "Жалоба отправлена и будет рассмотрена."
+      },
+      submit: "Отправить",
+      cancel: "Отмена"
+    },
+    chat: {
+      title: "Чат",
+      online: "Онлайн",
+      offline: "Офлайн",
+      aiMode: "AI Режим",
+      sellerMode: "Режим продавца",
+      aiAssist: "AI Помощник",
+      suggestReply: "Предложить ответ",
+      takeOver: "Взять управление",
+      returnToAi: "Вернуть в AI режим",
+      sending: "Отправка...",
+      sent: "Отправлено",
+      failed: "Ошибка",
+      aiAssistant: "AI Помощник",
+      aiDesc: "AI отвечает клиентам автоматически",
+      type: "Введите сообщение...",
+      noConversations: "Пока нет сообщений"
+    },
+    settings: {
+      shopProfile: "Профиль магазина",
+      shopName: "Название магазина",
+      description: "Описание",
+      city: "Город / Регион",
+      workingHours: "График работы",
+      selectDays: "Выберите дни",
+      startTime: "Время начала",
+      endTime: "Время окончания",
+      presets: {
+        monFri: "Пн-Пт",
+        monSat: "Пн-Сб",
+        everyday: "Каждый день"
+      },
+      days: {
+        mon: "Пн",
+        tue: "Вт",
+        wed: "Ср",
+        thu: "Чт",
+        fri: "Пт",
+        sat: "Сб",
+        sun: "Вс"
+      },
+      closed: "Закрыто",
+      contact: "Контакты",
+      saveChanges: "Сохранить изменения",
+      cancel: "Отмена",
+      success: "Настройки сохранены!",
+      verification: {
+        title: "Верификация продавца",
+        unverified: "Не верифицирован",
+        pending: "На проверке",
+        verified: "Верифицирован",
+        rejected: "Отклонено",
+        requestBtn: "Начать верификацию",
+        submitBtn: "Отправить на проверку",
+        resubmitBtn: "Переподать",
+        requestSent: "Документы отправлены. Служба поддержки рассмотрит их.",
+        pendingMessage: "Ваши документы проверяются. Мы сообщим вам о результате.",
+        adminVerify: "Верифицировать",
+        adminReject: "Отклонить",
+        sellerType: "Тип продавца",
+        individual: "Физическое лицо",
+        business: "Юридическое лицо (Бизнес)",
+        uploadIdFront: "Паспорт/ID (лицевая сторона)",
+        uploadIdBack: "Паспорт/ID (обратная сторона)",
+        uploadBusinessCert: "Свидетельство о регистрации",
+        fileRequirements: "PNG, JPG или PDF, макс. 10МБ",
+        replace: "Заменить",
+        remove: "Удалить",
+        missingDocs: "Пожалуйста, загрузите все обязательные документы",
+        adminNote: "Примечание админа",
+        supportReview: "Проверка (Support Mode)"
+      }
+    },
+    newProduct: {
+      title: "Новый товар",
+      basicInfo: "Основная информация",
+      media: "Медиа и активы",
+      pricing: "Цена и пробный период",
+      statusMod: "Статус и модерация",
+      visibilitySettings: "Настройки видимости",
+      nameLabel: "Название товара *",
+      namePlaceholder: "Напр: AI Prompt Engineer",
+      catLabel: "Категория *",
+      shortDescLabel: "Краткое описание",
+      shortDescPlaceholder: "Краткий обзор (1-2 строки)...",
+      fullDescLabel: "Полное описание (Markdown)",
+      fullDescPlaceholder: "# Детальное описание...",
+      tagsLabel: "Теги",
+      tagsPlaceholder: "Добавить тег...",
+      tagsAdd: "Добавить",
+      coverLabel: "Обложка",
+      galleryLabel: "Галерея изображений",
+      videoLabel: "Демо видео",
+      sampleLabel: "Пример результата (Скриншот)",
+      upload: "Загрузить",
+      replace: "Заменить",
+      remove: "Удалить",
+      addMore: "Добавить еще",
+      priceLabel: "Цена *",
+      discountLabel: "Скидка (%)",
+      currencyLabel: "Валюта",
+      trialToggle: "Предложить пробный период",
+      trialDesc: "Дайте пользователям протестировать перед покупкой",
+      trialDaysLabel: "Дней пробного периода",
+      statusLabel: "Начальный статус",
+      approvalLabel: "Требуется одобрение админа",
+      cancel: "Отмена",
+      create: "Создать товар",
+      errors: {
+        name: "Название товара обязательно",
+        category: "Категория обязательна",
+        price: "Введите корректную цену"
+      }
     },
     orders: {
       status: {
@@ -107,18 +480,34 @@ export const salesTranslations = {
         processing: "В работе",
         shipped: "Отправлен",
         delivered: "Доставлен",
-        cancelled: "Отменен"
+        cancelled: "Отменен",
+        disputed: "Спор",
+        refunded: "Возврат"
+      },
+      payoutStatus: {
+        on_hold: "Удержано",
+        eligible: "Доступно к выплате",
+        released: "Выплачено",
+        frozen: "Заморожено"
+      },
+      actions: {
+        markAsShipped: "Отметить как отправлено",
+        confirmReceipt: "Подтвердить получение",
+        reportProblem: "Сообщить о проблеме",
+        trackingRequired: "Нужен номер отслеживания",
+        selectCarrier: "Выберите службу доставки",
+        confirmPayout: "Подтвердить выплату"
+      },
+      disputeReasons: {
+        not_received: "Не получил товар",
+        damaged: "Поврежден",
+        wrong_item: "Не тот товар",
+        other: "Другое"
       },
       payment: {
         unpaid: "Не оплачен",
         paid: "Оплачен"
       }
-    },
-    chat: {
-      aiAssistant: "AI Помощник",
-      aiDesc: "AI отвечает клиентам автоматически",
-      type: "Введите сообщение...",
-      online: "В сети"
     },
     promotions: {
       create: "Создать акцию",
@@ -151,9 +540,13 @@ export const salesTranslations = {
       addProduct: "Add Product",
       viewShop: "View Shop",
       shareChannel: "Share",
-      analytics: "Analytics"
+      analytics: "Analytics",
+      onHoldFunds: "Escrow (On-hold)",
+      pendingPayouts: "Pending Payouts",
+      disputedOrders: "Disputes"
     },
     products: {
+      inventory: "Inventory",
       search: "Search products...",
       add: "New Product",
       edit: "Edit",
@@ -163,7 +556,182 @@ export const salesTranslations = {
       all: "All",
       draft: "Draft",
       active: "Active",
-      outOfStock: "Out of Stock"
+      pending: "Pending",
+      archived: "Archived",
+      published: "Published",
+      outOfStock: "Out of Stock",
+      visibility: "Visibility",
+      public: "Public",
+      private: "Private",
+      unlisted: "Unlisted",
+      status: "Status",
+      categories: {
+        clothing: "Clothing & Accessories",
+        shoes: "Shoes",
+        bags: "Bags & Wallets",
+        electronics: "Electronics & Gadgets",
+        home: "Home & Kitchen",
+        beauty: "Beauty & Personal Care",
+        kids: "Kids & Baby",
+        sports: "Sports & Outdoors",
+        auto: "Auto & Tools",
+        books: "Books & Stationery",
+        food: "Food & Drinks",
+        other: "Other"
+      }
+    },
+    publicShop: {
+      verified: "Verified Seller",
+      rateBtn: "Rate Seller",
+      reportBtn: "Report Seller",
+      location: "Location",
+      hours: "Working Hours",
+      contactBtn: "Contact Seller",
+      requestBtn: "Send Request",
+      reviews: "reviews",
+      chatFloatingBtn: "Chat with Seller",
+      messageSeller: "Message Seller",
+      startChat: "Start Chat",
+      close: "Close",
+      online: "Online",
+      offline: "Offline",
+      verificationPending: "Verification Pending",
+      rateModal: {
+        title: "Rate this Seller",
+        placeholder: "Write your review (optional)...",
+      },
+      reportModal: {
+        title: "Report this Seller",
+        reason: "Select a reason",
+        description: "Details",
+        reasons: {
+          scam: "Scam",
+          fake: "Fake product",
+          no_response: "No response",
+          inappropriate: "Inappropriate behavior",
+          other: "Other"
+        }
+      },
+      success: {
+        rated: "Thank you! Your rating has been received.",
+        reported: "Report submitted successfully."
+      },
+      submit: "Submit",
+      cancel: "Cancel"
+    },
+    chat: {
+      title: "Chat",
+      online: "Online",
+      offline: "Offline",
+      aiMode: "AI Mode",
+      sellerMode: "Seller Mode",
+      aiAssist: "AI Assist",
+      suggestReply: "Suggest reply",
+      takeOver: "Take over",
+      returnToAi: "Return to AI mode",
+      sending: "Sending...",
+      sent: "Sent",
+      failed: "Failed",
+      aiAssistant: "AI Assistant",
+      aiDesc: "AI responds to customers automatically",
+      type: "Type message...",
+      noConversations: "No messages yet"
+    },
+    settings: {
+      shopProfile: "Shop Profile",
+      shopName: "Shop Name",
+      description: "Description",
+      city: "City / Region",
+      workingHours: "Working Hours",
+      selectDays: "Select days",
+      startTime: "Start time",
+      endTime: "End time",
+      presets: {
+        monFri: "Mon–Fri",
+        monSat: "Mon–Sat",
+        everyday: "Everyday"
+      },
+      days: {
+        mon: "Mon",
+        tue: "Tue",
+        wed: "Wed",
+        thu: "Thu",
+        fri: "Fri",
+        sat: "Sat",
+        sun: "Sun"
+      },
+      closed: "Closed",
+      contact: "Contact Information",
+      saveChanges: "Save Changes",
+      cancel: "Cancel",
+      success: "Settings saved successfully!",
+      verification: {
+        title: "Seller Verification",
+        unverified: "Unverified",
+        pending: "Pending review",
+        verified: "Verified",
+        rejected: "Rejected",
+        requestBtn: "Start Verification",
+        submitBtn: "Submit for Review",
+        resubmitBtn: "Resubmit",
+        requestSent: "Documents submitted. Our support team will review them.",
+        pendingMessage: "Support is reviewing your documents. You will be notified when approved.",
+        adminVerify: "Approve Verification",
+        adminReject: "Reject Verification",
+        sellerType: "Seller Type",
+        individual: "Individual",
+        business: "Business Entity",
+        uploadIdFront: "Upload ID Front (Required)",
+        uploadIdBack: "Upload ID Back (Optional)",
+        uploadBusinessCert: "Upload Business Cert (Required)",
+        fileRequirements: "PNG, JPG or PDF, max 10MB",
+        replace: "Replace",
+        remove: "Remove",
+        missingDocs: "Please upload all required documents",
+        adminNote: "Admin Note",
+        supportReview: "Support Review (Hidden Mode)"
+      }
+    },
+    newProduct: {
+      title: "New Product",
+      basicInfo: "Basic Information",
+      media: "Media & Assets",
+      pricing: "Pricing & Trial",
+      statusMod: "Status & Moderation",
+      visibilitySettings: "Visibility Settings",
+      nameLabel: "Product Name *",
+      namePlaceholder: "e.g. AI Prompt Engineer",
+      catLabel: "Category *",
+      shortDescLabel: "Short Description",
+      shortDescPlaceholder: "Brief overview (1-2 lines)...",
+      fullDescLabel: "Full Description (Markdown)",
+      fullDescPlaceholder: "# Detailed Description...",
+      tagsLabel: "Tags",
+      tagsPlaceholder: "Add a tag...",
+      tagsAdd: "Add",
+      coverLabel: "Cover Image",
+      galleryLabel: "Gallery Images",
+      videoLabel: "Demo Video",
+      sampleLabel: "Sample Output Screenshot",
+      upload: "Upload",
+      replace: "Replace",
+      remove: "Remove",
+      addMore: "Add More",
+      priceLabel: "Price *",
+      discountLabel: "Discount (%)",
+      currencyLabel: "Valyuta",
+      trialToggle: "Offer Free Trial",
+      trialDesc: "Let users test before buying",
+      trialDaysLabel: "Trial Days",
+      statusLabel: "Initial Status",
+      approvalLabel: "Admin Approval Required",
+      cancel: "Cancel",
+      create: "Create Product",
+      errors: {
+        name: "Product Name is required",
+        category: "Category is required",
+        price: "Valid price is required"
+      }
     },
     orders: {
       status: {
@@ -171,18 +739,34 @@ export const salesTranslations = {
         processing: "Processing",
         shipped: "Shipped",
         delivered: "Delivered",
-        cancelled: "Cancelled"
+        cancelled: "Cancelled",
+        disputed: "Disputed",
+        refunded: "Refunded"
+      },
+      payoutStatus: {
+        on_hold: "On Hold",
+        eligible: "Eligible for Payout",
+        released: "Released",
+        frozen: "Frozen (Dispute)"
+      },
+      actions: {
+        markAsShipped: "Mark as Shipped",
+        confirmReceipt: "Confirm Receipt",
+        reportProblem: "Report a Problem",
+        trackingRequired: "Tracking number required",
+        selectCarrier: "Select a Carrier",
+        confirmPayout: "Confirm Payout"
+      },
+      disputeReasons: {
+        not_received: "Not received",
+        damaged: "Damaged",
+        wrong_item: "Wrong item",
+        other: "Other"
       },
       payment: {
         unpaid: "Unpaid",
         paid: "Paid"
       }
-    },
-    chat: {
-      aiAssistant: "AI Assistant",
-      aiDesc: "AI responds to customers automatically",
-      type: "Type message...",
-      online: "Online"
     },
     promotions: {
       create: "Create Promotion",

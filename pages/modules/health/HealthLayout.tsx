@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
@@ -21,19 +20,20 @@ const HealthLayout: React.FC<HealthLayoutProps> = ({ children }) => {
   const currentSection = location.pathname.split('/').pop() || 'dashboard';
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 flex flex-col">
-      {/* Safety Disclaimer Banner */}
-      <div className="bg-amber-50 dark:bg-amber-950/30 px-4 py-2 flex items-start gap-3 border-b border-amber-100 dark:border-amber-900/50">
-        <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-        <p className="text-[10px] leading-tight font-medium text-amber-800 dark:text-amber-200/70">
+    <div className="flex flex-col min-h-full">
+      {/* Global Health Disclaimer */}
+      <div className="bg-amber-50 dark:bg-amber-950/30 px-4 sm:px-6 py-2.5 flex items-center justify-center gap-3 border-b border-amber-100 dark:border-amber-900/50">
+        <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+        <p className="text-[9px] sm:text-[10px] md:text-xs leading-tight font-black uppercase tracking-widest text-amber-800 dark:text-amber-200/70 text-center line-clamp-1 sm:line-clamp-none">
           {t.disclaimer}
         </p>
       </div>
 
-      <header className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 z-40 px-4 pt-4">
+      {/* Sub-Navigation Section */}
+      <div className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 z-30 px-4 md:px-8 pt-6">
         <TopBar title={t.title} />
 
-        <div className="flex gap-6 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+        <nav className="max-w-7xl mx-auto w-full flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar md:justify-center md:gap-10 pb-1">
           {healthRoutes.map((route) => {
             const Icon = (LucideIcons as any)[route.icon] || LucideIcons.Circle;
             const isActive = currentSection === route.path;
@@ -42,27 +42,26 @@ const HealthLayout: React.FC<HealthLayoutProps> = ({ children }) => {
               <button
                 key={route.id}
                 onClick={() => navigate(`/modules/health/${route.path}`)}
-                className={`flex flex-col items-center gap-2 pb-3 min-w-[80px] transition-all relative ${
-                  isActive ? 'text-emerald-600' : 'text-slate-400 dark:text-slate-500'
+                className={`flex flex-col items-center gap-1.5 pb-3 min-w-[70px] sm:min-w-[90px] md:min-w-0 transition-all relative group shrink-0 ${
+                  isActive ? 'text-emerald-600' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600'
                 }`}
               >
                 <Icon size={18} className={isActive ? 'animate-pulse' : ''} />
-                <span className={`text-[10px] font-bold whitespace-nowrap`}>
+                <span className={`text-[9px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-wider whitespace-nowrap`}>
                   {(t.sections as any)[route.labelKey]}
                 </span>
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-600 rounded-t-full" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-600 rounded-t-full shadow-[0_-4px_10px_rgba(16,185,129,0.3)]" />
                 )}
               </button>
             );
           })}
-        </div>
-      </header>
+        </nav>
+      </div>
 
-      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-950">
-        <div className="p-6 pb-24">
-          {children}
-        </div>
+      {/* Module Content */}
+      <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 md:p-8 lg:px-10">
+        {children}
       </div>
     </div>
   );

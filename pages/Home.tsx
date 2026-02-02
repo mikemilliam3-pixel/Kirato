@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import ModuleCard from '../components/ModuleCard';
@@ -21,22 +20,26 @@ const Home: React.FC = () => {
   const { t } = useApp();
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-4 pb-12 lg:px-8">
-      <div className="text-center mb-8 lg:mb-12">
-        <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 py-6 md:py-12 lg:py-16 animate-in fade-in duration-500">
+      <div className="mb-6 md:mb-16 text-left">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-2 sm:mb-3 tracking-tight">
           {t('homeTitle')}
-        </h2>
-        <p className="text-sm lg:text-base font-medium text-slate-500 dark:text-slate-400">
+        </h1>
+        <p className="text-[11px] sm:text-base font-bold text-slate-400 dark:text-slate-500 max-w-2xl uppercase tracking-widest">
           {t('homeSubtitle')}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-8">
         {modules.map((module) => (
           <ModuleCard key={module.id} {...module} />
         ))}
       </div>
-    </main>
+      
+      {/* Decorative background blur elements */}
+      <div className="fixed -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="fixed top-1/4 -left-40 w-80 h-80 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+    </div>
   );
 };
 

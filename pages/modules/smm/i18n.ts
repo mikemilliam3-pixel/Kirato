@@ -1,4 +1,3 @@
-
 export const smmTranslations = {
   UZ: {
     title: "SMM va Kontent",
@@ -23,10 +22,36 @@ export const smmTranslations = {
     },
     planner: {
       addPost: "Post qo'shish",
-      platform: "Platforma",
+      integrations: "Integratsiyalar",
+      platforms: "Platformalar",
+      connect: "Bog'lanish",
+      disconnect: "Ulanishni uzish",
+      connected: "Ulangan",
+      notConnected: "Ulanmagan",
       caption: "Matn",
-      dateTime: "Sana va vaqt",
-      status: "Holat"
+      mediaUrl: "Media URL (ixtiyoriy)",
+      scheduledAt: "Sana va vaqt",
+      schedule: "Rejalashtirish",
+      sendNow: "Hozir yuborish",
+      retry: "Qayta urinish",
+      history: "Postlar tarixi",
+      allPlatforms: "Barcha platformalar",
+      noPosts: "Hozircha postlar yo'q",
+      modal: {
+        tgTitle: "Telegram ulanishi",
+        tgBotToken: "Bot Token",
+        tgChannelId: "Kanal ID yoki Username",
+        metaTitle: "Meta (IG/FB) ulanishi",
+        accessToken: "Access Token",
+        pageId: "Page / Business ID"
+      },
+      status: {
+        draft: "Qoralama",
+        scheduled: "Kutilmoqda",
+        sending: "Yuborilmoqda...",
+        sent: "Yuborildi",
+        failed: "Xatolik"
+      }
     },
     generator: {
       modes: {
@@ -122,17 +147,43 @@ export const smmTranslations = {
     },
     planner: {
       addPost: "Добавить пост",
-      platform: "Платформа",
-      caption: "Описание",
-      dateTime: "Дата и время",
-      status: "Статус"
+      integrations: "Интеграции",
+      platforms: "Платформы",
+      connect: "Подключить",
+      disconnect: "Отключить",
+      connected: "Подключено",
+      notConnected: "Не подключено",
+      caption: "Текст поста",
+      mediaUrl: "URL медиа (опц.)",
+      scheduledAt: "Дата и время",
+      schedule: "Запланировать",
+      sendNow: "Отправить сейчас",
+      retry: "Повторить",
+      history: "История публикаций",
+      allPlatforms: "Все платформы",
+      noPosts: "Пока нет публикаций",
+      modal: {
+        tgTitle: "Подключение Telegram",
+        tgBotToken: "Токен бота",
+        tgChannelId: "ID или Username канала",
+        metaTitle: "Подключение Meta (IG/FB)",
+        accessToken: "Access Token",
+        pageId: "ID страницы / Бизнеса"
+      },
+      status: {
+        draft: "Черновик",
+        scheduled: "Запланировано",
+        sending: "Отправка...",
+        sent: "Отправлено",
+        failed: "Ошибка"
+      }
     },
     generator: {
       modes: {
         post: "Пост",
         image: "Изображение",
-        t2v: "Текст → Видео",
-        i2v: "Фото → Видео"
+        t2v: "Текст → Video",
+        i2v: "Фото → Video"
       },
       postExplainer: {
         title: "Генератор Постов",
@@ -221,10 +272,36 @@ export const smmTranslations = {
     },
     planner: {
       addPost: "Schedule Post",
-      platform: "Platform",
-      caption: "Caption",
-      dateTime: "Date & Time",
-      status: "Status"
+      integrations: "Integrations",
+      platforms: "Platforms",
+      connect: "Connect",
+      disconnect: "Disconnect",
+      connected: "Connected",
+      notConnected: "Not Connected",
+      caption: "Post Caption",
+      mediaUrl: "Media URL (opt.)",
+      scheduledAt: "Date & Time",
+      schedule: "Schedule",
+      sendNow: "Send Now",
+      retry: "Retry",
+      history: "Publishing History",
+      allPlatforms: "All Platforms",
+      noPosts: "No posts yet",
+      modal: {
+        tgTitle: "Telegram Connection",
+        tgBotToken: "Bot Token",
+        tgChannelId: "Channel ID or Username",
+        metaTitle: "Meta (IG/FB) Connection",
+        accessToken: "Access Token",
+        pageId: "Page / Business ID"
+      },
+      status: {
+        draft: "Draft",
+        scheduled: "Scheduled",
+        sending: "Sending...",
+        sent: "Published",
+        failed: "Failed"
+      }
     },
     generator: {
       modes: {

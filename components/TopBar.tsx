@@ -1,84 +1,46 @@
-
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { ArrowLeft, Moon, Sun, ChevronDown } from 'lucide-react';
-import { Language } from '../types';
+import { ArrowLeft, Share2, MoreVertical } from 'lucide-react';
 
 interface TopBarProps {
   title: string;
+  hideMenu?: boolean;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ title }) => {
-  const { theme, toggleTheme, language, setLanguage } = useApp();
+const TopBar: React.FC<TopBarProps> = ({ title, hideMenu = false }) => {
   const navigate = useNavigate();
-  const [isLangOpen, setIsLangOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsLangOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
-    <div className="max-w-6xl mx-auto w-full flex items-center justify-between mb-4">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between mb-4 md:mb-10 animate-in fade-in slide-in-from-left-4 duration-500">
+      <div className="flex items-center gap-3 sm:gap-4">
         <button 
           onClick={() => navigate('/')}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 active:scale-90 transition-all border border-gray-100/50 dark:border-slate-800"
+          className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 active:scale-90 transition-all border border-gray-100 dark:border-slate-800 hover:shadow-md shadow-sm shrink-0"
+          aria-label="Back to Home"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="sm:size-6" />
         </button>
-        <h2 className="text-lg font-extrabold text-slate-900 dark:text-white truncate max-w-[140px] md:max-w-none leading-tight">
-          {title}
-        </h2>
+        <div className="flex flex-col">
+          <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-none leading-none tracking-tight">
+            {title}
+          </h2>
+          <div className="flex items-center gap-2 mt-1 sm:mt-1.5">
+             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 rounded-full animate-pulse" />
+             <span className="text-[8px] sm:text-[10px] text-gray-400 font-black uppercase tracking-[2px]">Active</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={toggleTheme}
-          className="p-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-100/50 dark:border-slate-800 transition-all active:scale-95"
-        >
-          {theme === 'light' ? (
-            <Moon className="w-5 h-5 text-gray-600" />
-          ) : (
-            <Sun className="w-5 h-5 text-yellow-400" />
-          )}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <button className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-all shadow-sm active:scale-95">
+          <Share2 size={16} /> Share
         </button>
-
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-1 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-100/50 dark:border-slate-800 font-bold text-xs transition-all active:scale-95"
-          >
-            {language}
-            <ChevronDown className={`w-3 h-3 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+        {!hideMenu && (
+          <button className="p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-slate-400 hover:text-slate-600 transition-all shadow-sm active:scale-95">
+            <MoreVertical size={20} />
           </button>
-
-          {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-20 py-1 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden z-[60]">
-              {(['UZ', 'RU', 'EN'] as Language[]).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => {
-                    setLanguage(lang);
-                    setIsLangOpen(false);
-                  }}
-                  className={`w-full px-4 py-2 text-left text-xs font-bold hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors ${
-                    language === lang ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

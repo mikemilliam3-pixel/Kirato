@@ -1,81 +1,155 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { Moon, Sun, ChevronDown } from 'lucide-react';
+import { 
+  Moon, Sun, ChevronDown, Search, Bell, 
+  User, Settings, LogOut, Menu, Globe
+} from 'lucide-react';
 import { Language } from '../types';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { theme, toggleTheme, language, setLanguage, t } = useApp();
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  const langRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsLangOpen(false);
-      }
+      const target = event.target as Node;
+      if (langRef.current && !langRef.current.contains(target)) setIsLangOpen(false);
+      if (profileRef.current && !profileRef.current.contains(target)) setIsProfileOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
-    <header className="sticky top-0 bg-gray-50/80 dark:bg-slate-950/80 backdrop-blur-md z-50 border-b border-transparent dark:border-slate-900">
-      <div className="max-w-6xl mx-auto flex items-center justify-between p-4 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-            K
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-blue-600 font-bold text-lg leading-tight">
-              {t('appName')}
-            </h1>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">
-              {t('appSubtitle')}
-            </span>
-          </div>
+    <header className="h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-b border-gray-100 dark:border-slate-800 px-4 md:px-8 flex items-center justify-between sticky top-0 shrink-0">
+      {/* Left: Mobile Toggle + Brand */}
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        <button 
+          onClick={toggleSidebar}
+          className="lg:hidden p-2 text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+        >
+          <Menu size={22} />
+        </button>
+        <div className="hidden xs:flex flex-col">
+          <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[2px] leading-tight">Kirato</h2>
+          <span className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">{t('appSubtitle')}</span>
+        </div>
+      </div>
+
+      {/* Center: Global Search - Responsive width */}
+      <div className={`
+        flex items-center gap-2 md:gap-3 px-3 md:px-4 h-11 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800
+        transition-all duration-300 flex-1 max-w-md mx-2 md:mx-8
+        ${searchFocused ? 'ring-2 ring-blue-500/20 border-blue-500/50 bg-white dark:bg-slate-900' : ''}
+      `}>
+        <Search size={18} className="text-slate-400 shrink-0" />
+        <input 
+          type="text" 
+          placeholder={t('common.search') || "Search..."} 
+          className="bg-transparent border-none text-[13px] font-bold w-full focus:ring-0 placeholder:text-gray-400"
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
+        />
+        <div className="hidden lg:flex items-center gap-1 text-[10px] text-gray-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-1.5 py-0.5 rounded shadow-sm shrink-0">
+          <span className="font-mono">⌘</span>K
+        </div>
+      </div>
+
+      {/* Right: Action Group */}
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        
+        {/* Theme Toggle - Always Visible */}
+        <button
+          onClick={toggleTheme}
+          className="flex p-2.5 rounded-xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 transition-all active:scale-95 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400"
+          aria-label="Toggle Theme"
+        >
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} className="text-yellow-400" />}
+        </button>
+
+        {/* Language Selector - Always Visible */}
+        <div className="relative" ref={langRef}>
+          <button
+            onClick={() => setIsLangOpen(!isLangOpen)}
+            className="flex items-center gap-1 px-2.5 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 font-black text-[11px] transition-all active:scale-95 text-slate-600 dark:text-slate-400"
+          >
+            {language}
+            <ChevronDown className={`w-3 h-3 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isLangOpen && (
+            <div className="absolute right-0 mt-3 w-24 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-200">
+              {(['UZ', 'RU', 'EN'] as Language[]).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => { setLanguage(lang); setIsLangOpen(false); }}
+                  className={`w-full px-4 py-3 text-left text-[11px] font-black hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors ${
+                    language === lang ? 'text-blue-600 bg-blue-50/50 dark:bg-blue-900/10' : 'text-slate-500'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Profile Dropdown (Includes Notifications) */}
+        <div className="relative" ref={profileRef}>
           <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 transition-all active:scale-95"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 p-1 md:p-1.5 md:pr-3 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 active:scale-95 transition-all group"
           >
-            {theme === 'light' ? (
-              <Moon className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Sun className="w-5 h-5 text-yellow-400" />
-            )}
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-xs shadow-md">
+              JD
+            </div>
+            <ChevronDown className={`hidden md:block w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
           </button>
-
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsLangOpen(!isLangOpen)}
-              className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 font-bold text-xs transition-all active:scale-95"
-            >
-              {language}
-              <ChevronDown className={`w-3 h-3 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {isLangOpen && (
-              <div className="absolute right-0 mt-2 w-20 py-1 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden">
-                {(['UZ', 'RU', 'EN'] as Language[]).map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => {
-                      setLanguage(lang);
-                      setIsLangOpen(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-xs font-bold hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors ${
-                      language === lang ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'
-                    }`}
-                  >
-                    {lang}
-                  </button>
-                ))}
+          
+          {isProfileOpen && (
+            <div className="fixed md:absolute right-4 md:right-0 mt-3 w-[calc(100vw-2rem)] md:w-64 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-slate-800 p-2 overflow-hidden animate-in slide-in-from-top-2 duration-200 z-[100]">
+              <div className="px-4 py-4 border-b border-gray-50 dark:border-slate-800 mb-2">
+                <p className="text-xs font-black text-slate-900 dark:text-white">John Doe</p>
+                <p className="text-[10px] font-bold text-gray-400 truncate">john.doe@kirato.ai</p>
               </div>
-            )}
-          </div>
+
+              {/* Unified Menu Items */}
+              <div className="space-y-1">
+                <button className="w-full flex items-center justify-between px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Bell size={18} className="text-blue-600" />
+                    <span>{t('common.notifications')}</span>
+                  </div>
+                  <span className="w-5 h-5 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black">2</span>
+                </button>
+                
+                <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                  <User size={18} className="text-blue-600" />
+                  <span>My Profile</span>
+                </button>
+
+                <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                  <Settings size={18} className="text-blue-600" />
+                  <span>Account Settings</span>
+                </button>
+              </div>
+              
+              <div className="h-px bg-gray-50 dark:border-slate-800 my-2" />
+              
+              <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors">
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
