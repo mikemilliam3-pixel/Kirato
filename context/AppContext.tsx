@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AppState, Language, Theme } from '../types';
 import { translations } from '../i18n/translations';
@@ -6,19 +5,39 @@ import { translations } from '../i18n/translations';
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(
-    (localStorage.getItem('app-language') as Language) || 'UZ'
-  );
-  const [theme, setThemeState] = useState<Theme>(
-    (localStorage.getItem('app-theme') as Theme) || 'light'
-  );
+  const [language, setLanguageState] = useState<Language>(() => {
+    try {
+      const stored = localStorage.getItem('app-language');
+      return (stored as Language) || 'UZ';
+    } catch {
+      return 'UZ';
+    }
+  });
+
+  const [theme, setThemeState] = useState<Theme>(() => {
+    try {
+      const stored = localStorage.getItem('app-theme');
+      return (stored as Theme) || 'light';
+    } catch {
+      return 'light';
+    }
+  });
 
   useEffect(() => {
-    localStorage.setItem('app-language', language);
+    try {
+      localStorage.setItem('app-language', language);
+    } catch (e) {
+      console.warn("Storage restricted:", e);
+    }
   }, [language]);
 
   useEffect(() => {
-    localStorage.setItem('app-theme', theme);
+    try {
+      localStorage.setItem('app-theme', theme);
+    } catch (e) {
+      console.warn("Storage restricted:", e);
+    }
+    
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {

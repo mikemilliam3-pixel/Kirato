@@ -6,10 +6,9 @@ import Dashboard from './resume/sections/Dashboard';
 import ResumeBuilder from './resume/sections/ResumeBuilder';
 import CoverLetters from './resume/sections/CoverLetters';
 import JobTracker from './resume/sections/JobTracker';
-import InterviewPractice from './sections/InterviewPractice';
 import Export from './resume/sections/Export';
 
-// Local InterviewPractice import fix if file was created in resume subfolder
+// Unified import for InterviewPractice
 import ResumeInterviewPractice from './resume/sections/InterviewPractice';
 
 const ResumePage: React.FC = () => {

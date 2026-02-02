@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -27,22 +26,37 @@
         font-family: 'Inter', sans-serif;
         -webkit-tap-highlight-color: transparent;
       }
+      /* Ensure root takes full height to avoid blank appearance */
+      #root {
+        min-height: 100vh;
+      }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
-    "zod": "https://esm.sh/zod@^4.3.6"
+    "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.475.0?external=react,react-dom",
+    "react-router-dom": "https://esm.sh/react-router-dom@7.1.5?external=react,react-dom",
+    "@google/genai": "https://esm.sh/@google/genai@0.21.0",
+    "zod": "https://esm.sh/zod@3.24.1"
   }
 }
 </script>
 </head>
   <body class="bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-gray-100 transition-colors duration-200">
     <div id="root"></div>
+    <!-- Main entry point for React - using relative path for better compatibility -->
+    <script type="module" src="./index.tsx"></script>
+    <script>
+      // Diagnostic check: if JS fails to load, this might help see it in console
+      window.addEventListener('error', function(e) {
+        console.error('Runtime error caught:', e.message, 'at', e.filename, ':', e.lineno);
+      });
+      console.log('Index.html loaded, waiting for index.tsx...');
+    </script>
   </body>
 </html>

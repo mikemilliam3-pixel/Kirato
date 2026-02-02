@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Header from './components/Header';
 import Home from './pages/Home';
 
-// Lazy loading is not used here for simplicity as per requirements of separate files
+// Module pages
 import SalesPage from './pages/modules/SalesPage';
 import SMMPage from './pages/modules/SMMPage';
 import EducationPage from './pages/modules/EducationPage';
