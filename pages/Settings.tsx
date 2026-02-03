@@ -5,6 +5,47 @@ import { Shield, Bell, Eye, Download, LogOut, Lock, Globe, Moon, Sun, Monitor, C
 import { Language, Theme } from '../types';
 import PageHeader from '../components/ui/PageHeader';
 
+// Fix: Moved Section and Toggle components outside of the main Settings component to avoid TypeScript JSX children inference errors.
+interface SectionProps {
+  title: string;
+  icon: any;
+  children: React.ReactNode;
+}
+
+const Section: React.FC<SectionProps> = ({ title, icon: Icon, children }) => (
+  <div className="space-y-4">
+    <div className="flex items-center gap-2 px-1">
+      <Icon className="text-blue-600" size={18} />
+      <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">{title}</h3>
+    </div>
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 p-1 overflow-hidden shadow-sm">
+      {children}
+    </div>
+  </div>
+);
+
+interface ToggleProps {
+  label: string;
+  desc: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}
+
+const Toggle: React.FC<ToggleProps> = ({ label, desc, checked, onChange }) => (
+  <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl">
+    <div>
+      <p className="text-sm font-bold text-slate-900 dark:text-white">{label}</p>
+      <p className="text-[10px] text-gray-400 font-medium">{desc}</p>
+    </div>
+    <button 
+      onClick={() => onChange(!checked)}
+      className={`w-12 h-6 rounded-full p-1 transition-all ${checked ? 'bg-blue-600' : 'bg-gray-200 dark:bg-slate-700'}`}
+    >
+      <div className={`w-4 h-4 bg-white rounded-full transition-transform ${checked ? 'translate-x-6' : ''}`} />
+    </button>
+  </div>
+);
+
 const Settings: React.FC = () => {
   const { language, setLanguage, theme, toggleTheme, t } = useApp();
   const [settings, setSettings] = useState({
@@ -36,33 +77,6 @@ const Settings: React.FC = () => {
     setSettings(newSettings);
     localStorage.setItem('kirato-user-settings', JSON.stringify(newSettings));
   };
-
-  const Section = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 px-1">
-        <Icon className="text-blue-600" size={18} />
-        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">{title}</h3>
-      </div>
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 p-1 overflow-hidden shadow-sm">
-        {children}
-      </div>
-    </div>
-  );
-
-  const Toggle = ({ label, desc, checked, onChange }: { label: string, desc: string, checked: boolean, onChange: (v: boolean) => void }) => (
-    <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl">
-      <div>
-        <p className="text-sm font-bold text-slate-900 dark:text-white">{label}</p>
-        <p className="text-[10px] text-gray-400 font-medium">{desc}</p>
-      </div>
-      <button 
-        onClick={() => onChange(!checked)}
-        className={`w-12 h-6 rounded-full p-1 transition-all ${checked ? 'bg-blue-600' : 'bg-gray-200 dark:bg-slate-700'}`}
-      >
-        <div className={`w-4 h-4 bg-white rounded-full transition-transform ${checked ? 'translate-x-6' : ''}`} />
-      </button>
-    </div>
-  );
 
   return (
     <div className="flex flex-col min-h-full">

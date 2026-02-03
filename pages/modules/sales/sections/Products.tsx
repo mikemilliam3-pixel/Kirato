@@ -16,7 +16,11 @@ const PRODUCT_CATEGORIES = [
 
 const DEFAULT_PLATFORM_BOT = "kirato_market_bot";
 
-const Products: React.FC = () => {
+interface ProductsProps {
+  isDemo?: boolean;
+}
+
+const Products: React.FC<ProductsProps> = ({ isDemo = false }) => {
   const { language } = useApp();
   const moduleT = useMemo(() => salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'], [language]);
   const t = moduleT.products;
@@ -71,6 +75,7 @@ const Products: React.FC = () => {
       setProducts([
         { 
           id: '1', 
+          sellerId: 'demo_seller',
           title: 'Wireless Headphones', 
           shortDescription: 'High quality sound',
           fullDescription: '# Best Headphones\n- Great Bass\n- Long Battery',
@@ -113,11 +118,13 @@ const Products: React.FC = () => {
   };
 
   const handleSave = () => {
+    if (isDemo) return;
     if (!validate()) return;
     const finalStatus: ProductStatus = form.approvalRequired ? 'pending' : (form.status || 'draft');
     const newProduct: Product = {
       ...form as Product,
       id: Math.random().toString(36).substr(2, 9),
+      sellerId: 'current_seller',
       status: finalStatus,
       createdAt: new Date().toISOString(),
       images: coverPreview ? [coverPreview, ...galleryPreviews] : ['📦']
@@ -228,8 +235,9 @@ const Products: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h3 className="font-black text-xl md:text-2xl tracking-tight">{t.inventory}</h3>
         <button 
+          disabled={isDemo}
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center justify-center gap-2 px-6 h-12 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:bg-rose-700 w-full sm:w-auto"
+          className={`flex items-center justify-center gap-2 px-6 h-12 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:bg-rose-700 w-full sm:w-auto ${isDemo ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
         >
           <Plus size={18} /> {t.add}
         </button>
@@ -304,7 +312,7 @@ const Products: React.FC = () => {
         })}
       </div>
 
-      {/* --- Modal Form - Kept as is --- */}
+      {/* --- Modal Form --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={resetForm} />
@@ -475,81 +483,6 @@ const Products: React.FC = () => {
                     </select>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-5 bg-gray-50 dark:bg-slate-800 rounded-[24px]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-blue-500 shadow-sm">
-                      <Layout size={20} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-black">{tForm.trialToggle}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">{tForm.trialDesc}</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setForm({ ...form, trialAvailable: !form.trialAvailable })}
-                    className={`w-14 h-7 rounded-full p-1 transition-all ${form.trialAvailable ? 'bg-emerald-500' : 'bg-gray-300'}`}
-                  >
-                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${form.trialAvailable ? 'translate-x-7' : ''}`} />
-                  </button>
-                </div>
-              </section>
-
-              <section className="space-y-8">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.statusMod}</h5>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tForm.statusLabel}</label>
-                          <select 
-                            value={form.status}
-                            onChange={e => setForm({ ...form, status: e.target.value as any })}
-                            className="w-full h-14 px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm"
-                          >
-                            <option value="draft">{t.draft}</option>
-                            <option value="active">{t.published}</option>
-                            <option value="archived">{t.archived}</option>
-                          </select>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-rose-50/50 dark:bg-rose-900/10 rounded-2xl border border-rose-100 dark:border-rose-900/30">
-                           <div className="flex items-center gap-3">
-                              <Info size={16} className="text-rose-500" />
-                              <span className="text-xs font-bold">{tForm.approvalLabel}</span>
-                           </div>
-                           <button 
-                            onClick={() => setForm({ ...form, approvalRequired: !form.approvalRequired })}
-                            className={`w-12 h-6 rounded-full p-1 transition-all ${form.approvalRequired ? 'bg-rose-500' : 'bg-gray-300'}`}
-                          >
-                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${form.approvalRequired ? 'translate-x-6' : ''}`} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <h5 className="text-xs font-black uppercase tracking-[3px] text-gray-400 border-l-4 border-rose-600 pl-3">{tForm.visibilitySettings}</h5>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { id: 'public', icon: Globe, label: t.public },
-                          { id: 'private', icon: EyeOff, label: t.private },
-                          { id: 'unlisted', icon: Eye, label: t.unlisted }
-                        ].map(v => (
-                          <button 
-                            key={v.id}
-                            onClick={() => setForm({ ...form, visibility: v.id as any })}
-                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-[24px] border-2 transition-all ${
-                              form.visibility === v.id 
-                                ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-600 text-rose-600 shadow-sm' 
-                                : 'bg-white dark:bg-slate-800 border-gray-50 dark:border-slate-800 text-gray-400'
-                            }`}
-                          >
-                            <v.icon size={20} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">{v.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                 </div>
               </section>
             </div>
 
@@ -561,8 +494,9 @@ const Products: React.FC = () => {
                 {tForm.cancel}
               </button>
               <button 
+                disabled={isDemo}
                 onClick={handleSave}
-                className="flex-[2] h-14 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all hover:bg-rose-700 flex items-center justify-center gap-2"
+                className={`flex-[2] h-14 bg-rose-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all hover:bg-rose-700 flex items-center justify-center gap-2 ${isDemo ? 'opacity-50 grayscale' : ''}`}
               >
                 <Check size={20} /> {tForm.create}
               </button>

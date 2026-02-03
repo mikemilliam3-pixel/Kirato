@@ -1,8 +1,19 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { AppState, Language, Theme, Notification, CreditWallet, CreditTransaction, UserSubscription, PlanId } from '../types';
+import { AppState, Language, Theme, Notification, CreditWallet, CreditTransaction, UserSubscription, PlanId, AppUser } from '../types';
 import { translations } from '../i18n/translations';
 import CreditLimitModal from '../components/CreditLimitModal';
+import { auth } from '../lib/firebase';
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut,
+  updateProfile,
+  sendEmailVerification,
+  reload,
+  sendPasswordResetEmail,
+  User as FirebaseUser
+} from 'firebase/auth';
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
@@ -38,7 +49,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('kirato-session'));
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [authView, setAuthView] = useState<'signin' | 'signup' | 'reset' | null>(null);
   
   // Credits State
   const [wallet, setWallet] = useState<CreditWallet>(() => {
@@ -66,6 +79,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Not enough credits modal state
   const [limitModal, setLimitModal] = useState<{show: boolean, required: number} | null>(null);
+
+  // Map Firebase User to AppUser
+  const user = useMemo<AppUser | null>(() => {
+    if (!currentUser) return null;
+    return {
+      uid: currentUser.uid,
+      email: currentUser.email,
+      displayName: currentUser.displayName,
+      emailVerified: currentUser.emailVerified
+    };
+  }, [currentUser]);
+
+  // Firebase Auth State Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      setIsAuthLoading(false);
+      
+      if (user) {
+        const token = await user.getIdToken();
+        localStorage.setItem('kirato-session', token);
+        window.dispatchEvent(new Event('auth-change'));
+        setAuthView(null);
+      } else {
+        localStorage.removeItem('kirato-session');
+        window.dispatchEvent(new Event('auth-change'));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const checkNotifications = () => {
@@ -196,19 +239,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setThemeState(prev => prev === 'light' ? 'dark' : 'light');
   }, []);
 
-  const login = useCallback(() => {
-    localStorage.setItem('kirato-session', 'mock-session-token');
-    setIsLoggedIn(true);
-    window.dispatchEvent(new Event('auth-change'));
+  const login = useCallback(async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('kirato-session');
-    localStorage.removeItem('kirato-user-profile');
-    localStorage.removeItem('kirato-user-settings');
-    setIsLoggedIn(false);
-    window.dispatchEvent(new Event('auth-change'));
-    window.location.href = '#/';
+  const register = useCallback(async (email: string, pass: string, fullName: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, {
+      displayName: fullName
+    });
+    await sendEmailVerification(userCredential.user);
+  }, []);
+
+  const resetPassword = useCallback(async (email: string) => {
+    await sendPasswordResetEmail(auth, email);
+  }, []);
+
+  const resendVerification = useCallback(async () => {
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser);
+    }
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    if (auth.currentUser) {
+      await reload(auth.currentUser);
+      setCurrentUser({ ...auth.currentUser });
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('kirato-user-profile');
+      localStorage.removeItem('kirato-user-settings');
+      window.location.hash = '#/';
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  }, []);
+
+  const openAuth = useCallback((view: 'signin' | 'signup' | 'reset' = 'signin') => {
+    setAuthView(view);
+  }, []);
+
+  const closeAuth = useCallback(() => {
+    setAuthView(null);
   }, []);
 
   const requireCredits = useCallback(async (amount: number, reason: string, metadata?: any): Promise<boolean> => {
@@ -274,9 +350,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       t, 
       unreadNotifications,
       setUnreadNotifications,
-      isLoggedIn,
+      isLoggedIn: !!currentUser,
+      user,
       login,
+      register,
+      resetPassword,
+      resendVerification,
+      refreshUser,
       logout,
+      openAuth,
+      closeAuth,
+      authView,
       credits: wallet.balance,
       subscription,
       grantCredits,
@@ -285,7 +369,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       changePlan,
       updateSubscription
     }}>
-      {children}
+      {isAuthLoading ? (
+        <div className="h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-slate-950">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : children}
       {limitModal?.show && (
         <CreditLimitModal 
           required={limitModal.required} 

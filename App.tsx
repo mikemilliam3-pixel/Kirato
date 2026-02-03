@@ -1,15 +1,17 @@
-
 import React, { useState, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
-import Header from './components/Header';
+import Header, { formatNameFromEmail } from './components/Header';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
+import AuthModal from './components/AuthModal';
+import VerifyEmail from './pages/VerifyEmail';
 import { 
   Home as HomeIcon, User as UserIcon, LogIn, 
   Settings, Bell, LogOut, ChevronRight, Compass
 } from 'lucide-react';
+import { useAndroidBackGuard } from './hooks/useAndroidBackGuard';
 
 // Module pages
 import SalesPage from './pages/modules/SalesPage';
@@ -46,10 +48,21 @@ const NotFound: React.FC = () => {
 };
 
 const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) => void }> = ({ sidebarOpen, setSidebarOpen }) => {
-  const { t, isLoggedIn, login, logout, unreadNotifications } = useApp();
+  const { t, isLoggedIn, unreadNotifications, openAuth, user, logout } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
+
+  // Initialize Android Hardware Back Protection
+  useAndroidBackGuard();
+
+  // CRITICAL: Hooks must be defined before any conditional returns
+  const userData = useMemo(() => {
+    if (!user) return null;
+    const name = user.displayName || formatNameFromEmail(user.email || '');
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return { name, email: user.email, initials };
+  }, [user]);
 
   const activeTab = useMemo(() => {
     if (isProfileSheetOpen) return 'profile';
@@ -58,6 +71,11 @@ const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) 
     if (location.pathname.startsWith('/profile') || location.pathname.startsWith('/settings') || location.pathname.startsWith('/notifications')) return 'profile';
     return '';
   }, [location.pathname, isProfileSheetOpen]);
+
+  // Route Guard: Block access if logged in but email not verified
+  if (isLoggedIn && user && !user.emailVerified && location.pathname !== '/verify-email') {
+    return <Navigate to="/verify-email" replace />;
+  }
 
   const handleNavClick = (tab: string) => {
     if (tab === 'home') {
@@ -70,8 +88,7 @@ const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) 
       if (isLoggedIn) {
         setIsProfileSheetOpen(!isProfileSheetOpen);
       } else {
-        login();
-        navigate('/');
+        openAuth('signin');
       }
     }
   };
@@ -83,10 +100,12 @@ const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) 
       <div className="flex flex-col flex-1 min-w-0 relative">
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         
-        {/* Main content scroll area - pb reserves space for the bottom nav bar height + safe area */}
+        {/* Main content scroll area */}
         <main className="flex-1 overflow-y-auto relative no-scrollbar bg-gray-50 dark:bg-slate-950 pb-[calc(72px+env(safe-area-inset-bottom))]">
           <Outlet />
         </main>
+
+        <AuthModal />
 
         {/* --- MODERN DOCKED BOTTOM NAVIGATION --- */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-gray-100 dark:border-slate-800 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.05)]">
@@ -117,9 +136,9 @@ const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) 
               onClick={() => handleNavClick('profile')}
               className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 relative ${activeTab === 'profile' ? 'text-blue-600' : 'text-slate-400'}`}
             >
-              {isLoggedIn ? (
+              {isLoggedIn && userData ? (
                 <>
-                  <div className={`w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-[10px] shadow-sm ${activeTab === 'profile' ? 'ring-2 ring-blue-500/50' : ''}`}>JD</div>
+                  <div className={`w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-[10px] shadow-sm ${activeTab === 'profile' ? 'ring-2 ring-blue-500/50' : ''}`}>{userData.initials}</div>
                   <span className="text-[10px] font-black uppercase tracking-widest">{t('nav.profile')}</span>
                   {unreadNotifications > 0 && (
                     <span className="absolute top-3 right-4 w-4 h-4 bg-rose-500 rounded-full border-2 border-white dark:border-slate-900 text-[8px] flex items-center justify-center text-white">!</span>
@@ -137,17 +156,17 @@ const RootLayout: React.FC<{ sidebarOpen: boolean; setSidebarOpen: (o: boolean) 
         </div>
 
         {/* --- PROFILE BOTTOM SHEET --- */}
-        {isProfileSheetOpen && (
+        {isProfileSheetOpen && userData && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end lg:hidden animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm" onClick={() => setIsProfileSheetOpen(false)} />
             <div className="relative bg-white dark:bg-slate-900 rounded-t-[40px] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-500 p-6 pb-[calc(24px+env(safe-area-inset-bottom))]">
               <div className="w-12 h-1.5 bg-gray-200 dark:bg-slate-800 rounded-full mx-auto mb-6 shrink-0" />
               
               <div className="flex items-center gap-4 mb-8">
-                 <div className="w-16 h-16 bg-blue-600 rounded-[24px] flex items-center justify-center text-white font-black text-2xl shadow-xl">JD</div>
-                 <div>
-                    <h3 className="text-xl font-black tracking-tight">John Doe</h3>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">@johndoe</p>
+                 <div className="w-16 h-16 bg-blue-600 rounded-[24px] flex items-center justify-center text-white font-black text-2xl shadow-xl">{userData.initials}</div>
+                 <div className="min-w-0">
+                    <h3 className="text-xl font-black tracking-tight truncate">{userData.name}</h3>
+                    <p className="text-xs font-bold text-gray-400 truncate">{userData.email}</p>
                  </div>
               </div>
 
@@ -216,6 +235,7 @@ const App: React.FC = () => {
           <Route element={<RootLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}>
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/modules/sales/*" element={<SalesPage />} />
             <Route path="/modules/smm/*" element={<SMMPage />} />
             <Route path="/modules/education/*" element={<EducationPage />} />

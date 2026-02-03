@@ -1,15 +1,17 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
-// Fixed: Added RefreshCw to imports
+// Fix: Added missing Store icon import from lucide-react
 import { 
-  ShieldAlert, ShieldCheck, Clock, CheckCircle2, XCircle, Search, 
-  Filter, ChevronRight, User, Briefcase, FileText, ExternalLink, 
-  ArrowLeft, Info, AlertTriangle, Eye, RefreshCw
+  ShieldAlert, ShieldCheck, Clock, XCircle, Search, 
+  ChevronRight, User, Building, FileText, 
+  ArrowLeft, Info, AlertTriangle, RefreshCw, Store
 } from 'lucide-react';
-import { ShopProfile, VerificationStatus, VerificationDocument, VerificationHistoryItem } from '../types';
+import { VerificationStatus, VerificationHistoryItem } from '../types';
+import { db } from '../../../../lib/firebase';
+import { collection, query, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 const SupportInbox: React.FC = () => {
   const { language } = useApp();
@@ -19,59 +21,65 @@ const SupportInbox: React.FC = () => {
 
   const [supportMode, setSupportMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [sellers, setSellers] = useState<ShopProfile[]>([]);
-  const [selectedSeller, setSelectedSeller] = useState<ShopProfile | null>(null);
+  const [sellers, setSellers] = useState<any[]>([]);
+  const [selectedSeller, setSelectedSeller] = useState<any | null>(null);
   const [filter, setFilter] = useState<VerificationStatus | 'all'>('pending');
   const [search, setSearch] = useState('');
   const [rejectNote, setRejectNote] = useState('');
 
   useEffect(() => {
-    const mode = localStorage.getItem('kirato-support-mode') === 'true';
+    const mode = localStorage.getItem('kirato-support-mode') === 'true' || localStorage.getItem('kirato-dev-mode') === 'true';
     setSupportMode(mode);
     if (!mode) {
       setTimeout(() => navigate('/modules/sales/dashboard'), 2000);
-    } else {
-      loadRequests();
     }
   }, [navigate]);
 
-  const loadRequests = () => {
-    setLoading(true);
-    // In a multi-seller app, we'd fetch a list. 
-    // For this single-seller demo, we use the main profile storage as a single-item array.
-    const profileStr = localStorage.getItem('kirato-sales-shop-profile');
-    if (profileStr) {
-      setSellers([JSON.parse(profileStr)]);
+  useEffect(() => {
+    if (supportMode) {
+      setLoading(true);
+      const q = query(collection(db, "sellerApplications"));
+      const unsub = onSnapshot(q, (snapshot) => {
+        const apps = snapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data(),
+          // Map fields for UI compatibility
+          shopName: (doc.data() as any).storeName || 'Unknown Shop',
+          verificationStatus: (doc.data() as any).status
+        }));
+        setSellers(apps);
+        setLoading(false);
+      });
+      return unsub;
     }
-    setLoading(false);
-  };
+  }, [supportMode]);
 
-  const handleAction = (status: VerificationStatus) => {
+  const handleAction = async (status: 'approved' | 'rejected') => {
     if (!selectedSeller) return;
     if (status === 'rejected' && !rejectNote.trim()) return;
 
-    const historyItem: VerificationHistoryItem = {
-      action: status === 'verified' ? 'approved' : 'rejected',
-      at: new Date().toISOString(),
-      note: status === 'rejected' ? rejectNote : undefined
-    };
+    try {
+      const appRef = doc(db, "sellerApplications", selectedSeller.id);
+      const userRef = doc(db, "users", selectedSeller.id);
 
-    const updatedSeller: ShopProfile = {
-      ...selectedSeller,
-      verificationStatus: status,
-      verifiedAt: status === 'verified' ? new Date().toISOString() : selectedSeller.verifiedAt,
-      verificationNote: status === 'rejected' ? rejectNote : undefined,
-      verificationHistory: [historyItem, ...(selectedSeller.verificationHistory || [])]
-    };
+      // Update both documents to grant/revoke dashboard access
+      await updateDoc(appRef, {
+        status: status,
+        verifiedAt: status === 'approved' ? new Date().toISOString() : null,
+        verificationNote: status === 'rejected' ? rejectNote : null,
+        updatedAt: serverTimestamp()
+      });
 
-    // Update global storage
-    localStorage.setItem('kirato-sales-shop-profile', JSON.stringify(updatedSeller));
-    window.dispatchEvent(new Event('shop-profile-updated'));
-    
-    // Refresh local list
-    setSellers(prev => prev.map(s => s.shopName === updatedSeller.shopName ? updatedSeller : s));
-    setSelectedSeller(null);
-    setRejectNote('');
+      await updateDoc(userRef, {
+        sellerStatus: status,
+        sellerStatusUpdatedAt: serverTimestamp()
+      });
+      
+      setSelectedSeller(null);
+      setRejectNote('');
+    } catch (error) {
+      console.error("Action failed", error);
+    }
   };
 
   const filteredSellers = sellers.filter(s => {
@@ -96,134 +104,76 @@ const SupportInbox: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-6 pb-24">
       {selectedSeller ? (
         <div className="animate-in slide-in-from-right duration-300 space-y-6">
-           {/* Detail View Header */}
            <div className="flex items-center justify-between">
               <button onClick={() => setSelectedSeller(null)} className="flex items-center gap-2 text-xs font-black uppercase text-slate-500 hover:text-rose-600 transition-colors">
                 <ArrowLeft size={16} /> {ts.detail.back}
               </button>
               <div className="flex items-center gap-2">
-                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Shop Name:</span>
-                 <h4 className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.shopName}</h4>
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Store ID:</span>
+                 <h4 className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.id}</h4>
               </div>
            </div>
 
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Seller Summary & Documents */}
               <div className="lg:col-span-2 space-y-6">
                  <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">{ts.detail.sellerInfo}</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Application Info</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                        <div className="space-y-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">{ts.list.type}</p>
-                          <div className="flex items-center gap-2 text-xs font-bold">
-                             {selectedSeller.sellerType === 'business' ? <Briefcase size={14} className="text-blue-500" /> : <User size={14} className="text-emerald-500" />}
-                             {selectedSeller.sellerType === 'business' ? t.settings.verification.business : t.settings.verification.individual}
-                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Shop Name</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.storeName}</p>
                        </div>
                        <div className="space-y-1">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">{ts.list.submitted}</p>
-                          <p className="text-xs font-bold">{selectedSeller.verificationSubmittedAt ? new Date(selectedSeller.verificationSubmittedAt).toLocaleString() : 'N/A'}</p>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Category</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white capitalize">{selectedSeller.category}</p>
+                       </div>
+                       <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Phone</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.phone || 'N/A'}</p>
+                       </div>
+                       <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase">Submitted At</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">
+                            {selectedSeller.submittedAt?.toDate ? selectedSeller.submittedAt.toDate().toLocaleString() : 'Just now'}
+                          </p>
                        </div>
                     </div>
                  </div>
 
-                 <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">{ts.detail.documents}</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       {(selectedSeller.verificationDocs || []).map(doc => (
-                         <div key={doc.id} className="p-4 bg-gray-50 dark:bg-slate-900 rounded-[24px] border border-gray-100 dark:border-slate-800 space-y-3 group relative">
-                            <div className="flex items-center justify-between">
-                               <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm shrink-0">
-                                     {doc.fileType.startsWith('image') ? <Eye size={18} className="text-blue-500" /> : <FileText size={18} className="text-rose-500" />}
-                                  </div>
-                                  <div className="min-w-0">
-                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 truncate">{doc.type.replace('_', ' ')}</p>
-                                     <p className="text-[11px] font-bold truncate">{doc.fileName}</p>
-                                  </div>
-                               </div>
-                            </div>
-                            
-                            {doc.fileType.startsWith('image') ? (
-                               <div className="aspect-video w-full rounded-xl overflow-hidden border border-gray-100 dark:border-slate-700 bg-white">
-                                  <img src={doc.previewUrl} className="w-full h-full object-contain" alt="Document" />
-                               </div>
-                            ) : (
-                               <div className="py-8 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-200">
-                                  <FileText size={32} className="text-gray-300" />
-                                  <span className="text-[10px] font-black uppercase mt-2">PDF Document</span>
-                               </div>
-                            )}
-
-                            <button 
-                              onClick={() => window.open(doc.previewUrl)}
-                              className="w-full py-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase flex items-center justify-center gap-2 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
-                            >
-                               <ExternalLink size={14} /> View Full
-                            </button>
-                         </div>
-                       ))}
-                    </div>
+                 <div className="p-10 bg-gray-50 dark:bg-slate-900/50 rounded-[32px] border border-dashed border-gray-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                    <FileText size={48} className="text-gray-300 mb-4" />
+                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No detailed documents uploaded</p>
                  </div>
               </div>
 
-              {/* Review Sidebar */}
               <div className="space-y-6">
                  <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
                     <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">{ts.detail.actions}</h3>
                     
-                    {selectedSeller.verificationStatus === 'pending' ? (
-                      <div className="space-y-4">
-                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-gray-400 uppercase ml-1">{t.settings.verification.adminNote}</label>
-                            <textarea 
-                              value={rejectNote}
-                              onChange={e => setRejectNote(e.target.value)}
-                              className="w-full h-32 p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 text-xs font-bold"
-                              placeholder={ts.detail.notePlaceholder}
-                            />
-                         </div>
-                         <div className="grid grid-cols-1 gap-3">
-                            <button 
-                              onClick={() => handleAction('verified')}
-                              className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[2px] shadow-lg active:scale-95 transition-all"
-                            >
-                               <ShieldCheck size={18} className="inline mr-2" /> {ts.detail.approve}
-                            </button>
-                            <button 
-                              onClick={() => handleAction('rejected')}
-                              disabled={!rejectNote.trim()}
-                              className="w-full py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[2px] active:scale-95 transition-all disabled:opacity-50"
-                            >
-                               <XCircle size={18} className="inline mr-2" /> {ts.detail.reject}
-                            </button>
-                         </div>
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-100 flex items-center justify-center text-[10px] font-black uppercase text-gray-400">
-                        Status: {selectedSeller.verificationStatus}
-                      </div>
-                    )}
-                 </div>
-
-                 {/* History / Log */}
-                 <div className="p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">{ts.detail.history}</h3>
                     <div className="space-y-4">
-                       {(selectedSeller.verificationHistory || []).map((h, i) => (
-                         <div key={i} className="flex gap-3 relative before:absolute before:left-[9px] before:top-4 before:bottom-0 before:w-[1px] before:bg-gray-100 last:before:hidden">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 z-10 ${
-                              h.action === 'approved' ? 'bg-emerald-500' : h.action === 'rejected' ? 'bg-rose-500' : 'bg-blue-500'
-                            }`}>
-                               <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                            </div>
-                            <div className="space-y-1 pb-4">
-                               <p className="text-[10px] font-black uppercase tracking-widest">{h.action}</p>
-                               <p className="text-[8px] font-bold text-gray-400">{new Date(h.at).toLocaleString()}</p>
-                               {h.note && <p className="text-[10px] font-bold text-slate-500 mt-1 italic">"{h.note}"</p>}
-                            </div>
-                         </div>
-                       ))}
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase ml-1">Admin Notes</label>
+                          <textarea 
+                            value={rejectNote}
+                            onChange={e => setRejectNote(e.target.value)}
+                            className="w-full h-32 p-4 bg-gray-50 dark:bg-slate-950 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 text-xs font-bold"
+                            placeholder="Reason for rejection or approval note..."
+                          />
+                       </div>
+                       <div className="grid grid-cols-1 gap-3">
+                          <button 
+                            onClick={() => handleAction('approved')}
+                            className="w-full py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[2px] shadow-lg active:scale-95 transition-all"
+                          >
+                             <ShieldCheck size={18} className="inline mr-2" /> Approve Application
+                          </button>
+                          <button 
+                            onClick={() => handleAction('rejected')}
+                            className="w-full py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[2px] active:scale-95 transition-all"
+                          >
+                             <XCircle size={18} className="inline mr-2" /> Reject Application
+                          </button>
+                       </div>
                     </div>
                  </div>
               </div>
@@ -234,13 +184,13 @@ const SupportInbox: React.FC = () => {
            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h3 className="text-2xl font-black tracking-tight">{ts.title}</h3>
               <div className="flex gap-2 p-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                 {['pending', 'verified', 'rejected', 'all'].map(f => (
+                 {['pending', 'approved', 'rejected', 'all'].map(f => (
                    <button 
                     key={f}
                     onClick={() => setFilter(f as any)}
                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400'}`}
                    >
-                     {ts.filters[f as keyof typeof ts.filters]}
+                     {f}
                    </button>
                  ))}
               </div>
@@ -252,8 +202,8 @@ const SupportInbox: React.FC = () => {
                 type="text" 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder={t.products.search || "Search by shop..."}
-                className="w-full h-14 pl-12 pr-6 bg-white dark:bg-slate-800 rounded-[20px] border border-gray-100 dark:border-slate-700 shadow-sm focus:ring-2 focus:ring-rose-500/20 font-bold"
+                placeholder="Search by store name..."
+                className="w-full h-14 pl-12 pr-6 bg-white dark:bg-slate-800 rounded-[20px] border border-gray-100 dark:border-slate-700 shadow-sm focus:ring-2 focus:ring-rose-500/20 font-bold text-sm"
               />
            </div>
 
@@ -263,35 +213,35 @@ const SupportInbox: React.FC = () => {
              </div>
            ) : filteredSellers.length === 0 ? (
              <div className="py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-[32px] border border-dashed border-gray-200 dark:border-slate-700 opacity-40">
-                <ShieldCheck size={48} className="text-gray-300 mb-4" />
-                <p className="text-xs font-black uppercase tracking-widest">No verification requests found</p>
+                <Building size={48} className="text-gray-300 mb-4" />
+                <p className="text-xs font-black uppercase tracking-widest">No applications found</p>
              </div>
            ) : (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredSellers.map((seller, i) => (
+                {filteredSellers.map((seller) => (
                   <div 
-                    key={i} 
+                    key={seller.id} 
                     onClick={() => setSelectedSeller(seller)}
                     className="p-6 bg-white dark:bg-slate-800 rounded-[32px] border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all cursor-pointer active:scale-[0.98] group"
                   >
                      <div className="flex justify-between items-start mb-4">
                         <div className="w-14 h-14 bg-gray-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center shrink-0 border border-gray-100 dark:border-slate-800">
-                           {seller.logoUrl ? <img src={seller.logoUrl} className="w-full h-full object-cover rounded-2xl" /> : <User size={24} className="text-gray-300" />}
+                           <Store size={24} className="text-gray-300" />
                         </div>
                         <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                          seller.verificationStatus === 'verified' ? 'bg-emerald-50 text-emerald-600' : 
+                          seller.verificationStatus === 'approved' ? 'bg-emerald-50 text-emerald-600' : 
                           seller.verificationStatus === 'rejected' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'
                         }`}>
                            {seller.verificationStatus}
                         </span>
                      </div>
                      <h4 className="text-lg font-black tracking-tight mb-1 group-hover:text-rose-600 transition-colors">{seller.shopName}</h4>
-                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4">{seller.city || 'Location N/A'} • {seller.sellerType}</p>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4">{seller.category} • {seller.phone || 'No phone'}</p>
                      
                      <div className="pt-4 border-t border-gray-50 dark:border-slate-700 flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400">
                            <Clock size={12} />
-                           {seller.verificationSubmittedAt ? new Date(seller.verificationSubmittedAt).toLocaleDateString() : 'N/A'}
+                           {seller.submittedAt?.toDate ? seller.submittedAt.toDate().toLocaleDateString() : 'N/A'}
                         </div>
                         <ChevronRight size={18} className="text-gray-300 group-hover:text-rose-600 transition-all" />
                      </div>

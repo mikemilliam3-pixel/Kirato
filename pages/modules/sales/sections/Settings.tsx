@@ -18,7 +18,11 @@ const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
   return `${hour}:${min}`;
 });
 
-const Settings: React.FC = () => {
+interface SettingsProps {
+  isDemo?: boolean;
+}
+
+const Settings: React.FC<SettingsProps> = ({ isDemo = false }) => {
   const { language } = useApp();
   const t = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
   const ts = t.settings;
@@ -75,6 +79,7 @@ const Settings: React.FC = () => {
   }, []);
 
   const handleSave = (updatedProfile?: ShopProfile) => {
+    if (isDemo) return;
     const toSave = updatedProfile || profile;
     localStorage.setItem('kirato-sales-shop-profile', JSON.stringify(toSave));
     setShowSuccess(true);
@@ -83,6 +88,7 @@ const Settings: React.FC = () => {
   };
 
   const handleFileUpload = (field: 'logoUrl' | 'bannerUrl', e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isDemo) return;
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -94,6 +100,7 @@ const Settings: React.FC = () => {
   };
 
   const handleDocUpload = (type: DocumentType, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isDemo) return;
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -127,6 +134,7 @@ const Settings: React.FC = () => {
   };
 
   const removeDoc = (type: DocumentType) => {
+    if (isDemo) return;
     setProfile(prev => ({
       ...prev,
       verificationDocs: (prev.verificationDocs || []).filter(d => d.type !== type)
@@ -134,6 +142,7 @@ const Settings: React.FC = () => {
   };
 
   const handleSubmitVerification = () => {
+    if (isDemo) return;
     const docs = profile.verificationDocs || [];
     const hasIdFront = docs.some(d => d.type === 'id_front');
     const hasCert = docs.some(d => d.type === 'business_certificate');
@@ -161,6 +170,7 @@ const Settings: React.FC = () => {
   };
 
   const toggleDay = (day: DayOfWeek) => {
+    if (isDemo) return;
     const currentWH = profile.workingHours as ShopWorkingHours;
     const newDays = currentWH.days.includes(day)
       ? currentWH.days.filter(d => d !== day)
@@ -173,6 +183,7 @@ const Settings: React.FC = () => {
   };
 
   const setPreset = (preset: 'monFri' | 'monSat' | 'everyday') => {
+    if (isDemo) return;
     let days: DayOfWeek[] = [];
     if (preset === 'monFri') days = ['mon', 'tue', 'wed', 'thu', 'fri'];
     if (preset === 'monSat') days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -201,7 +212,7 @@ const Settings: React.FC = () => {
     const doc = (profile.verificationDocs || []).find(d => d.type === type);
     const isPending = profile.verificationStatus === 'pending';
     const isVerified = profile.verificationStatus === 'verified';
-    const disabled = isPending || isVerified;
+    const disabled = isPending || isVerified || isDemo;
 
     return (
       <div className="space-y-1.5 flex-1 min-w-[240px]">
@@ -273,8 +284,9 @@ const Settings: React.FC = () => {
            
            {status === 'unverified' && !isRequesting && (
              <button 
+               disabled={isDemo}
                onClick={() => setIsRequesting(true)}
-               className="w-full sm:w-auto px-8 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+               className={`w-full sm:w-auto px-8 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all ${isDemo ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
              >
                {tv.requestBtn}
              </button>
@@ -282,8 +294,9 @@ const Settings: React.FC = () => {
 
            {isRejected && !isRequesting && (
              <button 
+               disabled={isDemo}
                onClick={() => setIsRequesting(true)}
-               className="w-full sm:w-auto px-8 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+               className={`w-full sm:w-auto px-8 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all ${isDemo ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
              >
                {tv.resubmitBtn}
              </button>
@@ -324,14 +337,14 @@ const Settings: React.FC = () => {
                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{tv.sellerType}</label>
                <div className="flex p-1 bg-gray-50 dark:bg-slate-900 rounded-2xl">
                   <button 
-                    disabled={isPending || isVerified}
+                    disabled={isPending || isVerified || isDemo}
                     onClick={() => setProfile({...profile, sellerType: 'individual'})}
                     className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase flex items-center justify-center gap-2 transition-all ${profile.sellerType === 'individual' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-md' : 'text-gray-400'}`}
                   >
                     <User size={14} /> {tv.individual}
                   </button>
                   <button 
-                    disabled={isPending || isVerified}
+                    disabled={isPending || isVerified || isDemo}
                     onClick={() => setProfile({...profile, sellerType: 'business'})}
                     className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase flex items-center justify-center gap-2 transition-all ${profile.sellerType === 'business' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-md' : 'text-gray-400'}`}
                   >
@@ -394,10 +407,12 @@ const Settings: React.FC = () => {
                       ) : (
                         <ImageIcon size={24} className="text-gray-300" />
                       )}
-                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity backdrop-blur-sm">
-                        <Upload size={18} />
-                        <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload('logoUrl', e)} />
-                      </label>
+                      {!isDemo && (
+                        <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity backdrop-blur-sm">
+                          <Upload size={18} />
+                          <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload('logoUrl', e)} />
+                        </label>
+                      )}
                     </div>
                   </div>
                </div>
@@ -411,11 +426,13 @@ const Settings: React.FC = () => {
                       ) : (
                         <ImageIcon size={24} className="text-gray-300" />
                       )}
-                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity backdrop-blur-sm">
-                        <Upload size={18} />
-                        <span className="text-[8px] font-black uppercase mt-1">Upload</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload('bannerUrl', e)} />
-                      </label>
+                      {!isDemo && (
+                        <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity backdrop-blur-sm">
+                          <Upload size={18} />
+                          <span className="text-[8px] font-black uppercase mt-1">Upload</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={e => handleFileUpload('bannerUrl', e)} />
+                        </label>
+                      )}
                     </div>
                   </div>
                </div>
@@ -425,18 +442,20 @@ const Settings: React.FC = () => {
               <div className="space-y-1.5">
                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{ts.shopName}</label>
                 <input 
+                  disabled={isDemo}
                   type="text" 
                   value={profile.shopName}
                   onChange={e => setProfile({...profile, shopName: e.target.value})}
-                  className="w-full h-12 md:h-14 px-4 md:px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm" 
+                  className="w-full h-12 md:h-14 px-4 md:px-5 bg-gray-50 dark:bg-slate-800 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-sm disabled:opacity-70" 
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{ts.description}</label>
                 <textarea 
+                  disabled={isDemo}
                   value={profile.description}
                   onChange={e => setProfile({...profile, description: e.target.value})}
-                  className="w-full p-4 md:p-5 bg-gray-50 dark:bg-slate-900 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-medium text-sm h-24" 
+                  className="w-full p-4 md:p-5 bg-gray-50 dark:bg-slate-900 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 font-medium text-sm h-24 disabled:opacity-70" 
                 />
               </div>
               
@@ -446,17 +465,18 @@ const Settings: React.FC = () => {
                     <div className="relative">
                       <MapPin size={16} className="absolute left-4 top-[14px] text-gray-400" />
                       <input 
+                        disabled={isDemo}
                         type="text" 
                         value={profile.city}
                         onChange={e => setProfile({...profile, city: e.target.value})}
-                        className="w-full h-11 pl-11 pr-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs" 
+                        className="w-full h-11 pl-11 pr-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none focus:ring-2 focus:ring-rose-500 font-bold text-xs disabled:opacity-70" 
                       />
                     </div>
                  </div>
 
                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">{ts.workingHours}</label>
-                    <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border-none space-y-4">
+                    <div className={`p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border-none space-y-4 ${isDemo ? 'opacity-70 pointer-events-none' : ''}`}>
                        <div className="flex items-center gap-2 mb-1">
                           <Clock size={14} className="text-gray-400" />
                           <span className="text-[10px] font-black text-slate-700 dark:text-slate-300">{formattedWHSummary}</span>
@@ -525,28 +545,31 @@ const Settings: React.FC = () => {
                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-gray-400 uppercase ml-1 flex items-center gap-2"><Send size={12} /> Telegram</label>
                     <input 
+                      disabled={isDemo}
                       type="text" 
                       value={profile.telegram}
                       onChange={e => setProfile({...profile, telegram: e.target.value})}
-                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs" 
+                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs disabled:opacity-70" 
                     />
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-gray-400 uppercase ml-1 flex items-center gap-2"><Phone size={12} /> Phone</label>
                     <input 
+                      disabled={isDemo}
                       type="text" 
                       value={profile.phone}
                       onChange={e => setProfile({...profile, phone: e.target.value})}
-                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs" 
+                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs disabled:opacity-70" 
                     />
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[9px] font-black text-gray-400 uppercase ml-1 flex items-center gap-2"><Mail size={12} /> Email</label>
                     <input 
+                      disabled={isDemo}
                       type="text" 
                       value={profile.email}
                       onChange={e => setProfile({...profile, email: e.target.value})}
-                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs" 
+                      className="w-full h-10 md:h-12 px-3 md:px-4 bg-gray-50 dark:bg-slate-900 rounded-xl border-none font-bold text-xs disabled:opacity-70" 
                     />
                  </div>
               </div>
@@ -575,8 +598,9 @@ const Settings: React.FC = () => {
            </div>
 
            <button 
+             disabled={isDemo}
              onClick={() => handleSave()}
-             className="w-full py-4 md:py-5 bg-rose-600 text-white rounded-[20px] md:rounded-[24px] text-xs md:text-sm font-black uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all hover:bg-rose-700 flex items-center justify-center gap-2 md:gap-3"
+             className={`w-full py-4 md:py-5 bg-rose-600 text-white rounded-[20px] md:rounded-[24px] text-xs md:text-sm font-black uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none active:scale-95 transition-all hover:bg-rose-700 flex items-center justify-center gap-2 md:gap-3 ${isDemo ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
            >
              <Check size={18} /> {ts.saveChanges}
            </button>

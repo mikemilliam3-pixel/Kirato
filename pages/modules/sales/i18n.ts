@@ -11,8 +11,8 @@ export const salesTranslations = {
       customers: "Mijozlar",
       chat: "Chat",
       promotions: "Aksiyalar",
-      settings: "Sozalamalar",
-      supportInbox: "Support Inbox"
+      settings: "Sozlamalar",
+      supportInbox: "Yordam markazi"
     },
     channel: {
       title: "Kanal Integratsiyalari",
@@ -121,11 +121,11 @@ export const salesTranslations = {
     },
     publicShop: {
       verified: "Tasdiqlangan sotuvchi",
-      rateBtn: "Baholash",
+      rateBtn: "Sotuvchini baholash",
       reportBtn: "Shikoyat qilish",
       location: "Manzil",
       hours: "Ish vaqti",
-      contactBtn: "Bog'lanish",
+      contactBtn: "Sotuvchi bilan bog'lanish",
       requestBtn: "So'rov yuborish",
       reviews: "Sharhlar",
       chatFloatingBtn: "Sotuvchi bilan chat",
@@ -235,7 +235,7 @@ export const salesTranslations = {
       }
     },
     supportInbox: {
-      title: "Support Inbox",
+      title: "Yordam markazi",
       notAuthorized: "Ruxsat berilmagan",
       filters: {
         all: "Barchasi",

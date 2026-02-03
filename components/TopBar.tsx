@@ -1,15 +1,54 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { ArrowLeft, Share2, MoreVertical } from 'lucide-react';
 
 interface TopBarProps {
   title: string;
   hideMenu?: boolean;
+  rightSlot?: React.ReactNode;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ title, hideMenu = false }) => {
+const TopBar: React.FC<TopBarProps> = ({ title, hideMenu = false, rightSlot }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const { t } = useApp();
+
+  const handleShare = () => {
+    const productId = searchParams.get('productId');
+    const domain = window.location.origin;
+    
+    // Construct the URL to share
+    // Use requested format for products, otherwise fallback to current full URL
+    const shareUrl = productId 
+      ? `${domain}/#/product/${productId}` 
+      : window.location.href;
+
+    const shareText = `Check this out on Kirato AI: ${title}`;
+    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+
+    // 1. Attempt Telegram WebApp Native Share
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg?.ready) {
+      try {
+        tg.openTelegramLink(telegramShareUrl);
+      } catch (err) {
+        window.open(telegramShareUrl, "_blank");
+      }
+    } else {
+      // 2. Standard Browser Fallback
+      window.open(telegramShareUrl, "_blank");
+    }
+
+    // 3. Clipboard Fallback (Useful for desktop or restricted environments)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).catch(() => {
+        // Ultimate fallback
+        prompt("Copy link to share:", shareUrl);
+      });
+    }
+  };
 
   return (
     <div className="flex items-center justify-between mb-4 md:mb-10 animate-in fade-in slide-in-from-left-4 duration-500">
@@ -33,7 +72,11 @@ const TopBar: React.FC<TopBarProps> = ({ title, hideMenu = false }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <button className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-all shadow-sm active:scale-95">
+        {rightSlot}
+        <button 
+          onClick={handleShare}
+          className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-all shadow-sm active:scale-95"
+        >
           <Share2 size={16} /> Share
         </button>
         {!hideMenu && (

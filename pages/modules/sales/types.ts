@@ -123,6 +123,8 @@ export interface Order {
 
 export interface Product {
   id: string;
+  // Added sellerId to link products to specific sellers in the marketplace
+  sellerId: string;
   slug?: string;
   title: string;
   shortDescription: string;

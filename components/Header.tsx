@@ -1,51 +1,42 @@
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   Moon, Sun, ChevronDown, Bell, 
-  User, Settings, LogOut, Menu, LogIn, Coins
+  User as UserIcon, Settings, LogOut, Menu, LogIn, Coins
 } from 'lucide-react';
-import { Language, UserProfile } from '../types';
+import { Language } from '../types';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
+export function formatNameFromEmail(email: string): string {
+  if (!email) return 'User';
+  const namePart = email.split('@')[0];
+  return namePart
+    .replace(/[._-]/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
-  const { theme, toggleTheme, language, setLanguage, t, unreadNotifications, isLoggedIn, login, logout, credits } = useApp();
+  const { theme, toggleTheme, language, setLanguage, t, unreadNotifications, isLoggedIn, openAuth, logout, credits, user } = useApp();
   const navigate = useNavigate();
   
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const langRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const loadProfile = () => {
-      const stored = localStorage.getItem('kirato-user-profile');
-      if (stored && isLoggedIn) {
-        setUserProfile(JSON.parse(stored));
-      } else if (isLoggedIn) {
-        setUserProfile({
-          fullName: 'John Doe',
-          username: 'johndoe',
-          phone: '+998 90 123 45 67'
-        });
-      } else {
-        setUserProfile(null);
-      }
-    };
-    loadProfile();
-    window.addEventListener('profile-updated', loadProfile);
-    window.addEventListener('auth-change', loadProfile);
-    return () => {
-      window.removeEventListener('profile-updated', loadProfile);
-      window.removeEventListener('auth-change', loadProfile);
-    };
-  }, [isLoggedIn]);
+  const userData = useMemo(() => {
+    if (!user) return null;
+    const name = user.displayName || formatNameFromEmail(user.email || '');
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return { name, email: user.email, initials };
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -130,14 +121,14 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         </div>
 
         {/* Profile Dropdown */}
-        {isLoggedIn ? (
+        {isLoggedIn && userData ? (
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 p-1 md:p-1.5 md:pr-3 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-gray-100 dark:border-slate-800 active:scale-95 transition-all group relative"
             >
               <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-xs shadow-md">
-                {userProfile?.fullName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'JD'}
+                {userData.initials}
               </div>
               {unreadNotifications > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[8px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900">
@@ -150,8 +141,8 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             {isProfileOpen && (
               <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-slate-800 p-2 overflow-hidden animate-in slide-in-from-top-2 duration-200 z-[100]">
                 <div className="px-4 py-4 border-b border-gray-50 dark:border-slate-800 mb-2">
-                  <p className="text-xs font-black text-slate-900 dark:text-white">{userProfile?.fullName || 'John Doe'}</p>
-                  <p className="text-[10px] font-bold text-gray-400 truncate">@{userProfile?.username || 'johndoe'}</p>
+                  <p className="text-xs font-black text-slate-900 dark:text-white truncate">{userData.name}</p>
+                  <p className="text-[10px] font-bold text-gray-400 truncate">{userData.email}</p>
                 </div>
 
                 <div className="space-y-1">
@@ -169,7 +160,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                     onClick={() => { setIsProfileOpen(false); navigate('/profile'); }}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
-                    <User size={18} className="text-blue-600" />
+                    <UserIcon size={18} className="text-blue-600" />
                     <span>My Profile</span>
                   </button>
 
@@ -196,7 +187,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           </div>
         ) : (
           <button 
-            onClick={() => { login(); navigate('/'); }}
+            onClick={() => openAuth('signup')}
             className="flex px-4 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex items-center gap-2"
           >
             <LogIn size={14} className="sm:hidden" />

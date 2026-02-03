@@ -86,6 +86,13 @@ export interface CreditPack {
   price: number;
 }
 
+export interface AppUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  emailVerified: boolean;
+}
+
 export interface AppState {
   language: Language;
   theme: Theme;
@@ -95,8 +102,16 @@ export interface AppState {
   unreadNotifications: number;
   setUnreadNotifications: (count: number) => void;
   isLoggedIn: boolean;
-  login: () => void;
+  user: AppUser | null;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string, fullName: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  resendVerification: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => void;
+  openAuth: (view?: 'signin' | 'signup' | 'reset') => void;
+  closeAuth: () => void;
+  authView: 'signin' | 'signup' | 'reset' | null;
   credits: number;
   subscription: UserSubscription;
   grantCredits: (amount: number, reason: string, metadata?: any) => void;
