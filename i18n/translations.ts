@@ -72,7 +72,8 @@ export const translations: any = {
       signIn: "Kirish",
       signUp: "Ro'yxat",
       logout: "Chiqish",
-      settings: "Sozlamalar"
+      settings: "Sozlamalar",
+      upgrade: "Upgrade"
     },
     profile: {
       title: "Mening Profilim",
@@ -91,6 +92,7 @@ export const translations: any = {
       email: "Email manzil",
       password: "Parol",
       showPassword: "Parolni ko'rsatish",
+      rememberMe: "Meni eslab qol",
       forgotPassword: "Parolni unutdingizmi?",
       resetPasswordTitle: "Parolni tahrirlash",
       resetPasswordDesc: "Email manzilingizni kiriting",
@@ -135,6 +137,7 @@ export const translations: any = {
     }
   },
   RU: {
+    title: "Образование",
     appName: "Kirato AI",
     appSubtitle: "ASSISTANT",
     homeTitle: "Выберите проект",
@@ -203,7 +206,8 @@ export const translations: any = {
       signIn: "Войти",
       signUp: "Регистрация",
       logout: "Выйти",
-      settings: "Настройки"
+      settings: "Настройки",
+      upgrade: "Обновить тариф"
     },
     profile: {
       title: "Мой Профиль",
@@ -222,6 +226,7 @@ export const translations: any = {
       email: "Электронная почта",
       password: "Пароль",
       showPassword: "Показать пароль",
+      rememberMe: "Запомнить меня",
       forgotPassword: "Забыли пароль?",
       resetPasswordTitle: "Сброс пароля",
       resetPasswordDesc: "Введите ваш email адрес",
@@ -335,7 +340,8 @@ export const translations: any = {
       signIn: "Sign in",
       signUp: "Sign up",
       logout: "Logout",
-      settings: "Settings"
+      settings: "Settings",
+      upgrade: "Upgrade"
     },
     profile: {
       title: "My Profile",
@@ -354,6 +360,7 @@ export const translations: any = {
       email: "Email Address",
       password: "Password",
       showPassword: "Show password",
+      rememberMe: "Remember me",
       forgotPassword: "Forgot password?",
       resetPasswordTitle: "Reset Password",
       resetPasswordDesc: "Enter your email address",

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
@@ -6,7 +5,8 @@ import { User, Search, MoreVertical, Star, ShieldAlert, History } from 'lucide-r
 
 const Customers: React.FC = () => {
   const { language } = useApp();
-  const tc = salesTranslations[language].dashboard;
+  const tBase = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
+  const t = tBase.customers || { title: "Customers", search: "Search customers...", viewHistory: "View History" };
 
   const customers = [
     { id: '1', name: 'John Doe', orders: 12, total: 450, last: '2 days ago', status: 'loyal' },
@@ -26,9 +26,13 @@ const Customers: React.FC = () => {
   return (
     <div className="space-y-6 pb-20">
       <div className="flex gap-2">
-        <div className="flex-1 flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <div className="flex-1 flex items-center gap-3 bg-white dark:bg-slate-800 h-12 px-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-all">
           <Search size={16} className="text-gray-400" />
-          <input type="text" placeholder="Find customer..." className="bg-transparent border-none text-xs focus:ring-0 w-full" />
+          <input 
+            type="text" 
+            placeholder={t.search} 
+            className="bg-transparent border-none text-xs font-medium focus:ring-0 focus:outline-none w-full" 
+          />
         </div>
       </div>
 
@@ -47,7 +51,7 @@ const Customers: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <button className="text-gray-300"><MoreVertical size={18} /></button>
+              <button className="text-gray-300 focus:outline-none focus:ring-0"><MoreVertical size={18} /></button>
             </div>
             
             <div className="grid grid-cols-2 gap-4 border-t border-gray-50 dark:border-slate-700 pt-4">
@@ -61,8 +65,8 @@ const Customers: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full py-2.5 mt-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-[10px] font-bold text-slate-500 flex items-center justify-center gap-2 group-hover:bg-rose-50 group-hover:text-rose-600 transition-all">
-              <History size={14} /> View History
+            <button className="w-full py-2.5 mt-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-[10px] font-bold text-slate-500 flex items-center justify-center gap-2 group-hover:bg-rose-50 group-hover:text-rose-600 transition-all focus:outline-none focus:ring-0">
+              <History size={14} /> {t.viewHistory}
             </button>
           </div>
         ))}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import * as LucideIcons from 'lucide-react';
@@ -17,7 +17,10 @@ const SalesLayout: React.FC<SalesLayoutProps> = ({ children, hideNav = false, is
   const { language, t: globalT } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
-  const t = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
+  
+  const t = useMemo(() => {
+    return salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
+  }, [language]);
 
   const [supportMode, setSupportMode] = useState(false);
 
@@ -27,12 +30,18 @@ const SalesLayout: React.FC<SalesLayoutProps> = ({ children, hideNav = false, is
 
   const currentSection = location.pathname.split('/').pop() || 'dashboard';
 
-  const visibleRoutes = salesRoutes.filter(route => {
-    if (route.id === 'support-inbox') return supportMode;
-    return true;
-  });
+  const visibleRoutes = useMemo(() => {
+    return salesRoutes.filter(route => {
+      if (route.id === 'support-inbox') return supportMode;
+      return true;
+    });
+  }, [supportMode]);
 
-  const baseRoute = isDemo ? '/modules/sales/seller-demo' : '/modules/sales';
+  const baseRoute = useMemo(() => {
+    if (isDemo) return '/modules/sales/seller-demo';
+    if (location.pathname.includes('/modules/sales/approved')) return '/modules/sales/approved';
+    return '/modules/sales';
+  }, [isDemo, location.pathname]);
 
   return (
     <div className="flex flex-col min-h-full">
@@ -53,7 +62,7 @@ const SalesLayout: React.FC<SalesLayoutProps> = ({ children, hideNav = false, is
           <nav className="max-w-7xl mx-auto w-full flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar md:justify-center md:gap-10 lg:gap-14 pb-1">
             {visibleRoutes.map((route) => {
               const IconComponent = (LucideIcons as any)[route.icon] || LucideIcons.Circle;
-              const isActive = currentSection === route.id;
+              const isActive = currentSection === route.path || currentSection === route.id;
               
               return (
                 <button

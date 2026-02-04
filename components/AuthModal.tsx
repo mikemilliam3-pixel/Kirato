@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { X, Mail, Lock, LogIn, UserPlus, AlertCircle, ChevronRight, User, Key, CheckCircle2 } from 'lucide-react';
@@ -9,11 +8,11 @@ const AuthModal: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Clear states when switching views
   useEffect(() => {
     setError(null);
     setSuccess(null);
@@ -25,23 +24,23 @@ const AuthModal: React.FC = () => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-    
-    // Client-side validation to prevent Firebase auth/missing-email
     if (!email.trim()) {
       setError('Email is required');
       return;
     }
-
     setLoading(true);
-
     try {
       if (authView === 'signin') {
-        await login(email, password);
+        await login(email, password, rememberMe);
+        setError(null);
+        closeAuth();
       } else if (authView === 'signup') {
         if (!fullName.trim()) {
           throw new Error('Full Name is required');
         }
-        await register(email, password, fullName);
+        await register(email, password, fullName, rememberMe);
+        setError(null);
+        closeAuth();
       } else if (authView === 'reset') {
         await resetPassword(email);
         setSuccess(t('auth.resetLinkSent'));
@@ -87,7 +86,7 @@ const AuthModal: React.FC = () => {
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-sm"
+                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:outline-none focus:ring-0 font-bold text-sm"
                 />
               </div>
             </div>
@@ -103,7 +102,7 @@ const AuthModal: React.FC = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="example@gmail.com"
-                className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-sm"
+                className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:outline-none focus:ring-0 font-bold text-sm"
               />
             </div>
           </div>
@@ -119,31 +118,46 @@ const AuthModal: React.FC = () => {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-sm"
+                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:outline-none focus:ring-0 font-bold text-sm"
                 />
               </div>
-              {/* Show password toggle + Forgot link */}
-              <div className="flex items-center justify-between mt-1 ml-1">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="show-password"
-                    type="checkbox"
-                    checked={showPassword}
-                    onChange={() => setShowPassword(!showPassword)}
-                    className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <label htmlFor="show-password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer select-none">
-                    {t('auth.showPassword')}
-                  </label>
+              <div className="flex flex-col gap-2 mt-2 ml-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="show-password"
+                      type="checkbox"
+                      checked={showPassword}
+                      onChange={() => setShowPassword(!showPassword)}
+                      className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:outline-none focus:ring-0 cursor-pointer"
+                    />
+                    <label htmlFor="show-password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer select-none">
+                      {t('auth.showPassword')}
+                    </label>
+                  </div>
+                  {authView === 'signin' && (
+                    <button 
+                      type="button"
+                      onClick={() => openAuth('reset')}
+                      className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                    >
+                      {t('auth.forgotPassword')}
+                    </button>
+                  )}
                 </div>
-                {authView === 'signin' && (
-                  <button 
-                    type="button"
-                    onClick={() => openAuth('reset')}
-                    className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
-                  >
-                    {t('auth.forgotPassword')}
-                  </button>
+                {(authView === 'signin' || authView === 'signup') && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="remember-me"
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={() => setRememberMe(!rememberMe)}
+                      className="w-3 h-3 rounded border-gray-300 text-blue-600 focus:outline-none focus:ring-0 cursor-pointer"
+                    />
+                    <label htmlFor="remember-me" className="text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer select-none">
+                      {t('auth.rememberMe')}
+                    </label>
+                  </div>
                 )}
               </div>
             </div>

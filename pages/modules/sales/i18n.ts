@@ -1,4 +1,3 @@
-
 export const salesTranslations = {
   UZ: {
     title: "Savdo va Do'kon",
@@ -14,334 +13,245 @@ export const salesTranslations = {
       settings: "Sozlamalar",
       supportInbox: "Yordam markazi"
     },
+    dashboard: {
+      totalSales: "Jami savdo",
+      onHoldFunds: "Muzlatilgan mablag'lar",
+      orders: "Buyurtmalar",
+      disputedOrders: "Bahsli buyurtmalar",
+      quickActions: "Tezkor amallar",
+      addProduct: "Mahsulot qo'shish",
+      viewShop: "Do'konni ko'rish",
+      shareChannel: "Kanalga ulashish",
+      recentOrders: "Oxirgi buyurtmalar"
+    },
+    orders: {
+      status: {
+        pending: "Kutilmoqda",
+        processing: "Jarayonda",
+        shipped: "Yuborildi",
+        delivered: "Yetkazildi",
+        cancelled: "Bekor qilindi",
+        disputed: "Bahsli",
+        refunded: "Qaytarildi"
+      }
+    },
+    cart: {
+      add_to_cart: "Savatga qo‘shish",
+      contact_seller: "Sotuvchi bilan aloqa",
+      added_to_cart: "Savatga qo‘shildi",
+      cart_title: "Savatingiz",
+      checkout: "Buyurtma berish",
+      remove: "O‘chirish",
+      clear_cart: "Savatni tozalash",
+      empty_cart: "Savat bo‘sh",
+      start_shopping: "Xaridni boshlash",
+      estimated_total: "Jami summa"
+    },
+    checkout: {
+      checkout_title: "Buyurtma",
+      payment_method: "To‘lov usuli",
+      place_order: "Buyurtma berish",
+      order_success: "Buyurtma muvaffaqiyatli yuborildi",
+      escrow_note: "To'lov yetkazib berish tasdiqlangunga qadar platformada saqlanadi.",
+      payment_methods: {
+        card: "Karta",
+        cash_on_delivery: "Yetkazib berishda to‘lov",
+        bank_transfer: "Bank o‘tkazmasi"
+      },
+      fields: {
+        full_name: "To‘liq ism",
+        phone: "Telefon",
+        address: "Manzil",
+        city: "Shahar",
+        card_number: "Karta raqami",
+        expiry: "Amal qilish muddati",
+        cvc: "CVC",
+        transaction_id: "Tranzaksiya kodi",
+        receipt_link: "Chek nusxasi (link)"
+      },
+      success: {
+        title: "Buyurtma qabul qilindi!",
+        subtitle: "Sizning buyurtmangiz muvaffaqiyatli ro'yxatga olindi.",
+        security_code_title: "Yetkazib berish xavfsizlik kodi",
+        security_warning: "USHBU KODNI TOVARNI QO'LINGIZGA OLGUNCHA HECH KIMGA BERMANG.",
+        copy_code: "Kodni nusxalash"
+      }
+    },
     channel: {
-      title: "Kanal Integratsiyalari",
-      subtitle: "Mahsulotlaringizni ijtimoiy tarmoqlarda avtomatik nashr qiling",
-      activeDeepLinks: "Faol Deep Linklar",
-      telegram: {
-        title: "Telegram Kanal + Bot",
-        desc: "Bot orqali mahsulotlarni kanalingizga to'g'ridan-to'g'ri joylang",
-        botMode: "Bot rejimi",
-        platformBot: "Platforma boti",
-        ownBot: "O'z botingiz",
-        botUsername: "Bot Username (masalan: mening_do'konim_bot)",
-        botToken: "Bot Token (ixtiyoriy)",
-        channelUsername: "Kanal Username (masalan: @kanal_nomi)",
-        testMsg: "Test Xabar",
-        disconnect: "Ulanishni uzish"
-      },
-      instagram: {
-        title: "Instagram Business",
-        desc: "Instagram post va storislarda mahsulotlarni belgilang",
-        permissions: "Talab qilinadigan ruxsatlar:",
-        p1: "Kontentni nashr qilish",
-        p2: "Profil ma'lumotlarini o'qish",
-        oauthRedirect: "Hozircha ma'lumotlarni qo'lda kiriting. Kelajakda OAuth qo'shiladi.",
-        username: "Instagram foydalanuvchi nomi",
-        accessToken: "Access Token (ixtiyoriy)",
-        businessId: "IG Business ID (ixtiyoriy)",
-        tokenHint: "Haqiqiy API orqali nashr qilish yoqilganda talab qilinadi",
-        idHint: "Hozircha ixtiyoriy",
-        oauthNote: "Haqiqiy Instagram ulanishi OAuth orqali amalga oshiriladi. Hozircha biz ushbu ma'lumotlarni sozlash uchun saqlaymiz."
-      },
+      title: "Kanalga ulash",
+      subtitle: "Mahsulotlarni ijtimoiy tarmoqlarga avtomatik yuborish",
       status: {
         connected: "Ulangan",
         notConnected: "Ulanmagan"
       },
+      telegram: {
+        title: "Telegram",
+        desc: "O'z botingiz orqali kanalingizga postlar yuboring",
+        botToken: "Bot Token",
+        channelUsername: "Kanal ID yoki Username"
+      },
+      instagram: {
+        title: "Instagram",
+        desc: "Mahsulotlarni Instagram biznes profilingizga joylang",
+        username: "Username",
+        accessToken: "Access Token",
+        businessId: "Instagram Business ID",
+        tokenHint: "Meta for Developers portalidan olingan token",
+        idHint: "Instagram Business Account ID",
+        oauthNote: "Hozirda faqat professional akkauntlar qo'llab-quvvatlanadi"
+      },
       actions: {
-        connect: "Bog'lanish",
         manage: "Boshqarish",
-        disconnect: "Ulanishni uzish",
+        connect: "Ulash",
         save: "Saqlash",
-        postProduct: "Mahsulotni ulashish",
-        postNow: "Hozir nashr qilish",
-        schedule: "Rejalashtirish",
-        selectProduct: "Mahsulotni tanlang",
-        preview: "Ko'rinishi",
-        copyLink: "Linkni nusxalash",
-        share: "Ulashish"
+        disconnect: "Ulanishni uzish"
       },
       validation: {
-        invalidToken: "Token noto'g'ri formatda ( : bo'lishi shart)",
-        invalidChannel: "Username @ bilan boshlanishi shart",
-        invalidBotUser: "Bot username @ siz, faqat do'kon nomi boti shaklida bo'lishi shart",
-        usernameRequired: "Foydalanuvchi nomi kiritilishi shart"
+        invalidToken: "Noto'g'ri bot tokeni",
+        invalidChannel: "Kanal nomi @ bilan boshlanishi kerak",
+        usernameRequired: "Username kiritish majburiy"
       }
-    },
-    dashboard: {
-      totalSales: "Umumiy tushum",
-      orders: "Buyurtmalar",
-      customers: "Mijozlar",
-      conversion: "Konversiya",
-      recentOrders: "Oxirgi buyurtmalar",
-      quickActions: "Tezkor amallar",
-      addProduct: "Mahsulot qo'shish",
-      viewShop: "Do'konni ko'rish",
-      shareChannel: "Ulashish",
-      analytics: "Analitika",
-      onHoldFunds: "Escrow (Ushlab turilgan)",
-      pendingPayouts: "To'lovga tayyor",
-      disputedOrders: "Bahsli buyurtmalar"
-    },
-    products: {
-      inventory: "Inventar",
-      search: "Mahsulotlarni qidirish...",
-      add: "Yangi mahsulot",
-      edit: "Tahrirlash",
-      price: "Narx",
-      stock: "Ombor",
-      category: "Toifa",
-      all: "Barchasi",
-      draft: "Qoralama",
-      active: "Faol",
-      pending: "Kutilmoqda",
-      archived: "Arxivlandi",
-      published: "Nashr etilgan",
-      outOfStock: "Tugagan",
-      visibility: "Ko'rinishi",
-      public: "Ochiq",
-      private: "Shaxsiy",
-      unlisted: "Ro'yxatdan tashqari",
-      status: "Holat",
-      productLink: "Mahsulot havolasi",
-      categories: {
-        clothing: "Kiyim-kechak va aksessuarlar",
-        shoes: "Oyoq kiyimlar",
-        bags: "Sumkalar va hamyonlar",
-        electronics: "Elektronika va gadjetlar",
-        home: "Uy va oshxona buyumlari",
-        beauty: "Go‘zallik va shaxsiy parvarish",
-        kids: "Bolalar va chaqaloqlar uchun",
-        sports: "Sport va faol dam olish",
-        auto: "Avto va asbob-uskunalar",
-        books: "Kitoblar va kanselyariya",
-        food: "Oziq-ovqat va ichimliklar",
-        other: "Boshqa"
-      }
-    },
-    publicShop: {
-      verified: "Tasdiqlangan sotuvchi",
-      rateBtn: "Sotuvchini baholash",
-      reportBtn: "Shikoyat qilish",
-      location: "Manzil",
-      hours: "Ish vaqti",
-      contactBtn: "Sotuvchi bilan bog'lanish",
-      requestBtn: "So'rov yuborish",
-      reviews: "Sharhlar",
-      chatFloatingBtn: "Sotuvchi bilan chat",
-      messageSeller: "Sotuvchiga xabar yuboring",
-      startChat: "Chatni boshlash",
-      close: "Yopish",
-      online: "Onlayn",
-      offline: "Oflayn",
-      verificationPending: "Tasdiqlash kutilmoqda",
-      moreFromShop: "Sotuvchining boshqa mahsulotlari",
-      openProduct: "Mahsulotni ochish",
-      rateModal: {
-        title: "Sotuvchini baholang",
-        placeholder: "O'z fikringizni yozing (ixtiyoriy)...",
-      },
-      reportModal: {
-        title: "Sotuvchi ustidan shikoyat",
-        reason: "Sababni tanlang",
-        description: "Tafsilotlar",
-        reasons: {
-          scam: "Firibgarlik",
-          fake: "Qalbaki mahsulot",
-          no_response: "Javob bermayapti",
-          inappropriate: "Noxush xulq-atvor",
-          other: "Boshqa sabab"
-        }
-      },
-      success: {
-        rated: "Rahmat! Bahongiz qabul qilindi.",
-        reported: "Shikoyatingiz yuborildi va ko'rib chiqiladi.",
-        linkCopied: "Link nusxalandi!"
-      },
-      submit: "Yuborish",
-      cancel: "Bekor qilish"
     },
     chat: {
-      title: "Chat",
-      online: "Onlayn",
-      offline: "Oflayn",
-      aiMode: "AI Rejimi",
-      sellerMode: "Sotuvchi Rejimi",
-      aiAssist: "AI Yordamchi",
-      suggestReply: "Javob taklif qilish",
-      takeOver: "Boshqaruvni olish",
-      returnToAi: "AI rejimiga qaytish",
-      sending: "Yuborilmoqda...",
-      sent: "Yuborildi",
-      failed: "Xatolik",
-      aiAssistant: "AI Yordamchi",
-      aiDesc: "AI mijozlarga avtomatik javob beradi",
+      title: "Muloqotlar",
+      aiMode: "AI yordamchi",
+      sellerMode: "Sotuvchi rejimi",
+      returnToAi: "AI ga topshirish",
+      suggestReply: "AI taklifi",
       type: "Xabar yozing...",
-      noConversations: "Hozircha xabarlar yo'q"
+      online: "Onlayn",
+      noConversations: "Hozircha suhbatlar yo'q"
+    },
+    promotions: {
+      active: "Faol",
+      expired: "Muddati o'tgan"
+    },
+    customers: {
+      title: "Mijozlar",
+      search: "Mijozni qidirish...",
+      viewHistory: "Tarixni ko'rish"
     },
     settings: {
-      shopProfile: "Do'kon Profili",
+      success: "Sozlamalar saqlandi",
+      closed: "Yopiq",
+      cancel: "Bekor qilish",
+      shopProfile: "Do'kon profili",
       shopName: "Do'kon nomi",
       description: "Tavsif",
-      city: "Shahar / Hudud",
+      city: "Shahar",
       workingHours: "Ish vaqti",
       selectDays: "Kunlarni tanlang",
-      startTime: "Boshlanish vaqti",
-      endTime: "Tugash vaqti",
+      startTime: "Boshlanish",
+      endTime: "Tugash",
+      contact: "Aloqa ma'lumotlari",
+      saveChanges: "Saqlash",
       presets: {
         monFri: "Dush-Jum",
         monSat: "Dush-Shan",
         everyday: "Har kuni"
       },
       days: {
-        mon: "Dush",
-        tue: "Sesh",
-        wed: "Chor",
-        thu: "Pay",
-        fri: "Jum",
-        sat: "Shan",
-        sun: "Yak"
+        mon: "Du", tue: "Se", wed: "Ch", thu: "Pa", fri: "Ju", sat: "Sh", sun: "Ya"
       },
-      closed: "Yopiq",
-      contact: "Aloqa ma'lumotlari",
-      saveChanges: "O'zgarishlarni saqlash",
-      cancel: "Bekor qilish",
-      success: "Sozlamalar saqlandi!",
       verification: {
-        title: "Sotuvchini tasdiqlash",
+        title: "Tasdiqlash",
         unverified: "Tasdiqlanmagan",
-        pending: "Ko'rib chiqilmoqda",
+        pending: "Kutilmoqda",
         verified: "Tasdiqlangan",
         rejected: "Rad etilgan",
-        requestBtn: "Tasdiqlashni boshlash",
-        submitBtn: "Ko'rib chiqishga yuborish",
+        requestBtn: "So'rov yuborish",
         resubmitBtn: "Qayta yuborish",
-        requestSent: "Hujjatlar yuborildi. Qo'llab-quvvatlash jamoasi ko'rib chiqadi.",
-        pendingMessage: "Hujjatlaringiz tekshirilmoqda. Tasdiqlangach, sizga xabar beriladi.",
-        adminVerify: "Tasdiqlash",
-        adminReject: "Rad etish",
+        pendingMessage: "Sizning arizangiz ko'rib chiqilmoqda. Iltimos, kuting.",
+        adminNote: "Admin izohi",
         sellerType: "Sotuvchi turi",
         individual: "Jismoniy shaxs",
-        business: "Yuridik shaxs (Biznes)",
-        uploadIdFront: "Pasport/ID oldi (Majburiy)",
-        uploadIdBack: "Pasport/ID orqasi",
-        uploadBusinessCert: "Guvohnoma (Majburiy)",
-        fileRequirements: "PNG, JPG yoki PDF, maksimal 10MB",
-        replace: "Almashtirish",
-        remove: "O'chirish",
-        missingDocs: "Iltimos, barcha majburiy hujjatlarni yuklang",
-        adminNote: "Admin izohi",
-        supportReview: "Support Review (Hidden Mode)"
+        business: "Yuridik shaxs",
+        uploadIdFront: "Passport/ID (old tomoni)",
+        uploadIdBack: "Passport/ID (orqa tomoni)",
+        uploadBusinessCert: "Guvohnoma (nusxa)",
+        missingDocs: "Hujjatlar to'liq emas",
+        requestSent: "So'rov muvaffaqiyatli yuborildi",
+        submitBtn: "Arizani yuborish",
+        fileRequirements: "PNG, JPG yoki PDF (Max 10MB)"
       }
     },
     supportInbox: {
       title: "Yordam markazi",
       notAuthorized: "Ruxsat berilmagan",
-      filters: {
-        all: "Barchasi",
-        pending: "Kutilmoqda",
-        verified: "Tasdiqlangan",
-        rejected: "Rad etilgan"
-      },
-      list: {
-        shop: "Do'kon",
-        type: "Turi",
-        submitted: "Yuborilgan",
-        status: "Holat"
-      },
       detail: {
-        sellerInfo: "Sotuvchi ma'lumoti",
-        documents: "Hujjatlar",
-        actions: "Amallar",
-        approve: "Tasdiqlash",
-        reject: "Rad etish",
-        notePlaceholder: "Rad etish sababini yozing...",
-        history: "Tarix",
-        back: "Ro'yxatga qaytish"
+        back: "Orqaga",
+        actions: "Amallar"
+      }
+    },
+    publicShop: {
+      shopProfile: "Do'kon haqida",
+      success: {
+        linkCopied: "Havola nusxalandi"
+      }
+    },
+    products: {
+      inventory: "Ombor",
+      add: "Qo'shish",
+      edit: "Tahrirlash",
+      search: "Qidirish...",
+      all: "Barchasi",
+      active: "Faol",
+      pending: "Kutilmoqda",
+      draft: "Qoralama",
+      archived: "Arxivlangan",
+      outOfStock: "Tugagan",
+      published: "E'lon qilingan",
+      public: "Ochiq",
+      private: "Yopiq",
+      unlisted: "Ro'yxatdan tashqari",
+      productLink: "Mahsulot havolasi",
+      categories: {
+        clothing: "Kiyim",
+        shoes: "Poyabzal",
+        bags: "Sumkalar",
+        electronics: "Elektronika",
+        home: "Uy-ro'zg'or",
+        beauty: "Go'zallik",
+        kids: "Bolalar uchun",
+        sports: "Sport",
+        auto: "Avto",
+        books: "Kitoblar",
+        food: "Oziq-ovqat",
+        other: "Boshqa"
       }
     },
     newProduct: {
       title: "Yangi mahsulot",
       basicInfo: "Asosiy ma'lumotlar",
-      media: "Media va aktivlar",
-      pricing: "Narxlash va Sinov",
-      statusMod: "Holat va Moderatsiya",
-      visibilitySettings: "Ko'rinish sozlamalari",
-      nameLabel: "Mahsulot nomi *",
-      namePlaceholder: "Masalan: AI Prompt Engineer",
-      catLabel: "Toifa *",
+      nameLabel: "Mahsulot nomi",
+      namePlaceholder: "Masalan: iPhone 15 Pro",
+      catLabel: "Toifa",
       shortDescLabel: "Qisqa tavsif",
-      shortDescPlaceholder: "Qisqacha sharh (1-2 qator)...",
-      fullDescLabel: "To'liq tavsif (Markdown)",
-      fullDescPlaceholder: "# Batafsil tavsif...",
+      shortDescPlaceholder: "Mahsulot haqida bir necha so'z",
+      fullDescLabel: "To'liq tavsif",
+      fullDescPlaceholder: "Batafsil ma'lumot (Markdown qo'llab-quvvatlanadi)",
       tagsLabel: "Teglar",
-      tagsPlaceholder: "Teg qo'shish...",
+      tagsPlaceholder: "Teg yozing...",
       tagsAdd: "Qo'shish",
-      coverLabel: "Muqova rasmi",
-      galleryLabel: "Galereya rasmlari",
-      videoLabel: "Demo video",
-      sampleLabel: "Namuna natijasi (Screenshot)",
+      media: "Media",
+      coverLabel: "Asosiy rasm",
+      videoLabel: "Video sharh",
       upload: "Yuklash",
-      replace: "Almashtirish",
-      remove: "O'chirish",
-      addMore: "Yana qo'shish",
-      priceLabel: "Narx *",
+      pricing: "Narxlash",
+      priceLabel: "Narx",
       discountLabel: "Chegirma (%)",
       currencyLabel: "Valyuta",
-      trialToggle: "Bepul sinov muddatini taklif qilish",
-      trialDesc: "Sotib olishdan oldin sinab ko'rish imkonini bering",
-      trialDaysLabel: "Sinov kunlari",
-      statusLabel: "Boshlang'ich holat",
-      approvalLabel: "Admin tasdiqlashi shart",
+      statusMod: "Holat va Ko'rinish",
+      statusLabel: "Holat",
+      visibilitySettings: "Ko'rinish",
       cancel: "Bekor qilish",
-      create: "Mahsulot yaratish",
+      create: "Yaratish",
+      remove: "O'chirish",
       errors: {
-        name: "Mahsulot nomi kiritilishi shart",
-        category: "Toifa tanlanishi shart",
-        price: "To'g'ri narx kiriting"
+        name: "Nom kiritilishi shart",
+        category: "Toifa tanlang",
+        price: "Narx noto'g'ri"
       }
-    },
-    orders: {
-      status: {
-        pending: "Kutilmoqda",
-        processing: "Tayyorlanmoqda",
-        shipped: "Yuborildi",
-        delivered: "Yetkazildi",
-        cancelled: "Bekor qilindi",
-        disputed: "Bahsli",
-        refunded: "Qaytarildi"
-      },
-      payoutStatus: {
-        on_hold: "Ushlab turilibdi",
-        eligible: "To'lanishi mumkin",
-        released: "To'lab berildi",
-        frozen: "Muzlatilgan"
-      },
-      actions: {
-        markAsShipped: "Yuborilgan deb belgilash",
-        confirmReceipt: "Qabul qildim",
-        reportProblem: "Muammo haqida xabar berish",
-        trackingRequired: "Kuzatuv raqami shart",
-        selectCarrier: "Kuryer xizmatini tanlang",
-        confirmPayout: "To'lovni tasdiqlash"
-      },
-      disputeReasons: {
-        not_received: "Yetib kelmadi",
-        damaged: "Zararlangan",
-        wrong_item: "Noto'g'ri mahsulot",
-        other: "Boshqa sabab"
-      },
-      payment: {
-        unpaid: "To'lanmagan",
-        paid: "To'langan"
-      }
-    },
-    promotions: {
-      create: "Aksiya yaratish",
-      code: "Promo kod",
-      discount: "Chegirma",
-      active: "Faol",
-      expired: "Muddati o'tgan"
     }
   },
   RU: {
@@ -358,334 +268,245 @@ export const salesTranslations = {
       settings: "Настройки",
       supportInbox: "Поддержка"
     },
-    channel: {
-      title: "Интеграции каналов",
-      subtitle: "Автоматически публикуйте товары в соцсетях",
-      activeDeepLinks: "Активные Deep Link",
-      telegram: {
-        title: "Telegram Канал + Бот",
-        desc: "Публикуйте товары напрямую в канал через бота",
-        botMode: "Режим бота",
-        platformBot: "Бот платформы",
-        ownBot: "Свой бот",
-        botUsername: "Username бота (например: my_shop_bot)",
-        botToken: "Токен бота (опц.)",
-        channelUsername: "Username канала (например: @my_channel)",
-        testMsg: "Тест сообщение",
-        disconnect: "Отключить"
-      },
-      instagram: {
-        title: "Instagram Business",
-        desc: "Отмечайте товары в постах и сторис Instagram",
-        permissions: "Требуемые разрешения:",
-        p1: "Публикация контента",
-        p2: "Чтение инфо профиля",
-        oauthRedirect: "Введите данные вручную. OAuth будет добавлен позже.",
-        username: "Username в Instagram",
-        accessToken: "Access Token (опц.)",
-        businessId: "IG Business ID (опц.)",
-        tokenHint: "Потребуется при включении публикации через API",
-        idHint: "Необязательно сейчас",
-        oauthNote: "Настоящее подключение Instagram будет через OAuth. Сейчас мы сохраняем эти данные для настройки публикаций."
-      },
-      status: {
-        connected: "Подключено",
-        notConnected: "Не подключено"
-      },
-      actions: {
-        connect: "Подключить",
-        manage: "Управлять",
-        disconnect: "Отключить",
-        save: "Сохранить",
-        postProduct: "Опубликовать товар",
-        postNow: "Опубликовать сейчас",
-        schedule: "Запланировать",
-        selectProduct: "Выберите товар",
-        preview: "Предпросмотр",
-        copyLink: "Копировать ссылку",
-        share: "Поделиться"
-      },
-      validation: {
-        invalidToken: "Неверный формат токена (должен содержать :)",
-        invalidChannel: "Username должен начинаться с @",
-        invalidBotUser: "Username бота должен быть без @ и заканчиваться на bot",
-        usernameRequired: "Username обязателен"
-      }
-    },
     dashboard: {
-      totalSales: "Общая выручка",
+      totalSales: "Общие продажи",
+      onHoldFunds: "Удержанные средства",
       orders: "Заказы",
-      customers: "Клиенты",
-      conversion: "Конверсия",
-      recentOrders: "Последние заказы",
-      quickActions: "Действия",
+      disputedOrders: "Споры",
+      quickActions: "Быстрые действия",
       addProduct: "Добавить товар",
-      viewShop: "В магазин",
-      shareChannel: "Поделиться",
-      analytics: "Аналитика",
-      onHoldFunds: "Escrow (Удержание)",
-      pendingPayouts: "К выплате",
-      disputedOrders: "Споры"
-    },
-    products: {
-      inventory: "Инвентарь",
-      search: "Поиск товаров...",
-      add: "Новый товар",
-      edit: "Изменить",
-      price: "Цена",
-      stock: "Склад",
-      category: "Категория",
-      all: "Все",
-      draft: "Черновик",
-      active: "Активен",
-      pending: "На рассмотрении",
-      archived: "Архивирован",
-      published: "Опубликован",
-      outOfStock: "Нет в наличии",
-      visibility: "Видимость",
-      public: "Публичный",
-      private: "Приватный",
-      unlisted: "Скрытый",
-      status: "Статус",
-      productLink: "Ссылка на товар",
-      categories: {
-        clothing: "Одежда и аксессуары",
-        shoes: "Обувь",
-        bags: "Сумки и кошельки",
-        electronics: "Электроника и гаджеты",
-        home: "Дом и кухня",
-        beauty: "Красота и уход",
-        kids: "Детские товары",
-        sports: "Спорт и отдых",
-        auto: "Авто и инструменты",
-        books: "Книги и канцелярия",
-        food: "Еда и напитки",
-        other: "Другое"
-      }
-    },
-    publicShop: {
-      verified: "Проверенный продавец",
-      rateBtn: "Оценить",
-      reportBtn: "Пожаловаться",
-      location: "Местоположение",
-      hours: "График работы",
-      contactBtn: "Связаться",
-      requestBtn: "Отправить запрос",
-      reviews: "Отзывов",
-      chatFloatingBtn: "Чат с продавцом",
-      messageSeller: "Написать продавцу",
-      startChat: "Начать чат",
-      close: "Закрыть",
-      online: "Онлайн",
-      offline: "Офлайн",
-      verificationPending: "Проверка kutilmoqda",
-      moreFromShop: "Другие товары продавца",
-      openProduct: "Открыть товар",
-      rateModal: {
-        title: "Оцените продавца",
-        placeholder: "Напишите ваш отзыв (необязательно)...",
-      },
-      reportModal: {
-        title: "Пожаловаться на продавца",
-        reason: "Выберите причину",
-        description: "Подробности",
-        reasons: {
-          scam: "Мошенничество",
-          fake: "Поддельный товар",
-          no_response: "Не отвечает",
-          inappropriate: "Неподобающее поведение",
-          other: "Другая причина"
-        }
-      },
-      success: {
-        rated: "Спасибо! Ваш отзыв принят.",
-        reported: "Жалоба отправлена и будет рассмотрена.",
-        linkCopied: "Ссылка скопирована!"
-      },
-      submit: "Отправить",
-      cancel: "Отмена"
-    },
-    chat: {
-      title: "Чат",
-      online: "Онлайн",
-      offline: "Офлайн",
-      aiMode: "AI Режим",
-      sellerMode: "Режим продавца",
-      aiAssist: "AI Помощник",
-      suggestReply: "Предложить ответ",
-      takeOver: "Взять управление",
-      returnToAi: "Вернуть в AI режим",
-      sending: "Отправка...",
-      sent: "Отправлено",
-      failed: "Ошибка",
-      aiAssistant: "AI Помощник",
-      aiDesc: "AI отвечает клиентам автоматически",
-      type: "Введите сообщение...",
-      noConversations: "Пока нет сообщений"
-    },
-    settings: {
-      shopProfile: "Профиль магазина",
-      shopName: "Название магазина",
-      description: "Описание",
-      city: "Город / Регион",
-      workingHours: "График работы",
-      selectDays: "Выберите дни",
-      startTime: "Время начала",
-      endTime: "Время окончания",
-      presets: {
-        monFri: "Пн-Пт",
-        monSat: "Пн-Сб",
-        everyday: "Каждый день"
-      },
-      days: {
-        mon: "Пн",
-        tue: "Вт",
-        wed: "Ср",
-        thu: "Чт",
-        fri: "Пт",
-        sat: "Сб",
-        sun: "Вс"
-      },
-      closed: "Закрыто",
-      contact: "Контакты",
-      saveChanges: "Сохранить изменения",
-      cancel: "Отмена",
-      success: "Настройки сохранены!",
-      verification: {
-        title: "Верификация продавца",
-        unverified: "Не верифицирован",
-        pending: "На проверке",
-        verified: "Верифицирован",
-        rejected: "Отклонено",
-        requestBtn: "Начать верификацию",
-        submitBtn: "Отправить на проверку",
-        resubmitBtn: "Переподать",
-        requestSent: "Документы отправлены. Служба поддержки рассмотрит их.",
-        pendingMessage: "Ваши документы проверяются. Мы сообщим вам о результате.",
-        adminVerify: "Верифицировать",
-        adminReject: "Отклонить",
-        sellerType: "Тип продавца",
-        individual: "Физическое лицо",
-        business: "Юридическое лицо (Бизнес)",
-        uploadIdFront: "Паспорт/ID (лицевая сторона)",
-        uploadIdBack: "Паспорт/ID (обратная сторона)",
-        uploadBusinessCert: "Свидетельство о регистрации",
-        fileRequirements: "PNG, JPG или PDF, макс. 10МБ",
-        replace: "Заменить",
-        remove: "Удалить",
-        missingDocs: "Пожалуйста, загрузите все обязательные документы",
-        adminNote: "Примечание админа",
-        supportReview: "Проверка (Support Mode)"
-      }
-    },
-    supportInbox: {
-      title: "Входящие поддержки",
-      notAuthorized: "Нет доступа",
-      filters: {
-        all: "Все",
-        pending: "Ожидают",
-        verified: "Одобрены",
-        rejected: "Отклонены"
-      },
-      list: {
-        shop: "Магазин",
-        type: "Тип",
-        submitted: "Отправлено",
-        status: "Статус"
-      },
-      detail: {
-        sellerInfo: "Инфо о продавце",
-        documents: "Документы",
-        actions: "Действия",
-        approve: "Одобрить",
-        reject: "Отклонить",
-        notePlaceholder: "Причина отклонения...",
-        history: "История",
-        back: "Назад к списку"
-      }
-    },
-    newProduct: {
-      title: "New Product",
-      basicInfo: "Basic Information",
-      media: "Media & Assets",
-      pricing: "Pricing & Trial",
-      statusMod: "Status & Moderation",
-      visibilitySettings: "Visibility Settings",
-      nameLabel: "Product Name *",
-      namePlaceholder: "e.g. AI Prompt Engineer",
-      catLabel: "Category *",
-      shortDescLabel: "Short Description",
-      shortDescPlaceholder: "Brief overview (1-2 lines)...",
-      fullDescLabel: "Full Description (Markdown)",
-      fullDescPlaceholder: "# Detailed Description...",
-      tagsLabel: "Tags",
-      tagsPlaceholder: "Add a tag...",
-      tagsAdd: "Add",
-      coverLabel: "Cover Image",
-      galleryLabel: "Gallery Images",
-      videoLabel: "Demo Video",
-      sampleLabel: "Sample Output Screenshot",
-      upload: "Upload",
-      replace: "Replace",
-      remove: "Remove",
-      addMore: "Add More",
-      priceLabel: "Price *",
-      discountLabel: "Discount (%)",
-      currencyLabel: "Valyuta",
-      trialToggle: "Offer Free Trial",
-      trialDesc: "Let users test before buying",
-      trialDaysLabel: "Trial Days",
-      statusLabel: "Initial Status",
-      approvalLabel: "Admin Approval Required",
-      cancel: "Cancel",
-      create: "Create Product",
-      errors: {
-        name: "Product Name is required",
-        category: "Category is required",
-        price: "Valid price is required"
-      }
+      viewShop: "Смотреть магазин",
+      shareChannel: "В канал",
+      recentOrders: "Последние заказы"
     },
     orders: {
       status: {
         pending: "Ожидает",
-        processing: "В работе",
+        processing: "В обработке",
         shipped: "Отправлен",
         delivered: "Доставлен",
         cancelled: "Отменен",
-        disputed: "Спор",
+        disputed: "В споре",
         refunded: "Возврат"
-      },
-      payoutStatus: {
-        on_hold: "Удержано",
-        eligible: "Доступно к выплате",
-        released: "Выплачено",
-        frozen: "Заморожено"
-      },
-      actions: {
-        markAsShipped: "Отметить как отправлено",
-        confirmReceipt: "Подтвердить получение",
-        reportProblem: "Сообщить о проблеме",
-        trackingRequired: "Нужен номер отслеживания",
-        selectCarrier: "Выберите службу доставки",
-        confirmPayout: "Подтвердить выплату"
-      },
-      disputeReasons: {
-        not_received: "Не получил товар",
-        damaged: "Поврежден",
-        wrong_item: "Не тот товар",
-        other: "Другое"
-      },
-      payment: {
-        unpaid: "Не оплачен",
-        paid: "Оплачен"
       }
     },
+    cart: {
+      add_to_cart: "В корзину",
+      contact_seller: "Связаться с продавцом",
+      added_to_cart: "Добавлено в корзину",
+      cart_title: "Ваша корзина",
+      checkout: "Оформить заказ",
+      remove: "Удалить",
+      clear_cart: "Очистить корзину",
+      empty_cart: "Корзина пуста",
+      start_shopping: "Начать покупки",
+      estimated_total: "Итоговая сумма"
+    },
+    checkout: {
+      checkout_title: "Оформление заказа",
+      payment_method: "Способ оплаты",
+      place_order: "Оформить заказ",
+      order_success: "Заказ успешно оформлен",
+      escrow_note: "Платеж удерживается платформой до подтверждения доставки.",
+      payment_methods: {
+        card: "Карта",
+        cash_on_delivery: "Оплата при получении",
+        bank_transfer: "Банковский перевод"
+      },
+      fields: {
+        full_name: "Полное имя",
+        phone: "Телефон",
+        address: "Адрес",
+        city: "Город",
+        card_number: "Номер карты",
+        expiry: "Срок действия",
+        cvc: "CVC",
+        transaction_id: "Код транзакции",
+        receipt_link: "Ссылка на чек"
+      },
+      success: {
+        title: "Заказ оформлен!",
+        subtitle: "Ваш заказ успешно зарегистрирован.",
+        security_code_title: "Код безопасности доставки",
+        security_warning: "НЕ ПЕРЕДАВАЙТЕ ЭТОТ КОД, ПОKА НЕ ПОЛУЧИТЕ ТОВАР В РУКИ.",
+        copy_code: "Копировать код"
+      }
+    },
+    channel: {
+      title: "Публикация в каналы",
+      subtitle: "Автоматический постинг товаров в соцсети",
+      status: {
+        connected: "Подключено",
+        notConnected: "Не подключено"
+      },
+      telegram: {
+        title: "Telegram",
+        desc: "Публикуйте товары в свой канал через бота",
+        botToken: "Токен бота",
+        channelUsername: "ID или Username канала"
+      },
+      instagram: {
+        title: "Instagram",
+        desc: "Размещайте товары в профиль Instagram Business",
+        username: "Имя пользователя",
+        accessToken: "Access Token",
+        businessId: "Instagram Business ID",
+        tokenHint: "Токен из портала Meta for Developers",
+        idHint: "ID аккаунта Instagram Business",
+        oauthNote: "Поддерживаются только профессиональные аккаунты"
+      },
+      actions: {
+        manage: "Управление",
+        connect: "Подключить",
+        save: "Сохранить",
+        disconnect: "Отключить"
+      },
+      validation: {
+        invalidToken: "Неверный токен бота",
+        invalidChannel: "Имя канала должно начинаться с @",
+        usernameRequired: "Имя пользователя обязательно"
+      }
+    },
+    chat: {
+      title: "Чаты",
+      aiMode: "AI Помощник",
+      sellerMode: "Режим продавца",
+      returnToAi: "Передать AI",
+      suggestReply: "AI ответ",
+      type: "Введите сообщение...",
+      online: "В сети",
+      noConversations: "Пока нет диалогов"
+    },
     promotions: {
-      create: "Создать акцию",
-      code: "Промокод",
-      discount: "Скидка",
       active: "Активна",
       expired: "Истекла"
+    },
+    customers: {
+      title: "Клиенты",
+      search: "Поиск клиента...",
+      viewHistory: "История"
+    },
+    settings: {
+      success: "Настройки сохранены",
+      closed: "Закрыто",
+      cancel: "Отмена",
+      shopProfile: "Профиль магазина",
+      shopName: "Название магазина",
+      description: "Описание",
+      city: "Город",
+      workingHours: "Режим работы",
+      selectDays: "Выберите дни",
+      startTime: "Начало",
+      endTime: "Конец",
+      contact: "Контакты",
+      saveChanges: "Сохранить",
+      presets: {
+        monFri: "Пн-Пт",
+        monSat: "Пн-Сб",
+        everyday: "Ежедневно"
+      },
+      days: {
+        mon: "Пн", tue: "Вт", wed: "Ср", thu: "Чт", fri: "Пт", sat: "Сб", sun: "Вс"
+      },
+      verification: {
+        title: "Верификация",
+        unverified: "Не подтвержден",
+        pending: "На проверке",
+        verified: "Подтвержден",
+        rejected: "Отклонен",
+        requestBtn: "Подать заявку",
+        resubmitBtn: "Повторить",
+        pendingMessage: "Ваша заявка на рассмотрении. Пожалуйста, подождите.",
+        adminNote: "Заметка админа",
+        sellerType: "Тип продавца",
+        individual: "Физ. лицо",
+        business: "Юр. лицо",
+        uploadIdFront: "Паспорт/ID (лицо)",
+        uploadIdBack: "Паспорт/ID (оборот)",
+        uploadBusinessCert: "Свидетельство (копия)",
+        missingDocs: "Не все документы загружены",
+        requestSent: "Заявка успешно отправлена",
+        submitBtn: "Отправить заявку",
+        fileRequirements: "PNG, JPG или PDF (Макс 10МБ)"
+      }
+    },
+    supportInbox: {
+      title: "Поддержка",
+      notAuthorized: "Доступ запрещен",
+      detail: {
+        back: "Назад",
+        actions: "Действия"
+      }
+    },
+    publicShop: {
+      shopProfile: "О магазине",
+      success: {
+        linkCopied: "Ссылка скопирована"
+      }
+    },
+    products: {
+      inventory: "Инвентарь",
+      add: "Добавить",
+      edit: "Изменить",
+      search: "Поиск...",
+      all: "Все",
+      active: "Активен",
+      pending: "Ожидает",
+      draft: "Черновик",
+      archived: "Архив",
+      outOfStock: "Нет в наличии",
+      published: "Опубликован",
+      public: "Публичный",
+      private: "Приватный",
+      unlisted: "Скрытый",
+      productLink: "Ссылка на товар",
+      categories: {
+        clothing: "Одежда",
+        shoes: "Обувь",
+        bags: "Сумки",
+        electronics: "Электроника",
+        home: "Дом",
+        beauty: "Красота",
+        kids: "Детям",
+        sports: "Спорт",
+        auto: "Авто",
+        books: "Книги",
+        food: "Еда",
+        other: "Другое"
+      }
+    },
+    newProduct: {
+      title: "Новый товар",
+      basicInfo: "Основная информация",
+      nameLabel: "Название товара",
+      namePlaceholder: "Напр.: iPhone 15 Pro",
+      catLabel: "Категория",
+      shortDescLabel: "Краткое описание",
+      shortDescPlaceholder: "Пару слов о товаре",
+      fullDescLabel: "Полное описание",
+      fullDescPlaceholder: "Детали (поддержка Markdown)",
+      tagsLabel: "Теги",
+      tagsPlaceholder: "Введите тег...",
+      tagsAdd: "Добавить",
+      media: "Медиа",
+      coverLabel: "Обложка",
+      videoLabel: "Видео-обзор",
+      upload: "Загрузить",
+      pricing: "Цена",
+      priceLabel: "Цена",
+      discountLabel: "Скидка (%)",
+      currencyLabel: "Валюта",
+      statusMod: "Статус и видимость",
+      statusLabel: "Статус",
+      visibilitySettings: "Видимость",
+      cancel: "Отмена",
+      create: "Создать",
+      remove: "Удалить",
+      errors: {
+        name: "Введите название",
+        category: "Выберите категорию",
+        price: "Неверная цена"
+      }
     }
   },
   EN: {
@@ -702,292 +523,16 @@ export const salesTranslations = {
       settings: "Settings",
       supportInbox: "Support Inbox"
     },
-    channel: {
-      title: "Channel Integrations",
-      subtitle: "Automatically publish products to social networks",
-      activeDeepLinks: "Active Deep Links",
-      telegram: {
-        title: "Telegram Channel + Bot",
-        desc: "Post products directly to your channel via bot",
-        botMode: "Bot Mode",
-        platformBot: "Platform Bot",
-        ownBot: "Your Own Bot",
-        botUsername: "Bot Username (e.g. my_shop_bot)",
-        botToken: "Bot Token (optional)",
-        channelUsername: "Channel Username (e.g. @myshopchannel)",
-        testMsg: "Test Message",
-        disconnect: "Disconnect"
-      },
-      instagram: {
-        title: "Instagram Business",
-        desc: "Tag products in Instagram posts and stories",
-        permissions: "Permissions required:",
-        p1: "Publish content",
-        p2: "Read account info",
-        oauthRedirect: "Enter info manually for now. OAuth will be added later.",
-        username: "Instagram Username",
-        accessToken: "Access Token (optional)",
-        businessId: "IG Business ID (optional)",
-        tokenHint: "Required when API posting is enabled",
-        idHint: "Optional for now",
-        oauthNote: "Real Instagram connection will use OAuth. For now, we store this info to enable posting setup."
-      },
-      status: {
-        connected: "Connected",
-        notConnected: "Not connected"
-      },
-      actions: {
-        connect: "Connect",
-        manage: "Manage",
-        disconnect: "Disconnect",
-        save: "Save Changes",
-        postProduct: "Post Product",
-        postNow: "Post Now",
-        schedule: "Schedule",
-        selectProduct: "Select Product",
-        preview: "Preview",
-        copyLink: "Copy Link",
-        share: "Share"
-      },
-      validation: {
-        invalidToken: "Token is invalid (must contain :)",
-        invalidChannel: "Username must start with @",
-        invalidBotUser: "Bot username must be without @ and end in bot",
-        usernameRequired: "Username is required"
-      }
-    },
     dashboard: {
-      totalSales: "Total Revenue",
+      totalSales: "Total Sales",
+      onHoldFunds: "On-Hold Funds",
       orders: "Orders",
-      customers: "Customers",
-      conversion: "Conversion",
-      recentOrders: "Recent Orders",
+      disputedOrders: "Disputed",
       quickActions: "Quick Actions",
       addProduct: "Add Product",
       viewShop: "View Shop",
-      shareChannel: "Share",
-      analytics: "Analytics",
-      onHoldFunds: "Escrow (On-hold)",
-      pendingPayouts: "Pending Payouts",
-      disputedOrders: "Disputes"
-    },
-    products: {
-      inventory: "Inventory",
-      search: "Search products...",
-      add: "New Product",
-      edit: "Edit",
-      price: "Price",
-      stock: "Stock",
-      category: "Category",
-      all: "All",
-      draft: "Draft",
-      active: "Active",
-      pending: "Pending",
-      archived: "Archived",
-      published: "Published",
-      outOfStock: "Out of Stock",
-      visibility: "Visibility",
-      public: "Public",
-      private: "Private",
-      unlisted: "Unlisted",
-      status: "Status",
-      productLink: "Product Link",
-      categories: {
-        clothing: "Clothing & Accessories",
-        shoes: "Shoes",
-        bags: "Bags & Wallets",
-        electronics: "Electronics & Gadgets",
-        home: "Home & Kitchen",
-        beauty: "Beauty & Personal Care",
-        kids: "Kids & Baby",
-        sports: "Sports & Outdoors",
-        auto: "Auto & Tools",
-        books: "Books & Stationery",
-        food: "Food & Drinks",
-        other: "Other"
-      }
-    },
-    publicShop: {
-      verified: "Verified Seller",
-      rateBtn: "Rate Seller",
-      reportBtn: "Report Seller",
-      location: "Location",
-      hours: "Working Hours",
-      contactBtn: "Contact Seller",
-      requestBtn: "Send Request",
-      reviews: "reviews",
-      chatFloatingBtn: "Chat with Seller",
-      messageSeller: "Message Seller",
-      startChat: "Start Chat",
-      close: "Close",
-      online: "Online",
-      offline: "Offline",
-      verificationPending: "Verification Pending",
-      moreFromShop: "More products from this shop",
-      openProduct: "Open Product",
-      rateModal: {
-        title: "Rate this Seller",
-        placeholder: "Write your review (optional)...",
-      },
-      reportModal: {
-        title: "Report this Seller",
-        reason: "Select a reason",
-        description: "Details",
-        reasons: {
-          scam: "Scam",
-          fake: "Fake product",
-          no_response: "No response",
-          inappropriate: "Inappropriate behavior",
-          other: "Other"
-        }
-      },
-      success: {
-        rated: "Thank you! Your rating has been received.",
-        reported: "Report submitted successfully.",
-        linkCopied: "Link copied to clipboard!"
-      },
-      submit: "Submit",
-      cancel: "Cancel"
-    },
-    chat: {
-      title: "Chat",
-      online: "Online",
-      offline: "Offline",
-      aiMode: "AI Mode",
-      sellerMode: "Seller Mode",
-      aiAssist: "AI Assist",
-      suggestReply: "Suggest reply",
-      takeOver: "Take over",
-      returnToAi: "Return to AI mode",
-      sending: "Sending...",
-      sent: "Sent",
-      failed: "Failed",
-      aiAssistant: "AI Assistant",
-      aiDesc: "AI responds to customers automatically",
-      type: "Type message...",
-      noConversations: "No messages yet"
-    },
-    settings: {
-      shopProfile: "Shop Profile",
-      shopName: "Shop Name",
-      description: "Description",
-      city: "City / Region",
-      workingHours: "Working Hours",
-      selectDays: "Select days",
-      startTime: "Start time",
-      endTime: "End time",
-      presets: {
-        monFri: "Mon–Fri",
-        monSat: "Mon–Sat",
-        everyday: "Everyday"
-      },
-      days: {
-        mon: "Mon",
-        tue: "Tue",
-        wed: "Wed",
-        thu: "Thu",
-        fri: "Fri",
-        sat: "Sat",
-        sun: "Sun"
-      },
-      closed: "Closed",
-      contact: "Contact Information",
-      saveChanges: "Save Changes",
-      cancel: "Cancel",
-      success: "Settings saved successfully!",
-      verification: {
-        title: "Seller Verification",
-        unverified: "Unverified",
-        pending: "Pending review",
-        verified: "Verified",
-        rejected: "Rejected",
-        requestBtn: "Start Verification",
-        submitBtn: "Submit for Review",
-        resubmitBtn: "Resubmit",
-        requestSent: "Documents submitted. Our support team will review them.",
-        pendingMessage: "Support is reviewing your documents. You will be notified when approved.",
-        adminVerify: "Approve Verification",
-        adminReject: "Reject Verification",
-        sellerType: "Seller Type",
-        individual: "Individual",
-        business: "Business Entity",
-        uploadIdFront: "Upload ID Front (Required)",
-        uploadIdBack: "Upload ID Back (Optional)",
-        uploadBusinessCert: "Upload Business Cert (Required)",
-        fileRequirements: "PNG, JPG or PDF, max 10MB",
-        replace: "Replace",
-        remove: "Remove",
-        missingDocs: "Please upload all required documents",
-        adminNote: "Admin Note",
-        supportReview: "Support Review (Hidden Mode)"
-      }
-    },
-    supportInbox: {
-      title: "Support Inbox",
-      notAuthorized: "Not Authorized",
-      filters: {
-        all: "All",
-        pending: "Pending",
-        verified: "Verified",
-        rejected: "Rejected"
-      },
-      list: {
-        shop: "Shop",
-        type: "Type",
-        submitted: "Submitted",
-        status: "Status"
-      },
-      detail: {
-        sellerInfo: "Seller Information",
-        documents: "Documents",
-        actions: "Review Actions",
-        approve: "Approve Verification",
-        reject: "Reject Verification",
-        notePlaceholder: "Reason for rejection...",
-        history: "Audit History",
-        back: "Back to Inbox"
-      }
-    },
-    newProduct: {
-      title: "New Product",
-      basicInfo: "Basic Information",
-      media: "Media & Assets",
-      pricing: "Pricing & Trial",
-      statusMod: "Status & Moderation",
-      visibilitySettings: "Visibility Settings",
-      nameLabel: "Product Name *",
-      namePlaceholder: "e.g. AI Prompt Engineer",
-      catLabel: "Category *",
-      shortDescLabel: "Short Description",
-      shortDescPlaceholder: "Brief overview (1-2 lines)...",
-      fullDescLabel: "Full Description (Markdown)",
-      fullDescPlaceholder: "# Detailed Description...",
-      tagsLabel: "Tags",
-      tagsPlaceholder: "Add a tag...",
-      tagsAdd: "Add",
-      coverLabel: "Cover Image",
-      galleryLabel: "Gallery Images",
-      videoLabel: "Demo Video",
-      sampleLabel: "Sample Output Screenshot",
-      upload: "Upload",
-      replace: "Replace",
-      remove: "Remove",
-      addMore: "Add More",
-      priceLabel: "Price *",
-      discountLabel: "Discount (%)",
-      currencyLabel: "Valyuta",
-      trialToggle: "Offer Free Trial",
-      trialDesc: "Let users test before buying",
-      trialDaysLabel: "Trial Days",
-      statusLabel: "Initial Status",
-      approvalLabel: "Admin Approval Required",
-      cancel: "Cancel",
-      create: "Create Product",
-      errors: {
-        name: "Product Name is required",
-        category: "Category is required",
-        price: "Valid price is required"
-      }
+      shareChannel: "Share Channel",
+      recentOrders: "Recent Orders"
     },
     orders: {
       status: {
@@ -998,38 +543,225 @@ export const salesTranslations = {
         cancelled: "Cancelled",
         disputed: "Disputed",
         refunded: "Refunded"
-      },
-      payoutStatus: {
-        on_hold: "On Hold",
-        eligible: "Eligible for Payout",
-        released: "Released",
-        frozen: "Frozen (Dispute)"
-      },
-      actions: {
-        markAsShipped: "Mark as Shipped",
-        confirmReceipt: "Confirm Receipt",
-        reportProblem: "Report a Problem",
-        trackingRequired: "Tracking number required",
-        selectCarrier: "Select a Carrier",
-        confirmPayout: "Confirm Payout"
-      },
-      disputeReasons: {
-        not_received: "Not received",
-        damaged: "Damaged",
-        wrong_item: "Wrong item",
-        other: "Other"
-      },
-      payment: {
-        unpaid: "Unpaid",
-        paid: "Paid"
       }
     },
+    cart: {
+      add_to_cart: "Add to Cart",
+      contact_seller: "Contact Seller",
+      added_to_cart: "Added to cart",
+      cart_title: "Your Cart",
+      checkout: "Checkout",
+      remove: "Remove",
+      clear_cart: "Clear Cart",
+      empty_cart: "Cart is empty",
+      start_shopping: "Start Shopping",
+      estimated_total: "Estimated Total"
+    },
+    checkout: {
+      checkout_title: "Checkout",
+      payment_method: "Payment Method",
+      place_order: "Place Order",
+      order_success: "Order placed successfully",
+      escrow_note: "Payments are held in Escrow until you confirm delivery.",
+      payment_methods: {
+        card: "Card",
+        cash_on_delivery: "Cash on Delivery",
+        bank_transfer: "Bank Transfer"
+      },
+      fields: {
+        full_name: "Full Name",
+        phone: "Phone",
+        address: "Address",
+        city: "City",
+        card_number: "Card Number",
+        expiry: "Expiry",
+        cvc: "CVC",
+        transaction_id: "Transaction ID",
+        receipt_link: "Receipt Link"
+      },
+      success: {
+        title: "Order Placed!",
+        subtitle: "Your order has been received.",
+        security_code_title: "Delivery Security Code",
+        security_warning: "DO NOT SHARE THIS CODE UNTIL YOU HAVE THE ITEM IN YOUR HANDS.",
+        copy_code: "Copy Code"
+      }
+    },
+    channel: {
+      title: "Channel Posting",
+      subtitle: "Automatically post products to your social channels",
+      status: {
+        connected: "Connected",
+        notConnected: "Not Connected"
+      },
+      telegram: {
+        title: "Telegram",
+        desc: "Post products to your channel using your own bot",
+        botToken: "Bot Token",
+        channelUsername: "Channel ID or Username"
+      },
+      instagram: {
+        title: "Instagram",
+        desc: "Share products directly to your Instagram Business profile",
+        username: "Username",
+        accessToken: "Access Token",
+        businessId: "Instagram Business ID",
+        tokenHint: "Get from Meta for Developers",
+        idHint: "Instagram Business Account ID",
+        oauthNote: "Only Professional accounts are supported"
+      },
+      actions: {
+        manage: "Manage",
+        connect: "Connect",
+        save: "Save",
+        disconnect: "Disconnect"
+      },
+      validation: {
+        invalidToken: "Invalid bot token",
+        invalidChannel: "Channel must start with @",
+        usernameRequired: "Username is required"
+      }
+    },
+    chat: {
+      title: "Messages",
+      aiMode: "AI Assistant",
+      sellerMode: "Seller Mode",
+      returnToAi: "Handover to AI",
+      suggestReply: "AI Suggestion",
+      type: "Type a message...",
+      online: "Online",
+      noConversations: "No conversations yet"
+    },
     promotions: {
-      create: "Create Promotion",
-      code: "Promo Code",
-      discount: "Discount",
       active: "Active",
       expired: "Expired"
+    },
+    customers: {
+      title: "Customers",
+      search: "Search customers...",
+      viewHistory: "View History"
+    },
+    settings: {
+      success: "Settings saved successfully",
+      closed: "Closed",
+      cancel: "Cancel",
+      shopProfile: "Shop Profile",
+      shopName: "Shop Name",
+      description: "Description",
+      city: "City",
+      workingHours: "Working Hours",
+      selectDays: "Select Days",
+      startTime: "Start Time",
+      endTime: "End Time",
+      contact: "Contact Information",
+      saveChanges: "Save Changes",
+      presets: {
+        monFri: "Mon-Fri",
+        monSat: "Mon-Sat",
+        everyday: "Everyday"
+      },
+      days: {
+        mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun"
+      },
+      verification: {
+        title: "Verification",
+        unverified: "Unverified",
+        pending: "Pending",
+        verified: "Verified",
+        rejected: "Rejected",
+        requestBtn: "Request Verification",
+        resubmitBtn: "Resubmit Request",
+        pendingMessage: "Your application is under review. Please wait.",
+        adminNote: "Admin Note",
+        sellerType: "Seller Type",
+        individual: "Individual",
+        business: "Business",
+        uploadIdFront: "ID/Passport (Front)",
+        uploadIdBack: "ID/Passport (Back)",
+        uploadBusinessCert: "Business Certificate",
+        missingDocs: "Missing required documents",
+        requestSent: "Verification request sent",
+        submitBtn: "Submit Application",
+        fileRequirements: "PNG, JPG or PDF (Max 10MB)"
+      }
+    },
+    supportInbox: {
+      title: "Support Inbox",
+      notAuthorized: "Not authorized",
+      detail: {
+        back: "Back",
+        actions: "Actions"
+      }
+    },
+    publicShop: {
+      shopProfile: "Shop Profile",
+      success: {
+        linkCopied: "Link copied"
+      }
+    },
+    products: {
+      inventory: "Inventory",
+      add: "Add",
+      edit: "Edit",
+      search: "Search...",
+      all: "All",
+      active: "Active",
+      pending: "Pending",
+      draft: "Draft",
+      archived: "Archived",
+      outOfStock: "Out of Stock",
+      published: "Published",
+      public: "Public",
+      private: "Private",
+      unlisted: "Unlisted",
+      productLink: "Product Link",
+      categories: {
+        clothing: "Clothing",
+        shoes: "Shoes",
+        bags: "Bags",
+        electronics: "Electronics",
+        home: "Home",
+        beauty: "Beauty",
+        kids: "Kids",
+        sports: "Sports",
+        auto: "Auto",
+        books: "Books",
+        food: "Food",
+        other: "Other"
+      }
+    },
+    newProduct: {
+      title: "New Product",
+      basicInfo: "Basic Info",
+      nameLabel: "Product Name",
+      namePlaceholder: "e.g. iPhone 15 Pro",
+      catLabel: "Category",
+      shortDescLabel: "Short Description",
+      shortDescPlaceholder: "Few words about the product",
+      fullDescLabel: "Full Description",
+      fullDescPlaceholder: "Details (Markdown supported)",
+      tagsLabel: "Tags",
+      tagsPlaceholder: "Type a tag...",
+      tagsAdd: "Add",
+      media: "Media",
+      coverLabel: "Cover Image",
+      videoLabel: "Video Review",
+      upload: "Upload",
+      pricing: "Pricing",
+      priceLabel: "Price",
+      discountLabel: "Discount (%)",
+      currencyLabel: "Valyuta",
+      statusMod: "Status & Visibility",
+      statusLabel: "Status",
+      visibilitySettings: "Visibility",
+      cancel: "Cancel",
+      create: "Create",
+      remove: "Remove",
+      errors: {
+        name: "Name is required",
+        category: "Select a category",
+        price: "Invalid price"
+      }
     }
   }
 };

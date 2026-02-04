@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
@@ -28,9 +27,9 @@ const Explore: React.FC = () => {
     <div className="flex flex-col min-h-full">
       <PageHeader title={t('nav.explore')} subtitle="Discover Modules" />
 
-      <div className="max-w-4xl mx-auto w-full px-4 py-8 animate-in fade-in duration-500 space-y-8">
-        {/* Results Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 animate-in fade-in duration-500 space-y-8">
+        {/* Results Grid - Fixed to 2 columns on mobile */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {MODULE_LIST.length > 0 ? (
             MODULE_LIST.map((m) => {
               const Icon = (LucideIcons as any)[m.iconName] || Sparkles;
@@ -38,19 +37,19 @@ const Explore: React.FC = () => {
                 <button
                   key={m.id}
                   onClick={() => navigate(m.path)}
-                  className="flex items-center gap-5 p-5 bg-white dark:bg-slate-900 rounded-[32px] border border-gray-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all active:scale-[0.98] group text-left"
+                  className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-5 p-3 sm:p-5 bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all active:scale-[0.98] group text-center sm:text-left"
                 >
                   <div 
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-3"
+                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-3 shrink-0"
                     style={{ backgroundColor: m.color }}
                   >
-                    <Icon size={28} />
+                    <Icon size={20} className="sm:size-[28px]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{t(`modules.${m.translationKey}.title`)}</h4>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest truncate mt-0.5">{t(`modules.${m.translationKey}.subtitle`)}</p>
+                    <h4 className="text-[11px] sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{t(`modules.${m.translationKey}.title`)}</h4>
+                    <p className="text-[8px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest truncate mt-0.5">{t(`modules.${m.translationKey}.subtitle`)}</p>
                   </div>
-                  <ArrowRight size={18} className="text-gray-200 group-hover:text-blue-500 group-hover:translate-x-1 transition-all shrink-0" />
+                  <ArrowRight size={16} className="hidden sm:block text-gray-200 group-hover:text-blue-500 group-hover:translate-x-1 transition-all shrink-0" />
                 </button>
               );
             })

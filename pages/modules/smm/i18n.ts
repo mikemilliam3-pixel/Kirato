@@ -12,13 +12,15 @@ export const smmTranslations = {
     },
     dashboard: {
       scheduled: "Rejalashtirilgan",
-      generated: "Yaratilgan",
-      saved: "Saqlanganlar",
+      generated: "Draftlar",
+      saved: "Kutubxona",
       activeVoice: "Faol ovoz",
       thisWeek: "Shu haftada",
       quickActions: "Tezkor amallar",
       createPost: "Post yaratish",
-      openPlanner: "Kalendarni ochish"
+      openPlanner: "Kalendarni ochish",
+      nextScheduled: "Keyingi reja",
+      none: "Mavjud emas"
     },
     planner: {
       addPost: "Post qo'shish",
@@ -29,6 +31,7 @@ export const smmTranslations = {
       connected: "Ulangan",
       notConnected: "Ulanmagan",
       caption: "Matn",
+      topic: "Mavzu",
       mediaUrl: "Media URL (ixtiyoriy)",
       scheduledAt: "Sana va vaqt",
       schedule: "Rejalashtirish",
@@ -37,6 +40,19 @@ export const smmTranslations = {
       history: "Postlar tarixi",
       allPlatforms: "Barcha platformalar",
       noPosts: "Hozircha postlar yo'q",
+      success: "Muvaffaqiyatli saqlandi",
+      error: "Xatolik yuz berdi",
+      loginRequired: "Tizimga kirish shart",
+      tgModalTitle: "Telegram kanalni ulamoq",
+      tgChannelPlaceholder: "@kanal_nomi",
+      metaOAuthStart: "Meta orqali ulanish boshlanmoqda...",
+      status: {
+        draft: "Qoralama",
+        scheduled: "Rejalashtirildi",
+        publishing: "Yuborilmoqda...",
+        published: "Yuborildi",
+        failed: "Xatolik"
+      },
       modal: {
         tgTitle: "Telegram ulanishi",
         tgBotToken: "Bot Token",
@@ -44,13 +60,6 @@ export const smmTranslations = {
         metaTitle: "Meta (IG/FB) ulanishi",
         accessToken: "Access Token",
         pageId: "Page / Business ID"
-      },
-      status: {
-        draft: "Qoralama",
-        scheduled: "Kutilmoqda",
-        sending: "Yuborilmoqda...",
-        sent: "Yuborildi",
-        failed: "Xatolik"
       }
     },
     generator: {
@@ -137,13 +146,15 @@ export const smmTranslations = {
     },
     dashboard: {
       scheduled: "Запланировано",
-      generated: "Создано",
-      saved: "Сохранено",
+      generated: "Черновики",
+      saved: "Библиотека",
       activeVoice: "Активный голос",
       thisWeek: "На этой неделе",
       quickActions: "Быстрые действия",
       createPost: "Создать пост",
-      openPlanner: "Открыть планнер"
+      openPlanner: "Открыть планнер",
+      nextScheduled: "Следующий пост",
+      none: "Нет"
     },
     planner: {
       addPost: "Добавить пост",
@@ -154,6 +165,7 @@ export const smmTranslations = {
       connected: "Подключено",
       notConnected: "Не подключено",
       caption: "Текст поста",
+      topic: "Тема",
       mediaUrl: "URL медиа (опц.)",
       scheduledAt: "Дата и время",
       schedule: "Запланировать",
@@ -162,6 +174,19 @@ export const smmTranslations = {
       history: "История публикаций",
       allPlatforms: "Все платформы",
       noPosts: "Пока нет публикаций",
+      success: "Успешно сохранено",
+      error: "Произошла ошибка",
+      loginRequired: "Требуется вход",
+      tgModalTitle: "Подключить Telegram канал",
+      tgChannelPlaceholder: "@название_канала",
+      metaOAuthStart: "Запуск Meta OAuth...",
+      status: {
+        draft: "Черновик",
+        scheduled: "Запланировано",
+        publishing: "Публикация...",
+        published: "Опубликовано",
+        failed: "Ошибка"
+      },
       modal: {
         tgTitle: "Подключение Telegram",
         tgBotToken: "Токен бота",
@@ -169,13 +194,6 @@ export const smmTranslations = {
         metaTitle: "Подключение Meta (IG/FB)",
         accessToken: "Access Token",
         pageId: "ID страницы / Бизнеса"
-      },
-      status: {
-        draft: "Черновик",
-        scheduled: "Запланировано",
-        sending: "Отправка...",
-        sent: "Отправлено",
-        failed: "Ошибка"
       }
     },
     generator: {
@@ -262,13 +280,15 @@ export const smmTranslations = {
     },
     dashboard: {
       scheduled: "Scheduled",
-      generated: "Generated",
+      generated: "Draft Posts",
       saved: "Assets Saved",
       activeVoice: "Active Voice",
       thisWeek: "Activity This Week",
       quickActions: "Quick Actions",
       createPost: "Create Post",
-      openPlanner: "Open Planner"
+      openPlanner: "Open Planner",
+      nextScheduled: "Next Scheduled",
+      none: "None"
     },
     planner: {
       addPost: "Schedule Post",
@@ -279,6 +299,7 @@ export const smmTranslations = {
       connected: "Connected",
       notConnected: "Not Connected",
       caption: "Post Caption",
+      topic: "Topic",
       mediaUrl: "Media URL (opt.)",
       scheduledAt: "Date & Time",
       schedule: "Schedule",
@@ -287,6 +308,19 @@ export const smmTranslations = {
       history: "Publishing History",
       allPlatforms: "All Platforms",
       noPosts: "No posts yet",
+      success: "Successfully saved",
+      error: "An error occurred",
+      loginRequired: "Login required",
+      tgModalTitle: "Connect Telegram Channel",
+      tgChannelPlaceholder: "@channel_name",
+      metaOAuthStart: "Starting Meta OAuth...",
+      status: {
+        draft: "Draft",
+        scheduled: "Scheduled",
+        publishing: "Publishing...",
+        published: "Published",
+        failed: "Failed"
+      },
       modal: {
         tgTitle: "Telegram Connection",
         tgBotToken: "Bot Token",
@@ -294,13 +328,6 @@ export const smmTranslations = {
         metaTitle: "Meta (IG/FB) Connection",
         accessToken: "Access Token",
         pageId: "Page / Business ID"
-      },
-      status: {
-        draft: "Draft",
-        scheduled: "Scheduled",
-        sending: "Sending...",
-        sent: "Published",
-        failed: "Failed"
       }
     },
     generator: {

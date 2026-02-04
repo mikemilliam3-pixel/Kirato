@@ -1,15 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
-import { User, Smartphone, AtSign, Check, Camera, Info } from 'lucide-react';
+import { User, Smartphone, AtSign, Check, Camera, Info, Mail } from 'lucide-react';
 import { UserProfile } from '../types';
 import PageHeader from '../components/ui/PageHeader';
+import { db } from '../lib/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const Profile: React.FC = () => {
-  const { t } = useApp();
+  const { t, user, refreshUser } = useApp();
   const [profile, setProfile] = useState<UserProfile>({
-    fullName: '',
-    username: '',
+    fullName: user?.displayName || '',
+    username: user?.email ? `@${user.email.split('@')[0]}` : '',
     phone: '',
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -17,65 +18,48 @@ const Profile: React.FC = () => {
   const [showPhoneInfo, setShowPhoneInfo] = useState(false);
 
   useEffect(() => {
-    // 1. Try to get data from Telegram WebApp
-    const tg = (window as any).Telegram?.WebApp;
-    const tgUser = tg?.initDataUnsafe?.user;
-
-    // 2. Load from localStorage as fallback or to get stored phone
-    const stored = localStorage.getItem('kirato-user-profile');
-    const storedProfile = stored ? JSON.parse(stored) : null;
-
-    if (tgUser) {
-      const tgProfile: UserProfile = {
-        telegramId: tgUser.id,
-        firstName: tgUser.first_name,
-        lastName: tgUser.last_name,
-        fullName: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
-        username: tgUser.username ? `@${tgUser.username}` : '',
-        phone: storedProfile?.phone || '', // Telegram user object usually doesn't have phone by default
-        avatarUrl: tgUser.photo_url
-      };
-      setProfile(tgProfile);
-      localStorage.setItem('kirato-user-profile', JSON.stringify(tgProfile));
-    } else if (storedProfile) {
-      setProfile(storedProfile);
-    } else {
-      // Complete mock fallback
-      const mock: UserProfile = {
-        fullName: 'Guest User',
-        username: '@guest',
-        phone: ''
-      };
-      setProfile(mock);
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        fullName: user.displayName || prev.fullName,
+        username: user.email ? `@${user.email.split('@')[0]}` : prev.username,
+      }));
     }
-  }, []);
+  }, [user]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!user) return;
     setIsSaving(true);
-    setTimeout(() => {
-      localStorage.setItem('kirato-user-profile', JSON.stringify(profile));
-      setIsSaving(false);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        fullName: profile.fullName,
+        updatedAt: new Date().toISOString()
+      });
+      await refreshUser();
       setSuccess(true);
-      window.dispatchEvent(new Event('profile-updated'));
       setTimeout(() => setSuccess(false), 3000);
-    }, 800);
+    } catch (error) {
+      console.error("Save failed", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const userInitials = useMemo(() => {
+    const name = profile.fullName || 'User';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }, [profile.fullName]);
 
   return (
     <div className="flex flex-col min-h-full">
       <PageHeader title={t('profile.title')} subtitle={t('profile.subtitle')} />
-
       <div className="max-w-3xl mx-auto w-full px-4 py-8 animate-in fade-in duration-500 pb-24">
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 p-8 shadow-sm space-y-8">
-          {/* Avatar Section */}
           <div className="flex flex-col items-center">
             <div className="relative group">
               <div className="w-32 h-32 rounded-[2rem] bg-blue-600 flex items-center justify-center text-white text-4xl font-black shadow-xl overflow-hidden">
-                {profile.avatarUrl ? (
-                  <img src={profile.avatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                ) : (
-                  profile.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'JD'
-                )}
+                {userInitials}
               </div>
               <button className="absolute -bottom-2 -right-2 p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-lg text-blue-600 hover:scale-110 transition-transform">
                 <Camera size={20} />
@@ -83,7 +67,6 @@ const Profile: React.FC = () => {
             </div>
             <p className="mt-4 text-xs font-black text-gray-400 uppercase tracking-widest">{t('profile.publicProfile')}</p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{t('profile.fullName')}</label>
@@ -93,11 +76,10 @@ const Profile: React.FC = () => {
                   type="text"
                   value={profile.fullName}
                   onChange={e => setProfile({...profile, fullName: e.target.value})}
-                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-sm"
+                  className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-slate-950 border border-transparent rounded-2xl focus:outline-none focus:ring-0 font-bold text-sm"
                 />
               </div>
             </div>
-
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{t('profile.username')}</label>
               <div className="relative">
@@ -110,14 +92,24 @@ const Profile: React.FC = () => {
                 />
               </div>
             </div>
-
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{t('auth.email')}</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="w-full h-12 pl-12 pr-4 bg-gray-100 dark:bg-slate-900 border border-transparent rounded-2xl text-slate-500 font-bold text-sm cursor-not-allowed"
+                />
+              </div>
+            </div>
             <div className="space-y-2 md:col-span-2">
               <div className="flex justify-between items-center mb-1">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
                   {t('profile.phone')} {!profile.phone && `(${t('profile.optional')})`}
                 </label>
               </div>
-              
               {profile.phone ? (
                 <div className="relative">
                   <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -136,7 +128,6 @@ const Profile: React.FC = () => {
                   >
                     <Smartphone size={16} /> {t('profile.addPhone')}
                   </button>
-                  
                   {showPhoneInfo && (
                     <div className="p-4 bg-gray-50 dark:bg-slate-950 rounded-2xl flex gap-3 animate-in slide-in-from-top-2 duration-300">
                       <Info className="text-blue-500 shrink-0" size={18} />
@@ -149,7 +140,6 @@ const Profile: React.FC = () => {
               )}
             </div>
           </div>
-
           <button
             onClick={handleSave}
             disabled={isSaving}

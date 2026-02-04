@@ -91,6 +91,8 @@ export interface AppUser {
   email: string | null;
   displayName: string | null;
   emailVerified: boolean;
+  role?: 'admin' | 'user';
+  sellerStatus?: 'none' | 'pending' | 'approved' | 'rejected';
 }
 
 export interface AppState {
@@ -103,8 +105,8 @@ export interface AppState {
   setUnreadNotifications: (count: number) => void;
   isLoggedIn: boolean;
   user: AppUser | null;
-  login: (email: string, pass: string) => Promise<void>;
-  register: (email: string, pass: string, fullName: string) => Promise<void>;
+  login: (email: string, pass: string, rememberMe?: boolean) => Promise<void>;
+  register: (email: string, pass: string, fullName: string, rememberMe?: boolean) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
   refreshUser: () => Promise<void>;

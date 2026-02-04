@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
@@ -11,7 +10,7 @@ const Dashboard: React.FC = () => {
   const kpis = [
     { label: t.totalSales, value: "$12,450", trend: 12.5, icon: BarChart3, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
     { label: t.onHoldFunds, value: "$3,240", trend: 2.1, icon: ShieldCheck, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
-    { label: t.pendingPayouts, value: "$1,120", trend: 8.4, icon: ShoppingCart, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+    { label: t.orders, value: "24", trend: 8.4, icon: ShoppingCart, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
     { label: t.disputedOrders, value: "2", trend: -50, icon: AlertCircle, color: "text-rose-600", bg: "bg-rose-50 dark:bg-rose-900/20" },
   ];
 
@@ -23,7 +22,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 md:space-y-8 max-w-7xl mx-auto">
-      {/* KPI Grid - Scales 2 to 4 columns */}
+      {/* KPI Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {kpis.map((kpi, idx) => (
           <div key={idx} className="p-4 sm:p-5 md:p-7 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 transition-all hover:shadow-md">

@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { Shield, Bell, Eye, Download, LogOut, Lock, Globe, Moon, Sun, Monitor, ChevronRight as ChevronIcon } from 'lucide-react';
 import { Language, Theme } from '../types';
 import PageHeader from '../components/ui/PageHeader';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
-// Fix: Moved Section and Toggle components outside of the main Settings component to avoid TypeScript JSX children inference errors.
+// Moved Section and Toggle components outside of the main Settings component to avoid TypeScript JSX children inference errors.
 interface SectionProps {
   title: string;
   icon: any;
@@ -47,7 +47,8 @@ const Toggle: React.FC<ToggleProps> = ({ label, desc, checked, onChange }) => (
 );
 
 const Settings: React.FC = () => {
-  const { language, setLanguage, theme, toggleTheme, t } = useApp();
+  const { language, setLanguage, theme, toggleTheme, logout } = useApp();
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [settings, setSettings] = useState({
     notifications: {
       email: true,
@@ -84,14 +85,20 @@ const Settings: React.FC = () => {
 
       <div className="max-w-3xl mx-auto w-full px-4 py-8 animate-in fade-in duration-500 space-y-12 pb-24">
         <Section title="Security" icon={Lock}>
-          <div className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl cursor-pointer">
+          <div 
+            onClick={() => setIsPasswordModalOpen(true)}
+            className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl cursor-pointer"
+          >
             <div>
               <p className="text-sm font-bold text-slate-900 dark:text-white">Change Password</p>
               <p className="text-[10px] text-gray-400 font-medium">Last changed 3 months ago</p>
             </div>
             <ChevronIcon size={18} className="text-slate-400" />
           </div>
-          <div className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl cursor-pointer text-rose-500">
+          <div 
+            onClick={() => logout()}
+            className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors rounded-2xl cursor-pointer text-rose-500"
+          >
             <p className="text-sm font-bold">Sign out from all devices</p>
             <LogOut size={18} />
           </div>
@@ -169,6 +176,10 @@ const Settings: React.FC = () => {
           </div>
         </Section>
       </div>
+
+      {isPasswordModalOpen && (
+        <ChangePasswordModal onClose={() => setIsPasswordModalOpen(false)} />
+      )}
     </div>
   );
 };

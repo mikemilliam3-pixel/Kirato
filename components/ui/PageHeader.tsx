@@ -1,4 +1,3 @@
-
 import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
@@ -19,8 +18,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, onBack, rightS
     if (onBack) {
       onBack();
     } else {
-      // Logic: if history exists go back, otherwise go home
-      // In a real app we might check window.history.length, but usually navigate(-1) works well
       navigate(-1);
     }
   };
@@ -35,12 +32,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, onBack, rightS
         >
           <ChevronLeft size={24} />
         </button>
-        <div className="flex flex-col truncate">
-          <h1 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight truncate leading-none">
+        <div className="flex flex-col min-w-0 truncate">
+          <h1 className="text-sm sm:text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight truncate leading-none">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 truncate">
+            <p className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 truncate">
               {subtitle}
             </p>
           )}
@@ -48,7 +45,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, onBack, rightS
       </div>
 
       {rightSlot && (
-        <div className="flex items-center gap-2 ml-4 shrink-0">
+        <div className="flex items-center gap-2 ml-2 shrink-0">
           {rightSlot}
         </div>
       )}

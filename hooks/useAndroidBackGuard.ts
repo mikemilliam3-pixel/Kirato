@@ -19,15 +19,34 @@ export const useAndroidBackGuard = () => {
   // 1. Synchronize Telegram Native BackButton UI
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
-    if (!tg) return;
+    const bb = tg?.BackButton;
 
-    const backButton = tg.BackButton;
+    /**
+     * Strict Feature Detection Guard:
+     * We verify that the BackButton object exists and all required methods 
+     * are actual functions before calling them. This prevents the 
+     * "[Telegram.WebApp] BackButton is not supported in version 6.0" warning.
+     */
+    const canUseBackButton = 
+      bb && 
+      typeof bb.show === 'function' && 
+      typeof bb.hide === 'function' && 
+      typeof bb.onClick === 'function' && 
+      typeof bb.offClick === 'function';
+
     const isRoot = isRootPage(location.pathname);
 
-    if (isRoot) {
-      backButton.hide();
-    } else {
-      backButton.show();
+    // Sync visibility only if supported
+    if (canUseBackButton) {
+      try {
+        if (isRoot) {
+          bb.hide();
+        } else {
+          bb.show();
+        }
+      } catch (err) {
+        // Silent catch for potential SDK internal errors
+      }
     }
 
     const handleTgBackClick = () => {
@@ -37,13 +56,25 @@ export const useAndroidBackGuard = () => {
       window.history.pushState({ isGuard: true }, '');
     };
 
-    backButton.onClick(handleTgBackClick);
+    // Attach listener only if supported
+    if (canUseBackButton) {
+      try {
+        bb.onClick(handleTgBackClick);
+      } catch (err) {}
+    }
+
     return () => {
-      backButton.offClick(handleTgBackClick);
+      // Safe cleanup guarded by feature detection
+      if (canUseBackButton) {
+        try {
+          bb.offClick(handleTgBackClick);
+        } catch (err) {}
+      }
     };
   }, [location.pathname, navigate, isRootPage]);
 
   // 2. Intercept Hardware Back Button (Popstate)
+  // This logic must run independently of Telegram BackButton support
   useEffect(() => {
     // Push the dummy state exactly once on mount to "catch" the hardware back gesture
     if (!hasPushedInitialGuard.current) {

@@ -18,19 +18,19 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ iconName, color, path, translat
   return (
     <Link 
       to={path} 
-      className="flex flex-col rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 active:scale-95 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 group h-full relative"
+      className="flex flex-col rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 active:scale-95 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 group h-full relative"
     >
       <div 
-        className="h-20 sm:h-36 md:h-44 flex items-center justify-center transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
+        className="h-24 sm:h-36 md:h-44 flex items-center justify-center transition-all duration-700 group-hover:scale-105 group-hover:brightness-110 shrink-0"
         style={{ backgroundColor: color }}
       >
-        <Icon className="w-7 h-7 sm:w-12 sm:h-12 md:w-14 md:h-14 text-white drop-shadow-lg transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110" />
+        <Icon className="w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14 text-white drop-shadow-lg transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110" />
       </div>
-      <div className="p-2.5 sm:p-6 md:p-8 flex flex-col items-center text-center flex-1 justify-center relative bg-white dark:bg-slate-900">
-        <h3 className="font-black text-[13px] sm:text-base md:text-lg mb-0.5 sm:mb-2 line-clamp-1 uppercase tracking-tight" style={{ color: color }}>
+      <div className="p-3 sm:p-6 md:p-8 flex flex-col items-center text-center flex-1 justify-center relative bg-white dark:bg-slate-900 min-w-0">
+        <h3 className="font-black text-[10px] sm:text-base md:text-lg mb-0.5 sm:mb-2 truncate w-full uppercase tracking-tight" style={{ color: color }}>
           {t(`modules.${translationKey}.title`)}
         </h3>
-        <p className="text-[9px] sm:text-[10px] md:text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-tight sm:leading-relaxed">
+        <p className="text-[7px] sm:text-[10px] md:text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-tight sm:leading-relaxed line-clamp-1">
           {t(`modules.${translationKey}.subtitle`)}
         </p>
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
@@ -17,7 +16,7 @@ interface ScheduledPost {
   status: 'pending' | 'sent';
 }
 
-const DEFAULT_PLATFORM_BOT = "kirato_market_bot";
+const DEFAULT_PLATFORM_BOT = "kiratoai_bot";
 
 const ChannelPosting: React.FC = () => {
   const { language } = useApp();

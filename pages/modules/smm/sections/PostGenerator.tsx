@@ -9,8 +9,10 @@ import {
   Download, AlertCircle,
   Info, ChevronDown, ChevronUp, Instagram, 
   Send, Smartphone, Tag,
-  Upload, X
+  Upload, X, Check
 } from 'lucide-react';
+import { db } from '../../../../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 type GenMode = 'post' | 'image' | 't2v' | 'i2v';
 type JobStatus = 'queued' | 'running' | 'done' | 'failed';
@@ -26,14 +28,14 @@ interface GenResult {
 }
 
 const PostGenerator: React.FC = () => {
-  const { language } = useApp();
+  const { language, user } = useApp();
   const t = smmTranslations[language].generator;
   
   const [mode, setMode] = useState<GenMode>('post');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GenResult[]>([]);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   
-  // Post Mode Specific State
   const [platform, setPlatform] = useState('Telegram');
   const [postType, setPostType] = useState('promo');
   const [showDetails, setShowDetails] = useState(false);
@@ -46,21 +48,17 @@ const PostGenerator: React.FC = () => {
   const [hashtagsEnabled, setHashtagsEnabled] = useState('auto');
   const [ctaType, setCtaType] = useState('buy');
 
-  // Shared Media State
   const [aspect, setAspect] = useState('1:1');
   const [quality, setQuality] = useState('standard');
   const [resolution, setResolution] = useState('720p');
   const [duration, setDuration] = useState('4s');
   const [prompt, setPrompt] = useState('');
-  const [negativePrompt, setNegativePrompt] = useState('');
   
-  // Image to Video Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Status polling for active jobs
   useEffect(() => {
     const timer = setInterval(async () => {
       const activeJobs = results.filter(r => r.status === 'queued' || r.status === 'running');
@@ -84,6 +82,25 @@ const PostGenerator: React.FC = () => {
     return () => clearInterval(timer);
   }, [results]);
 
+  const handleSaveToLibrary = async (res: GenResult) => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, "smm_assets"), {
+        ownerId: user.uid,
+        title: res.content ? `${res.content.substring(0, 20)}...` : `Generated ${res.type}`,
+        type: res.type === 'text' ? 'post' : res.type,
+        content: res.content || '',
+        url: res.url || '',
+        tags: [platform, mode, res.type],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      setSavedIds(prev => new Set(prev).add(res.id));
+    } catch (e) {
+      console.error("Save to library failed", e);
+    }
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     validateAndSetFile(file);
@@ -92,18 +109,15 @@ const PostGenerator: React.FC = () => {
   const validateAndSetFile = (file?: File) => {
     setUploadError(null);
     if (!file) return;
-
     const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       setUploadError('Invalid type. Use PNG, JPG or WEBP.');
       return;
     }
-
     if (file.size > 20 * 1024 * 1024) {
       setUploadError('File too large. Max 20MB.');
       return;
     }
-
     setSelectedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -162,7 +176,6 @@ const PostGenerator: React.FC = () => {
           const tempUrl = filePreview || '';
           job = await mediaService.createImageToVideoJob(tempUrl, prompt, aspect, quality, resolution, duration);
         }
-
         if (job) {
           const newResult: GenResult = {
             id: job.id,
@@ -190,7 +203,7 @@ const PostGenerator: React.FC = () => {
         <select 
           value={aspect}
           onChange={(e) => setAspect(e.target.value)}
-          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
         >
           {['1:1', '4:5', '9:16', '16:9', '3:2', '2:3'].map(a => <option key={a} value={a}>{a}</option>)}
         </select>
@@ -202,7 +215,7 @@ const PostGenerator: React.FC = () => {
         <select 
           value={quality}
           onChange={(e) => setQuality(e.target.value)}
-          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+          className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
         >
           {mode === 'image' && <option value="draft">{t.qualityLevels.draft}</option>}
           <option value="standard">{t.qualityLevels.standard}</option>
@@ -218,7 +231,7 @@ const PostGenerator: React.FC = () => {
             <select 
               value={resolution}
               onChange={(e) => setResolution(e.target.value)}
-              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
             >
               <option value="720p">720p</option>
               <option value="1080p">1080p</option>
@@ -231,7 +244,7 @@ const PostGenerator: React.FC = () => {
             <select 
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
             >
               <option value="4s">4s</option>
               <option value="6s">6s</option>
@@ -244,10 +257,9 @@ const PostGenerator: React.FC = () => {
   );
 
   const renderPostGenerator = () => (
-    <div className="space-y-6 md:space-y-8">
-      {/* Explainer Header - Responsive Padding */}
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
       <div className="p-5 sm:p-7 md:p-8 bg-purple-50 dark:bg-purple-900/10 rounded-[32px] border border-purple-100 dark:border-purple-800/50">
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shrink-0">
             <Info size={24} />
           </div>
@@ -256,17 +268,9 @@ const PostGenerator: React.FC = () => {
             <p className="text-[10px] sm:text-[11px] md:text-xs font-bold text-purple-700/70 dark:text-purple-300/60 line-clamp-1 sm:line-clamp-none">{t.postExplainer.subtitle}</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-          {[t.postExplainer.bullet1, t.postExplainer.bullet2, t.postExplainer.bullet3].map((b, i) => (
-            <div key={i} className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-white/50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-white/50 dark:border-transparent">
-              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full shrink-0" /> {b}
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="p-5 sm:p-8 md:p-10 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-6">
-        {/* Platform Selector */}
         <div className="space-y-3">
           <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.platform}</label>
           <div className="flex p-1 bg-gray-50 dark:bg-slate-900 rounded-2xl overflow-x-auto no-scrollbar">
@@ -288,14 +292,13 @@ const PostGenerator: React.FC = () => {
           </div>
         </div>
 
-        {/* Post Type & CTA Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.postType}</label>
             <select 
               value={postType}
               onChange={(e) => setPostType(e.target.value)}
-              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
             >
               {Object.keys(t.postTypes).map(k => <option key={k} value={k}>{(t.postTypes as any)[k]}</option>)}
             </select>
@@ -305,25 +308,23 @@ const PostGenerator: React.FC = () => {
             <select 
               value={ctaType}
               onChange={(e) => setCtaType(e.target.value)}
-              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:ring-2 focus:ring-purple-500 font-bold"
+              className="w-full h-12 sm:h-14 px-4 bg-gray-50 dark:bg-slate-900 rounded-2xl text-sm border-none focus:outline-none focus:ring-0 font-bold"
             >
               {Object.keys(t.ctas).map(k => <option key={k} value={k}>{(t.ctas as any)[k]}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Main Topic TextArea */}
         <div className="space-y-2">
           <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.promptLabel}</label>
           <textarea 
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[24px] text-sm md:text-base border-none focus:ring-2 focus:ring-purple-500 min-h-[120px] sm:min-h-[140px] font-medium leading-relaxed"
+            className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[24px] text-sm md:text-base border-none focus:outline-none focus:ring-0 min-h-[120px] sm:min-h-[140px] font-medium leading-relaxed"
             placeholder={t.promptHelper}
           />
         </div>
 
-        {/* Details Section */}
         <div className="space-y-4 border-t border-gray-100 dark:border-slate-700/50 pt-6">
           <button 
             onClick={() => setShowDetails(!showDetails)}
@@ -339,53 +340,23 @@ const PostGenerator: React.FC = () => {
                 <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.price}</label>
                 <div className="relative">
                   <span className="absolute left-3 top-[13px] text-gray-400 text-xs font-bold">$</span>
-                  <input type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full h-11 pl-7 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="100" />
+                  <input type="text" value={price} onChange={e => setPrice(e.target.value)} className="w-full h-11 pl-7 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:outline-none focus:ring-0 font-bold" placeholder="100" />
                 </div>
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.discount}</label>
-                <input type="text" value={discount} onChange={e => setDiscount(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="20%" />
+                <input type="text" value={discount} onChange={e => setDiscount(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:outline-none focus:ring-0 font-bold" placeholder="20%" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.link}</label>
-                <input type="text" value={link} onChange={e => setLink(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="shop.com" />
+                <input type="text" value={link} onChange={e => setLink(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:outline-none focus:ring-0 font-bold" placeholder="shop.com" />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.brand}</label>
-                <input type="text" value={brand} onChange={e => setBrand(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold" placeholder="Brand" />
+                <input type="text" value={brand} onChange={e => setBrand(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none focus:outline-none focus:ring-0 font-bold" placeholder="Brand" />
               </div>
             </div>
           )}
-        </div>
-
-        {/* Output Settings Grid */}
-        <div className="space-y-4 border-t border-gray-100 dark:border-slate-700/50 pt-6">
-           <h5 className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.outputSettings}</h5>
-           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-             <div className="space-y-2">
-               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.variantCount}</label>
-               <select value={variantCount} onChange={e => setVariantCount(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
-                 <option value="3">3 Variants</option>
-                 <option value="5">5 Variants</option>
-               </select>
-             </div>
-             <div className="space-y-2">
-               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.length}</label>
-               <select value={length} onChange={e => setLength(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
-                 <option value="short">{t.lengths.short}</option>
-                 <option value="medium">{t.lengths.medium}</option>
-                 <option value="long">{t.lengths.long}</option>
-               </select>
-             </div>
-             <div className="space-y-2">
-               <label className="text-[9px] font-black text-gray-400 uppercase ml-1 tracking-widest">{t.hashtags}</label>
-               <select value={hashtagsEnabled} onChange={e => setHashtagsEnabled(e.target.value)} className="w-full h-11 px-4 bg-gray-50 dark:bg-slate-900 rounded-xl text-xs border-none font-bold">
-                 <option value="off">Off</option>
-                 <option value="on">On</option>
-                 <option value="auto">Auto</option>
-               </select>
-             </div>
-           </div>
         </div>
 
         <button 
@@ -402,8 +373,7 @@ const PostGenerator: React.FC = () => {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-24 max-w-7xl mx-auto">
-      {/* Mode Switcher - Responsive width */}
-      <div className="max-w-3xl mx-auto flex p-1.5 bg-white dark:bg-slate-800 rounded-[28px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-x-auto no-scrollbar">
+      <div className="max-w-3xl mx-auto flex p-1.5 bg-white dark:bg-slate-800 rounded-[28px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-x-auto no-scrollbar animate-in slide-in-from-top-4 duration-500">
         {[
           { id: 'post', icon: FileText, label: t.modes.post },
           { id: 'image', icon: ImageIcon, label: t.modes.image },
@@ -426,11 +396,10 @@ const PostGenerator: React.FC = () => {
       </div>
 
       {mode === 'post' ? renderPostGenerator() : (
-        <div className="p-5 sm:p-8 md:p-10 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-6">
+        <div className="p-5 sm:p-8 md:p-10 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] shadow-sm border border-gray-100 dark:border-slate-700 space-y-6 animate-in fade-in duration-500">
           {mode === 'i2v' && (
             <div className="space-y-3">
               <label className="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Source Image</label>
-              
               {!filePreview ? (
                 <div 
                   onDragOver={(e) => e.preventDefault()}
@@ -448,7 +417,7 @@ const PostGenerator: React.FC = () => {
                   <p className="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-widest">PNG, JPG • Max 20MB</p>
                 </div>
               ) : (
-                <div className="relative p-3 sm:p-4 bg-gray-50 dark:bg-slate-900 rounded-[32px] border border-gray-200 dark:border-slate-700">
+                <div className="relative p-3 sm:p-4 bg-gray-50 dark:bg-slate-900 rounded-[32px] border border-gray-100 dark:border-slate-700">
                   <div className="flex items-center gap-4 sm:gap-5">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-white dark:border-slate-800 shrink-0 shadow-lg">
                       <img src={filePreview} alt="Preview" className="w-full h-full object-cover" />
@@ -475,13 +444,11 @@ const PostGenerator: React.FC = () => {
             <textarea 
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[28px] text-sm md:text-base border-none focus:ring-2 focus:ring-purple-500 min-h-[100px] sm:min-h-[120px] leading-relaxed font-medium"
+              className="w-full p-4 sm:p-5 bg-gray-50 dark:bg-slate-900 rounded-[28px] text-sm md:text-base border-none focus:outline-none focus:ring-0 min-h-[100px] sm:min-h-[120px] leading-relaxed font-medium"
               placeholder="Describe what you want to see in detail..."
             />
           </div>
-
           {renderSharedControls()}
-
           <button 
             onClick={handleGenerate}
             disabled={loading || (mode === 'i2v' && !selectedFile) || !prompt}
@@ -493,16 +460,14 @@ const PostGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Results Section - Desktop Optimized Grid */}
       <div className="space-y-6">
         <h3 className="font-black text-sm sm:text-base md:text-lg px-2 flex items-center gap-3 tracking-tight">
           {t.variants}
           {results.length > 0 && <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full text-xs font-black text-purple-600">{results.length}</span>}
         </h3>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map((res) => (
-            <div key={res.id} className="p-5 sm:p-6 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col group hover:shadow-xl transition-all h-full">
+            <div key={res.id} className="p-5 sm:p-6 bg-white dark:bg-slate-800 rounded-[32px] sm:rounded-[40px] border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col group hover:shadow-xl transition-all h-full animate-in slide-in-from-bottom-4">
               <div className="flex justify-between items-center mb-5">
                 {res.platform && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-900 rounded-xl text-[9px] font-black uppercase tracking-widest text-purple-600">
@@ -512,13 +477,11 @@ const PostGenerator: React.FC = () => {
                 )}
                 {res.content && <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{res.content.length} {t.charCount}</span>}
               </div>
-
               {res.type === 'text' && (
                 <p className="text-xs sm:text-sm md:text-base text-slate-700 dark:text-slate-200 leading-relaxed mb-6 flex-1 italic bg-gray-50 dark:bg-slate-900/30 p-4 sm:p-5 rounded-[24px] border border-transparent dark:border-slate-700/50">
                   {res.content}
                 </p>
               )}
-
               {res.status !== 'done' ? (
                 <div className="aspect-square bg-gray-50 dark:bg-slate-900 rounded-[32px] flex flex-col items-center justify-center gap-4 border border-gray-100 dark:border-slate-700">
                   {res.status === 'failed' ? (
@@ -540,13 +503,21 @@ const PostGenerator: React.FC = () => {
                   )}
                 </>
               )}
-
               <div className="flex items-center gap-2 sm:gap-3 border-t border-gray-50 dark:border-slate-700/50 pt-5 sm:pt-6 mt-auto">
                 <button className="flex-1 h-12 bg-gray-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all active:scale-95 text-slate-600 dark:text-slate-300">
                   <Copy size={16} className="text-purple-600" /> {t.copy}
                 </button>
-                <button className="flex-1 h-12 bg-gray-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all active:scale-95 text-slate-600 dark:text-slate-300">
-                  <FolderPlus size={16} className="text-purple-600" /> {t.save}
+                <button 
+                  onClick={() => handleSaveToLibrary(res)}
+                  disabled={savedIds.has(res.id)}
+                  className={`flex-1 h-12 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+                    savedIds.has(res.id) 
+                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' 
+                    : 'bg-gray-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                  }`}
+                >
+                  {savedIds.has(res.id) ? <Check size={16} /> : <FolderPlus size={16} className="text-purple-600" />} 
+                  {savedIds.has(res.id) ? "Saved" : t.save}
                 </button>
               </div>
             </div>

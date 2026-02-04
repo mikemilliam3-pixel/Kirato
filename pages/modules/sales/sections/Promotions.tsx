@@ -1,12 +1,18 @@
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
 import { Tag, Plus, MoreHorizontal, CheckCircle2, XCircle, Calendar } from 'lucide-react';
 
 const Promotions: React.FC = () => {
   const { language } = useApp();
-  const t = salesTranslations[language].promotions;
+  
+  const t = useMemo(() => {
+    const tBase = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
+    return {
+      active: tBase?.promotions?.active || "Active",
+      expired: tBase?.promotions?.expired || "Expired"
+    };
+  }, [language]);
 
   const promos = [
     { code: 'SUMMER20', type: 'percentage', value: 20, usage: '124/500', active: true, expires: 'Jun 30' },
@@ -15,10 +21,10 @@ const Promotions: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <h3 className="font-extrabold text-lg">Marketing</h3>
-        <button className="p-3 bg-rose-600 text-white rounded-xl shadow-lg active:scale-95 transition-all">
+        <button className="p-3 bg-rose-600 text-white rounded-xl shadow-lg active:scale-95 transition-all focus:outline-none focus:ring-0">
           <Plus size={20} />
         </button>
       </div>

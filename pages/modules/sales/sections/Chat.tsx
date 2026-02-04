@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
@@ -102,7 +101,7 @@ const Chat: React.FC = () => {
         {/* Active Chat Header */}
         <div className="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setActiveConv(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl">
+            <button onClick={() => setActiveConv(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl focus:outline-none focus:ring-0">
               <ArrowLeft size={20} />
             </button>
             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center font-black text-blue-600">
@@ -120,7 +119,7 @@ const Chat: React.FC = () => {
           <div className="flex items-center gap-2">
              <button 
                onClick={returnToAi}
-               className="p-2.5 bg-gray-50 dark:bg-slate-900 text-slate-500 rounded-xl hover:text-purple-600 transition-colors"
+               className="p-2.5 bg-gray-50 dark:bg-slate-900 text-slate-500 rounded-xl hover:text-purple-600 transition-colors focus:outline-none focus:ring-0"
                title={t.returnToAi}
              >
                <BrainCircuit size={20} />
@@ -155,12 +154,12 @@ const Chat: React.FC = () => {
             <button 
               onClick={suggestReply}
               disabled={isSuggesting}
-              className="flex-1 h-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+              className="flex-1 h-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 focus:outline-none focus:ring-0"
             >
               {isSuggesting ? <RefreshCw size={14} className="animate-spin"/> : <Sparkles size={14}/>}
               {t.suggestReply}
             </button>
-            <button className="h-10 px-4 bg-gray-50 dark:bg-slate-800 text-slate-400 rounded-xl transition-all">
+            <button className="h-10 px-4 bg-gray-50 dark:bg-slate-800 text-slate-400 rounded-xl transition-all focus:outline-none focus:ring-0">
               <Phone size={16} />
             </button>
           </div>
@@ -171,11 +170,11 @@ const Chat: React.FC = () => {
               onChange={e => setInputText(e.target.value)}
               onKeyPress={e => e.key === 'Enter' && handleSend()}
               placeholder={t.type} 
-              className="flex-1 bg-transparent border-none text-xs focus:ring-0 px-2 font-bold" 
+              className="flex-1 bg-transparent border-none text-xs focus:ring-0 focus:outline-none px-2 font-bold" 
             />
             <button 
               onClick={handleSend}
-              className="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center shadow-md active:scale-90 transition-all shrink-0"
+              className="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center shadow-md active:scale-90 transition-all shrink-0 focus:outline-none focus:ring-0"
             >
               <Send size={18} />
             </button>

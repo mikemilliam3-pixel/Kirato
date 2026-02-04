@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../../../context/AppContext';
 import { salesTranslations } from '../i18n';
-// Fix: Added missing Store icon import from lucide-react
 import { 
   ShieldAlert, ShieldCheck, Clock, XCircle, Search, 
   ChevronRight, User, Building, FileText, 
@@ -14,45 +12,55 @@ import { db } from '../../../../lib/firebase';
 import { collection, query, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 const SupportInbox: React.FC = () => {
-  const { language } = useApp();
+  const { language, user } = useApp();
   const navigate = useNavigate();
   const t = salesTranslations[language as keyof typeof salesTranslations] || salesTranslations['EN'];
   const ts = t.supportInbox;
 
-  const [supportMode, setSupportMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [sellers, setSellers] = useState<any[]>([]);
   const [selectedSeller, setSelectedSeller] = useState<any | null>(null);
   const [filter, setFilter] = useState<VerificationStatus | 'all'>('pending');
   const [search, setSearch] = useState('');
   const [rejectNote, setRejectNote] = useState('');
 
-  useEffect(() => {
-    const mode = localStorage.getItem('kirato-support-mode') === 'true' || localStorage.getItem('kirato-dev-mode') === 'true';
-    setSupportMode(mode);
-    if (!mode) {
-      setTimeout(() => navigate('/modules/sales/dashboard'), 2000);
-    }
-  }, [navigate]);
+  // Explicit check for admin role
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    if (supportMode) {
+    if (!isAdmin) {
+      const timer = setTimeout(() => {
+        if (!isAdmin) navigate('/modules/sales/dashboard');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAdmin, navigate]);
+
+  useEffect(() => {
+    if (isAdmin) {
       setLoading(true);
       const q = query(collection(db, "sellerApplications"));
       const unsub = onSnapshot(q, (snapshot) => {
         const apps = snapshot.docs.map(doc => ({ 
           id: doc.id, 
           ...doc.data(),
-          // Map fields for UI compatibility
-          shopName: (doc.data() as any).storeName || 'Unknown Shop',
+          shopName: (doc.data() as any).shopName || (doc.data() as any).storeName || 'Unknown Shop',
           verificationStatus: (doc.data() as any).status
         }));
         setSellers(apps);
         setLoading(false);
+        setError(null);
+      }, (err) => {
+        console.error("Support inbox listener error:", err);
+        setError("Permission denied. You must be an admin to view this.");
+        setLoading(false);
       });
       return unsub;
+    } else {
+      setLoading(false);
     }
-  }, [supportMode]);
+  }, [isAdmin]);
 
   const handleAction = async (status: 'approved' | 'rejected') => {
     if (!selectedSeller) return;
@@ -62,7 +70,6 @@ const SupportInbox: React.FC = () => {
       const appRef = doc(db, "sellerApplications", selectedSeller.id);
       const userRef = doc(db, "users", selectedSeller.id);
 
-      // Update both documents to grant/revoke dashboard access
       await updateDoc(appRef, {
         status: status,
         verifiedAt: status === 'approved' ? new Date().toISOString() : null,
@@ -88,7 +95,7 @@ const SupportInbox: React.FC = () => {
     return matchesFilter && matchesSearch;
   });
 
-  if (!supportMode) {
+  if (!isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] p-8 text-center animate-in fade-in duration-500">
         <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-full flex items-center justify-center mb-6">
@@ -121,7 +128,7 @@ const SupportInbox: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                        <div className="space-y-1">
                           <p className="text-[10px] font-bold text-gray-400 uppercase">Shop Name</p>
-                          <p className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.storeName}</p>
+                          <p className="text-sm font-black text-slate-900 dark:text-white">{selectedSeller.shopName}</p>
                        </div>
                        <div className="space-y-1">
                           <p className="text-[10px] font-bold text-gray-400 uppercase">Category</p>
@@ -134,7 +141,7 @@ const SupportInbox: React.FC = () => {
                        <div className="space-y-1">
                           <p className="text-[10px] font-bold text-gray-400 uppercase">Submitted At</p>
                           <p className="text-sm font-black text-slate-900 dark:text-white">
-                            {selectedSeller.submittedAt?.toDate ? selectedSeller.submittedAt.toDate().toLocaleString() : 'Just now'}
+                            {selectedSeller.createdAt?.toDate ? selectedSeller.createdAt.toDate().toLocaleString() : 'Just now'}
                           </p>
                        </div>
                     </div>
@@ -211,6 +218,11 @@ const SupportInbox: React.FC = () => {
              <div className="py-20 flex flex-col items-center justify-center">
                 <RefreshCw size={32} className="text-rose-500 animate-spin" />
              </div>
+           ) : error ? (
+             <div className="py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-[32px] border border-rose-100 dark:border-rose-900/30">
+                <ShieldAlert size={48} className="text-rose-500 mb-4" />
+                <p className="text-xs font-black uppercase tracking-widest text-rose-600">{error}</p>
+             </div>
            ) : filteredSellers.length === 0 ? (
              <div className="py-20 flex flex-col items-center justify-center bg-white dark:bg-slate-800 rounded-[32px] border border-dashed border-gray-200 dark:border-slate-700 opacity-40">
                 <Building size={48} className="text-gray-300 mb-4" />
@@ -241,7 +253,7 @@ const SupportInbox: React.FC = () => {
                      <div className="pt-4 border-t border-gray-50 dark:border-slate-700 flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400">
                            <Clock size={12} />
-                           {seller.submittedAt?.toDate ? seller.submittedAt.toDate().toLocaleDateString() : 'N/A'}
+                           {seller.createdAt?.toDate ? seller.createdAt.toDate().toLocaleDateString() : 'N/A'}
                         </div>
                         <ChevronRight size={18} className="text-gray-300 group-hover:text-rose-600 transition-all" />
                      </div>

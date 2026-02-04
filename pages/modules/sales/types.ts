@@ -1,6 +1,6 @@
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'disputed' | 'refunded';
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
+export type PaymentStatus = 'unpaid' | 'paid' | 'refunded' | 'held' | 'released';
 export type ProductStatus = 'active' | 'draft' | 'out_of_stock' | 'pending' | 'archived';
 export type PromoType = 'percentage' | 'fixed_amount' | 'free_shipping';
 export type ProductVisibility = 'public' | 'private' | 'unlisted';
@@ -111,6 +111,10 @@ export interface Order {
   paymentStatus: PaymentStatus;
   createdAt: string;
   address?: string;
+  // Trust System Fields
+  deliveryCode?: string;
+  deliveryConfirmed?: boolean;
+  deliveryConfirmedAt?: string;
   // Marketplace & Escrow fields
   payoutStatus: PayoutStatus;
   payoutEligibleAt?: string;
